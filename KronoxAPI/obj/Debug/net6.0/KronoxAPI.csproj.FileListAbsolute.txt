@@ -1,0 +1,12 @@
+D:\Coding\tumbleRebuild\TumbleBackend\KronoxAPI\bin\Debug\net6.0\KronoxAPI.deps.json
+D:\Coding\tumbleRebuild\TumbleBackend\KronoxAPI\bin\Debug\net6.0\KronoxAPI.dll
+D:\Coding\tumbleRebuild\TumbleBackend\KronoxAPI\bin\Debug\net6.0\KronoxAPI.pdb
+D:\Coding\tumbleRebuild\TumbleBackend\KronoxAPI\obj\Debug\net6.0\KronoxAPI.csproj.AssemblyReference.cache
+D:\Coding\tumbleRebuild\TumbleBackend\KronoxAPI\obj\Debug\net6.0\KronoxAPI.GeneratedMSBuildEditorConfig.editorconfig
+D:\Coding\tumbleRebuild\TumbleBackend\KronoxAPI\obj\Debug\net6.0\KronoxAPI.AssemblyInfoInputs.cache
+D:\Coding\tumbleRebuild\TumbleBackend\KronoxAPI\obj\Debug\net6.0\KronoxAPI.AssemblyInfo.cs
+D:\Coding\tumbleRebuild\TumbleBackend\KronoxAPI\obj\Debug\net6.0\KronoxAPI.csproj.CoreCompileInputs.cache
+D:\Coding\tumbleRebuild\TumbleBackend\KronoxAPI\obj\Debug\net6.0\KronoxAPI.dll
+D:\Coding\tumbleRebuild\TumbleBackend\KronoxAPI\obj\Debug\net6.0\refint\KronoxAPI.dll
+D:\Coding\tumbleRebuild\TumbleBackend\KronoxAPI\obj\Debug\net6.0\KronoxAPI.pdb
+D:\Coding\tumbleRebuild\TumbleBackend\KronoxAPI\obj\Debug\net6.0\ref\KronoxAPI.dll
