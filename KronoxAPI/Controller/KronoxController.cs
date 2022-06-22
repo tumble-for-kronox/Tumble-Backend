@@ -35,7 +35,8 @@ namespace KronoxAPI.Controller
             string uri = $"https://{schoolUrl}/setup/jsp/SchemaICAL.ics?startDatum={parsedDate}&intervallTyp=m&intervallAntal=6&sprak=SV&sokMedAND=true&forklaringar=true&resurser={scheduleId}";
 
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
-            request.Headers.Add("cookies", "JSESSIONID=gIbUWlXsSu9tm12ogJNsOO1mxXBl0a-BNaxXIafW.hkapp35;");
+
+            if (sessionToken != null) request.Headers.Add("cookies", $"JSESSIONID={sessionToken};");
 
             var response = await client.SendAsync(request);
             response.EnsureSuccessStatusCode();
