@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using KronoxAPI.Controller;
+using KronoxAPI.Model.Users;
+using KronoxAPI.Model.Scheduling;
+
 
 namespace KronoxAPI.Model.Schools
 {
@@ -55,14 +59,20 @@ namespace KronoxAPI.Model.Schools
         /// <param name="id"></param>
         /// <param name="startDate"></param>
         /// <returns></returns>
-        public Scheduling.Schedule FetchSchedule(string id, DateTime? startDate)
+        public Schedule FetchSchedule(string id, DateTime? startDate)
         {
-            return new Scheduling.Schedule(new DateTime(), "ass", new List<Scheduling.Day>());
+            return new Schedule("ass", new List<Day>());
         }
 
-        public List<Scheduling.Programme> SearchProgrammes(string searchQuery)
+        public List<Programme> SearchProgrammes(string searchQuery)
         {
-            return new List<Scheduling.Programme>();
+            return new List<Programme>();
+        }
+
+        public User Login(string username, string password)
+        {
+            Response.LoginResponse loginResponse = KronoxPushController.Login(username, password, Url).Result;
+            return new User("name", "participatorID", "sessionToken", false);
         }
     }
 }

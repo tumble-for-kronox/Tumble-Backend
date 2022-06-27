@@ -13,25 +13,29 @@ namespace KronoxAPI.Model.Scheduling
     {
         private readonly string _name;
         private readonly string _id;
-        private readonly string _color;
 
         public string Name => _name;
 
         public string Id => _id;
-
-        public string Color => _color;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="name"></param>
         /// <param name="id"></param>
-        /// <param name="color"></param>
-        public Course(String name, String id, String color)
+        public Course(string name, string id)
         {
-            this._name = name;
-            this._id = id;
-            this._color = color;
+            _name = name;
+            _id = id;
+        }
+
+        /// <summary>
+        /// For use as default or in case a course is not found, to make sure nothing breaks.
+        /// </summary>
+        /// <returns><see cref="Course"/> wiht all values set as "N/A"</returns>
+        public static Course NotAvailable()
+        {
+            return new Course("N/A", "N/A");
         }
     }
 }

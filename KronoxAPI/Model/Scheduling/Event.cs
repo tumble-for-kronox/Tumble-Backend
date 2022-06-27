@@ -13,10 +13,10 @@ namespace KronoxAPI.Model.Scheduling
     {
         private readonly string _title;
         private readonly Course _course;
+        private readonly List<Teacher> _teachers;
         private readonly DateTime _timeStart;
         private readonly DateTime _timeEnd;
-        private readonly string _location;
-        private readonly string _signature;
+        private readonly List<Location> _locations;
 
         public string Title => _title;
 
@@ -26,27 +26,33 @@ namespace KronoxAPI.Model.Scheduling
 
         public DateTime TimeEnd => _timeEnd;
 
-        public string Location => _location;
+        public List<Location> Locations => _locations;
 
-        public string Signature => _signature;
+        public List<Teacher> Teachers => _teachers;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="title"></param>
         /// <param name="course"></param>
+        /// <param name="teachers"></param>
         /// <param name="timeStart"></param>
         /// <param name="timeEnd"></param>
-        /// <param name="location"></param>
-        /// <param name="signature"></param>
-        public Event(string title, Course course, DateTime timeStart, DateTime timeEnd, string location, string signature)
+        /// <param name="locations"></param>
+        public Event(string title, Course course, List<Teacher> teachers, DateTime timeStart, DateTime timeEnd, List<Location> locations)
         {
-            this._title = title;
-            this._course = course;
-            this._timeStart = timeStart;
-            this._timeEnd = timeEnd;
-            this._location = location;
-            this._signature = signature;
+            _title = title;
+            _course = course;
+            _timeStart = timeStart;
+            _timeEnd = timeEnd;
+            _locations = locations;
+            _teachers = teachers;
+        }
+
+        public override string? ToString()
+        {
+            return $"Course: {_course.Name}\nTitle: {_title}\nStarts: {_timeStart:yyyy-MM-dd HH:mm}" +
+                $"\nEnds: {_timeEnd:yyyy-MM-dd HH:mm}\nTeachers: [{String.Join(", ", _teachers)}]\nLocations: [{String.Join(", ", _locations)}]";
         }
     }
 }

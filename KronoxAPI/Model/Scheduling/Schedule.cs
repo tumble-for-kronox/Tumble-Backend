@@ -11,27 +11,24 @@ namespace KronoxAPI.Model.Scheduling
     /// </summary>
     public class Schedule
     {
-        private readonly DateTime _cachedAt;
         private readonly string _id;
         private readonly List<Day> _days;
 
-        public DateTime CachedAt => _cachedAt;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="days"></param>
+        /// <param name="teachers"></param>
+        public Schedule(string id, List<Day> days)
+        {
+            _id = id;
+            _days = days;
+        }
 
         public string Id => _id;
 
         public List<Day> Days => _days;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cachedAt"></param>
-        /// <param name="id"></param>
-        /// <param name="days"></param>
-        public Schedule(DateTime cachedAt, string id, List<Day> days)
-        {
-            this._cachedAt = cachedAt;
-            this._id = id;
-            this._days = days;
-        }
     }
 }
