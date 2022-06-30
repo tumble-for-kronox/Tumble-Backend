@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "z4i2yy3Se1/QMfa285zL+4GftaytvSfotTpcKIZygiUO/C+6HqjNo8CY/V1SyDVNSLvNFtmdW1fs33eHzaHVPw==",
+  "dgSpecHash": "77FOdwCL5iB/tTlp6qo2vP3P1AZGKgDgdcpl+HmQIAMouGcmW2uJwZB1Ierbi3nKBHeqBS8SsZCKWthh8Y84tg==",
   "success": true,
   "projectFilePath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\TestingConsole\\TestingConsole.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\workl\\.nuget\\packages\\htmlagilitypack\\1.11.43\\htmlagilitypack.1.11.43.nupkg.sha512"
+  ],
   "logs": []
 }

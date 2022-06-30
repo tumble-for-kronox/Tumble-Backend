@@ -12,28 +12,25 @@ namespace KronoxAPI.Model.Users
     public class User
     {
         private readonly string _name;
-        private readonly string _participatorId;
+        private readonly string _username;
         private string? _sessionToken;
-        private bool _loggedIn = false;
 
-        public User(string name, string participatorId, string? sessionToken, bool loggedIn)
+        public User(string name, string username, string? sessionToken)
         {
             _name = name;
-            _participatorId = participatorId;
+            _username = username;
             _sessionToken = sessionToken;
-            _loggedIn = loggedIn;
         }
 
-        public string? Name => _name;
-        public string? ParticipatorId => _participatorId;
+        public string Name => _name;
+        public string Username => _username;
         public string? SessionToken { get => _sessionToken; set => _sessionToken = value; }
-        public bool LoggedIn { get => _loggedIn; set => _loggedIn = value; }
 
         /// <summary>
-        /// Login the user, using <see cref="Username"/> and <see cref="Password"/>.
-        /// Updates <see cref="SessionToken"/>, <see cref="LoggedIn"/>, <see cref="Name"/>, and <see cref="ParticipatorId"/> from Kronox's information.
+        /// For use as default or in case a user is not found.
         /// </summary>
-
+        /// <returns><see cref="User"/> with all values set as "N/A".</returns>
+        public static User NotAvailable => new("N/A", "N/A", "N/A");
 
         /// <summary>
         /// Fetch a list of <see cref="UserEvent"/> from Kronox's database.
@@ -41,6 +38,11 @@ namespace KronoxAPI.Model.Users
         /// <returns>List of events connected to the User.</returns>
         public List<UserEvent> GetUserEvents()
         {
+            if (SessionToken == null)
+                throw new NullReferenceException("SessionToken was null when attempting to fetch user info. Make sure the user is logged in and that the sessionToken is not expired.");
+
+
+
             return new List<UserEvent>();
         }
     }

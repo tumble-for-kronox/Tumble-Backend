@@ -14,8 +14,8 @@ namespace KronoxAPI.Controller
     /// </summary>
     public static class KronoxFetchController
     {
-        static HttpClientHandler clientHandler = new HttpClientHandler();
-        static readonly HttpClient client = new HttpClient(clientHandler);
+        static readonly HttpClientHandler clientHandler = new();
+        static readonly HttpClient client = new(clientHandler);
 
         /// <summary>
         /// Fetch a schedule from Kronox's database, that starts at <paramref name="startDate"/> and goes 6 months forward.
@@ -29,16 +29,19 @@ namespace KronoxAPI.Controller
         /// <param name="sessionToken"></param>
         /// <param name="startDate"></param>
         /// <returns></returns>
-        public static async Task<string> GetSchedule(string scheduleId, string schoolUrl, LangEnum language, string? sessionToken, DateTime? startDate)
+        public static async Task<string> GetSchedule(string scheduleId, string schoolUrl, LangEnum? language, string? sessionToken, DateTime? startDate)
         {
             string parsedDate = startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : "idag";
-            string uri = $"https://{schoolUrl}/setup/jsp/SchemaXML.jsp?startDatum={parsedDate}&intervallTyp=m&intervallAntal=6&sprak={language.Value}&sokMedAND=true&forklaringar=true&resurser={scheduleId}";
+            LangEnum parsedLang = language == null ? LangEnum.Sv : language;
+
+            string uri = $"https://{schoolUrl}/setup/jsp/SchemaXML.jsp?startDatum={parsedDate}&intervallTyp=m&intervallAntal=6&sprak={parsedLang}&sokMedAND=true&forklaringar=true&resurser={scheduleId}";
 
             using var request = new HttpRequestMessage(HttpMethod.Get, uri);
             if (sessionToken != null) request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
 
             HttpResponseMessage response = await client.SendAsync(request);
             response.EnsureSuccessStatusCode();
+
             return await response.Content.ReadAsStringAsync();
         }
 

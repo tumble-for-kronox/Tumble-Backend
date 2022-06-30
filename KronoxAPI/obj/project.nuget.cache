@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "uoNSbJp80gdp5HoNBK5uEeCRwRru7GkQ/jUnI9rL4fBDOW3DDq5LgSy9zStoRgROGamzE9tCpZVU5YmU42jS3w==",
+  "dgSpecHash": "WC2eBvtnRxXLA5aDqbqDZYtGWCLVln7wvRs8KkrrSlyMgqkK30kUXfLc8geMlkvingzmFB5NbZkLjgwF/D8ZUw==",
   "success": true,
   "projectFilePath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\workl\\.nuget\\packages\\htmlagilitypack\\1.11.43\\htmlagilitypack.1.11.43.nupkg.sha512"
+  ],
   "logs": []
 }

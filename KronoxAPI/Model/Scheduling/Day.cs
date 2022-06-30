@@ -11,6 +11,7 @@ namespace KronoxAPI.Model.Scheduling
     /// </summary>
     public class Day
     {
+        private readonly string _id;
         private readonly string _name;
         private readonly DateOnly _date;
         private readonly List<Event> _events;
@@ -21,6 +22,8 @@ namespace KronoxAPI.Model.Scheduling
 
         public List<Event> Events => _events;
 
+        public string Id => _id;
+
         /// <summary>
         /// 
         /// </summary>
@@ -29,9 +32,10 @@ namespace KronoxAPI.Model.Scheduling
         /// <param name="events"></param>
         public Day(string name, DateOnly date, List<Event> events)
         {
-            this._name = name;
-            this._date = date;
-            this._events = events;
+            _id = Guid.NewGuid().ToString();
+            _name = name;
+            _date = date;
+            _events = events;
         }
     }
 }

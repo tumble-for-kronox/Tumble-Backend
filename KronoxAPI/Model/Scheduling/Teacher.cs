@@ -22,11 +22,8 @@ namespace KronoxAPI.Model.Scheduling
         /// <summary>
         /// For use as default or in case a teacher is not found, to make sure nothing breaks.
         /// </summary>
-        /// <returns><see cref="Teacher"/> wiht all values set as "N/A"</returns>
-        public static Teacher NotAvailable()
-        {
-            return new Teacher("N/A", "N/A", "N/A");
-        }
+        /// <returns><see cref="Teacher"/> with all values set as "N/A"</returns>
+        public static Teacher NotAvailable => new("N/A", "N/A", "N/A");
 
         public override string? ToString()
         {

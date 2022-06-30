@@ -11,7 +11,7 @@ namespace KronoxAPI.Controller
 {
     public static class KronoxPushController
     {
-        static HttpClientHandler clientHandler = new();
+        static readonly HttpClientHandler clientHandler = new();
         static readonly HttpClient client = new(clientHandler);
 
         /// <summary>

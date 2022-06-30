@@ -4,18 +4,15 @@ using System.Xml.Linq;
 using System.Xml;
 using KronoxAPI.Utilities;
 using KronoxAPI.Parser;
+using KronoxAPI.Model.Response;
+using KronoxAPI.Model.Users;
+using KronoxAPI.Model.Schools;
 
 // See https://aka.ms/new-console-template for more information
 
-//string htmlResult = KronoxPushController.Login("lasse_koordt_rosenkrans.poulsen0003@stud.hkr.se", "oUPJA4j@iocd$dp", "schema.hkr.se").Result.htmlResult;
-string xmlResult = KronoxFetchController.GetSchedule("p.TBSE2+2020+36+100+NML+en", "schema.hkr.se", LangEnum.En, null, null).Result;
-List<Event> events = ScheduleParser.ParseToEvents(xmlResult);
+School chosenSchool = SchoolFactory.Hkr();
+User user = chosenSchool.Login("lasse_koordt_rosenkrans.poulsen0003@stud.hkr.s", "bAFKfmX#ME%^R7u");
 
-//Console.WriteLine(xmlResult.ToString());
-
-foreach (Event e in events)
-{
-    Console.WriteLine(e.ToString() + "\n\n");
-}
-
-Console.WriteLine("COUNT: " + events.Count);
+Console.WriteLine(user.Name);
+Console.WriteLine(user.Username);
+Console.WriteLine(user.SessionToken);

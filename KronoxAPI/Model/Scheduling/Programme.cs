@@ -11,21 +11,32 @@ namespace KronoxAPI.Model.Scheduling
     /// </summary>
     public class Programme
     {
-        private readonly string _name;
+        private readonly string _title;
+        private readonly string _subtitle;
         private readonly string _id;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="title"></param>
+        /// <param name="subtitle"></param>
         /// <param name="id"></param>
-        public Programme(string name, string id)
+        public Programme(string title, string subtitle, string id)
         {
-            _name = name;
+            _title = title;
+            _subtitle = subtitle;
             _id = id;
         }
 
-        public string Name => _name;
+        /// <summary>
+        /// For use as default or in case a programme is not found.
+        /// </summary>
+        /// <returns><see cref="Programme"/> with all values set as "N/A"</returns>
+        public static Programme NotAvailable => new("N/A", "N/A", "N/A");
+
+        public string Title => _title;
+
+        public string Subtitle => _subtitle;
 
         public string Id => _id;
     }

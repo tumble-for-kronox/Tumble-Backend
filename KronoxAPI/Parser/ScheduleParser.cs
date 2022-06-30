@@ -9,25 +9,25 @@ using KronoxAPI.Model.Scheduling;
 
 namespace KronoxAPI.Parser
 {
+    /// <summary>
+    /// All parsers built for parsing Schedule data and their related functions. Parses Kronox schedule XML standards into different combinations of objects.
+    /// </summary>
     public static class ScheduleParser
     {
-        public static Schedule ParseToSchedule(string scheduleId, string scheduleXml)
+        /// <summary>
+        /// Parse entire scheduleXML (as per Kronox's standard XML layout) into <see cref="Event"/> Objects.
+        /// </summary>
+        /// <param name="scheduleXml"></param>
+        /// <returns><see cref="List{Event}"/> where one <see cref="Event"/> object is one event on the schedule.</returns>
+        public static List<Event> ParseToEvents(XDocument scheduleXml)
         {
-            XDocument xmlDoc = XDocument.Parse(scheduleXml);
+            Dictionary<string, Teacher> teachersDict = GetScheduleTeachers(scheduleXml);
+            Dictionary<string, Location> locationsDict = GetScheduleLocations(scheduleXml);
+            Dictionary<string, Course> coursesDict = GetScheduleCourses(scheduleXml);
 
-            return new Schedule(scheduleId, new List<Day>());
-        }
+            List<Event> events = new();
 
-        public static List<Event> ParseToEvents(string scheduleXml)
-        {
-            XDocument xmlDoc = XDocument.Parse(scheduleXml);
-            Dictionary<string, Teacher> teachersDict = GetScheduleTeachers(xmlDoc);
-            Dictionary<string, Location> locationsDict = GetScheduleLocations(xmlDoc);
-            Dictionary<string, Course> coursesDict = GetScheduleCourses(xmlDoc);
-
-            List<Event> events = new List<Event>();
-
-            foreach (XElement e in xmlDoc.Descendants("schemaPost"))
+            foreach (XElement e in scheduleXml.Descendants("schemaPost"))
             {
                 events.Add(XmlToEvent(e, teachersDict, locationsDict, coursesDict));
             }
@@ -35,10 +35,35 @@ namespace KronoxAPI.Parser
             return events;
         }
 
-        public static List<Day> ParseToDays(string scheduleXml)
+        /// <summary>
+        /// Parse entire scheduleXML (as per Kronox's standard XML layout) into <see cref="Day"/> Objects.
+        /// </summary>
+        /// <param name="scheduleXml"></param>
+        /// <returns>The <see cref="List{Day}"/> parsed from the XML file. Each Day corresponds to a date, if the date contains an event. Eventless dates are skipped.</returns>
+        public static List<Day> ParseToDays(XDocument scheduleXml)
         {
-            return new List<Day>();
+            Dictionary<string, Teacher> teachersDict = GetScheduleTeachers(scheduleXml);
+            Dictionary<string, Location> locationsDict = GetScheduleLocations(scheduleXml);
+            Dictionary<string, Course> coursesDict = GetScheduleCourses(scheduleXml);
+
+            List<Day> days = new();
+
+            foreach (XElement element in scheduleXml.Descendants("schemaPost"))
+            {
+                Event currentEvent = XmlToEvent(element, teachersDict, locationsDict, coursesDict);
+
+                if (days.Count == 0 || DateOnly.FromDateTime(currentEvent.TimeStart.Date) != days.Last().Date)
+                {
+                    days.Add(new Day(currentEvent.TimeStart.DayOfWeek.ToString(), DateOnly.FromDateTime(currentEvent.TimeStart.Date), new List<Event> { currentEvent }));
+                    continue;
+                }
+
+                days.Last().Events.Add(currentEvent);
+            }
+
+            return days;
         }
+
 
         /// <summary>
         /// Parse a given <see cref="XElement"/> with Kronox's "schemaPost" format into a full <see cref="Event"/> object.
@@ -54,35 +79,25 @@ namespace KronoxAPI.Parser
         /// <returns></returns>
         public static Event XmlToEvent(XElement eventElement, Dictionary<string, Teacher> teachersDict, Dictionary<string, Location> locationsDict, Dictionary<string, Course> coursesDict)
         {
-            // Parse all needed Event info from the xml document
+            // Parse all needed Event info from the xml document into strings
             string title = eventElement.Element("moment") == null ? "" : eventElement.Element("moment")!.Value;
-            string courseId =
-                eventElement.Element("resursTrad")!
-                 .Elements("resursNod")
-                 .Where(el => el.Attribute("resursTypId") != null && el.Attribute("resursTypId")!.Value == "UTB_KURSINSTANS_GRUPPER")
-                 .First()
-                 .Element("resursId")!
-                 .Value;
+            string courseId = GetEventCourseId(eventElement);
             List<string> teacherIds = GetEventTeacherIds(eventElement);
             List<string> locationIds = GetEventLocationIds(eventElement);
             string timeStartIsoString = eventElement.Element("bokadeDatum")!.Attribute("startDatumTid_iCal")!.Value;
             string timeEndIsoString = eventElement.Element("bokadeDatum")!.Attribute("slutDatumTid_iCal")!.Value;
 
-            // Parse and translate some of the gathered info from above into correct types and formats
-            Course course = coursesDict.GetValueOrDefault(courseId, Course.NotAvailable());
+            // Parse and translate the gathered info from above into correct types and formats
+            Course course = coursesDict.GetValueOrDefault(courseId, Course.NotAvailable);
             DateTime timeStart = DateTime.ParseExact(timeStartIsoString, new string[] { "yyyyMMddTHHmmssZ" }, CultureInfo.InvariantCulture, DateTimeStyles.None);
             DateTime timeEnd = DateTime.ParseExact(timeEndIsoString, new string[] { "yyyyMMddTHHmmssZ" }, CultureInfo.InvariantCulture, DateTimeStyles.None);
-            List<Teacher> teachers = new List<Teacher>();
-            List<Location> locations = new List<Location>();
-            foreach (string teacherId in teacherIds)
-            {
-                teachers.Add(teachersDict.GetValueOrDefault(teacherId, Teacher.NotAvailable()));
-            }
+            List<Teacher> teachers = new();
+            List<Location> locations = new();
 
-            foreach (string locationId in locationIds)
-            {
-                locations.Add(locationsDict.GetValueOrDefault(locationId, Location.NotAvailable()));
-            }
+            // Translate the event's teacher ids into teacher objects
+            teacherIds.ForEach(id => teachers.Add(teachersDict.GetValueOrDefault(id, Teacher.NotAvailable)));
+            // Translate the event's location ids into location objects
+            locationIds.ForEach(id => locations.Add(locationsDict.GetValueOrDefault(id, Location.NotAvailable)));
 
             return new Event(title, course, teachers, timeStart, timeEnd, locations);
         }
@@ -221,6 +236,21 @@ namespace KronoxAPI.Parser
             }
 
             return locationIds;
+        }
+
+        /// <summary>
+        /// Parse event xml element (Kronox's "schemaPost" element) into the course id related to the event.
+        /// </summary>
+        /// <param name="eventElement"></param>
+        /// <returns>The <see cref="string"/> of the event's related course id.</returns>
+        private static string GetEventCourseId(XElement eventElement)
+        {
+            return eventElement.Element("resursTrad")!
+                 .Elements("resursNod")
+                 .Where(el => el.Attribute("resursTypId") != null && el.Attribute("resursTypId")!.Value == "UTB_KURSINSTANS_GRUPPER")
+                 .First()
+                 .Element("resursId")!
+                 .Value;
         }
     }
 }

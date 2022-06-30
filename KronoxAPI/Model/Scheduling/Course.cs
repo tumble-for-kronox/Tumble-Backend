@@ -19,6 +19,12 @@ namespace KronoxAPI.Model.Scheduling
         public string Id => _id;
 
         /// <summary>
+        /// For use as default or in case a course is not found.
+        /// </summary>
+        /// <returns><see cref="Course"/> wiht all values set as "N/A".</returns>
+        public static Course NotAvailable => new("N/A", "N/A");
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="name"></param>
@@ -29,13 +35,6 @@ namespace KronoxAPI.Model.Scheduling
             _id = id;
         }
 
-        /// <summary>
-        /// For use as default or in case a course is not found, to make sure nothing breaks.
-        /// </summary>
-        /// <returns><see cref="Course"/> wiht all values set as "N/A"</returns>
-        public static Course NotAvailable()
-        {
-            return new Course("N/A", "N/A");
-        }
+
     }
 }

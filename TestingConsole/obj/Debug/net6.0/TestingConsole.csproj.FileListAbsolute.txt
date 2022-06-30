@@ -16,3 +16,4 @@ D:\Coding\tumbleRebuild\TumbleBackend\TestingConsole\obj\Debug\net6.0\refint\Tes
 D:\Coding\tumbleRebuild\TumbleBackend\TestingConsole\obj\Debug\net6.0\TestingConsole.pdb
 D:\Coding\tumbleRebuild\TumbleBackend\TestingConsole\obj\Debug\net6.0\TestingConsole.genruntimeconfig.cache
 D:\Coding\tumbleRebuild\TumbleBackend\TestingConsole\obj\Debug\net6.0\ref\TestingConsole.dll
+D:\Coding\tumbleRebuild\TumbleBackend\TestingConsole\bin\Debug\net6.0\HtmlAgilityPack.dll

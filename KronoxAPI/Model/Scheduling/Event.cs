@@ -11,6 +11,7 @@ namespace KronoxAPI.Model.Scheduling
     /// </summary>
     public class Event
     {
+        private readonly string _id;
         private readonly string _title;
         private readonly Course _course;
         private readonly List<Teacher> _teachers;
@@ -30,6 +31,8 @@ namespace KronoxAPI.Model.Scheduling
 
         public List<Teacher> Teachers => _teachers;
 
+        public string Id => _id;
+
         /// <summary>
         /// 
         /// </summary>
@@ -41,6 +44,7 @@ namespace KronoxAPI.Model.Scheduling
         /// <param name="locations"></param>
         public Event(string title, Course course, List<Teacher> teachers, DateTime timeStart, DateTime timeEnd, List<Location> locations)
         {
+            _id = Guid.NewGuid().ToString();
             _title = title;
             _course = course;
             _timeStart = timeStart;
@@ -51,7 +55,7 @@ namespace KronoxAPI.Model.Scheduling
 
         public override string? ToString()
         {
-            return $"Course: {_course.Name}\nTitle: {_title}\nStarts: {_timeStart:yyyy-MM-dd HH:mm}" +
+            return $"Id: {_id}\nCourse: {_course.Name}\nTitle: {_title}\nStarts: {_timeStart:yyyy-MM-dd HH:mm}" +
                 $"\nEnds: {_timeEnd:yyyy-MM-dd HH:mm}\nTeachers: [{String.Join(", ", _teachers)}]\nLocations: [{String.Join(", ", _locations)}]";
         }
     }

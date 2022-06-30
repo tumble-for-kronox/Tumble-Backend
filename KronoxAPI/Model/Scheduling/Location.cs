@@ -24,13 +24,10 @@ namespace KronoxAPI.Model.Scheduling
         }
 
         /// <summary>
-        /// For use as default or in case a location is not found, to make sure nothing breaks.
+        /// For use as default or in case a location is not found.
         /// </summary>
-        /// <returns><see cref="Location"/> wiht all values set as "N/A"</returns>
-        public static Location NotAvailable()
-        {
-            return new Location("N/A", "N/A", "N/A", "N/A", "N/A");
-        }
+        /// <returns><see cref="Location"/> wiht all values set as "N/A".</returns>
+        public static Location NotAvailable => new("N/A", "N/A", "N/A", "N/A", "N/A");
 
         public override string? ToString()
         {
