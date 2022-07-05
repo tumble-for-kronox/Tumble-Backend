@@ -29,14 +29,14 @@ namespace KronoxAPI.Parser
         /// </list>
         /// </para>
         /// </returns>
-        public static Dictionary<string, List<UserEvent>> ParseToList(HtmlDocument userEventsHtml)
+        public static Dictionary<string, List<UserEvent>> ParseToDict(HtmlDocument userEventsHtml)
         {
             Dictionary<string, List<UserEvent>> userEvents = new() { { "registered", new() }, { "unregistered", new() }, { "upcoming", new() } };
 
             // Fetch all individual user event div nodes for scraping.
-            IEnumerable<HtmlNode> registeredEvents = userEventsHtml.DocumentNode.SelectSingleNode("/html/body/div[1]/div[4]/div/div[1]/div").SelectNodes("*");
-            IEnumerable<HtmlNode> unregisteredEvents = userEventsHtml.DocumentNode.SelectSingleNode("/html/body/div[1]/div[4]/div/div[2]/div").SelectNodes("*");
-            IEnumerable<HtmlNode> upcomingEvents = userEventsHtml.DocumentNode.SelectSingleNode("/html/body/div[1]/div[4]/div/div[3]/div").SelectNodes("*");
+            IEnumerable<HtmlNode> registeredEvents = userEventsHtml.DocumentNode.SelectSingleNode("/html/body/div[2]/div[4]/div/div[1]/div").SelectNodes("*");
+            IEnumerable<HtmlNode> unregisteredEvents = userEventsHtml.DocumentNode.SelectSingleNode("/html/body/div[2]/div[4]/div/div[2]/div").SelectNodes("*");
+            IEnumerable<HtmlNode> upcomingEvents = userEventsHtml.DocumentNode.SelectSingleNode("/html/body/div[2]/div[4]/div/div[3]/div").SelectNodes("*");
 
             if (registeredEvents != null)
             {
@@ -75,6 +75,7 @@ namespace KronoxAPI.Parser
             // Variables needed to construct the AvailableUserEvent in the end.
             bool registered = false;
             bool supportAvailable = false;
+            bool mustChooseLocation = false;
             string id = string.Empty;
             string? participatorId = null;
             string? supportId = null;
@@ -123,7 +124,9 @@ namespace KronoxAPI.Parser
                 // The button is a "sign up" button.
                 if (button.GetAttributeValue("onclick", "").ToLowerInvariant().Contains("anmal"))
                 {
-                    id = Regex.Match(HttpUtility.HtmlDecode(button.GetAttributeValue("onclick", "").ToLowerInvariant()), @"anmal\('(.*?),").Groups[1].Value;
+                    Match eventIdAndLocationChoice = Regex.Match(HttpUtility.HtmlDecode(button.GetAttributeValue("onclick", "").ToLowerInvariant()), @"anmal\('(.*?)', (.*?)\)");
+                    id = eventIdAndLocationChoice.Groups[1].Value;
+                    if (eventIdAndLocationChoice.Groups[2].Value == "true") mustChooseLocation = true;
                 }
             }
 
@@ -144,7 +147,7 @@ namespace KronoxAPI.Parser
             startTime = DateTime.Parse(rawDate + " " + rawStartTime);
             endTime = DateTime.Parse(rawDate + " " + rawEndTime);
 
-            return new AvailableUserEvent(title, type, lastSignupDate, startTime, endTime, id, participatorId, supportId, anonymousCode, registered, supportAvailable);
+            return new AvailableUserEvent(title, type, lastSignupDate, startTime, endTime, id, participatorId, supportId, anonymousCode, registered, supportAvailable, mustChooseLocation);
         }
 
         /// <summary>

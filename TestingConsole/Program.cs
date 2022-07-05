@@ -11,10 +11,10 @@ using HtmlAgilityPack;
 
 // See https://aka.ms/new-console-template for more information
 
-HtmlDocument doc = new();
-doc.Load("C:/Users/workl/Documents/git/tumbleRebuild/KronoxExamples/kronox_upcoming_events_Tom.html");
+School hkr = SchoolFactory.Hkr();
+User timmy = hkr.Login("usernameHere", "passwordHere");
 
-Dictionary<string, List<UserEvent>> userEvents = UserEventParser.ParseToList(doc);
+Dictionary<string, List<UserEvent>> userEvents = timmy.GetUserEvents(hkr);
 
 Console.WriteLine("REGISTERED EVENTS ------------------------");
 userEvents["registered"].ForEach(el =>
@@ -33,6 +33,7 @@ userEvents["registered"].ForEach(el =>
     Console.WriteLine(userEvent.Type);
     Console.WriteLine(userEvent.AnonymousCode);
     Console.WriteLine("\n");
+
 });
 
 Console.WriteLine("UNREGISTERED EVENTS ------------------------");
@@ -65,3 +66,4 @@ userEvents["upcoming"].ForEach(el =>
     Console.WriteLine(userEvent.Type);
     Console.WriteLine("\n");
 });
+

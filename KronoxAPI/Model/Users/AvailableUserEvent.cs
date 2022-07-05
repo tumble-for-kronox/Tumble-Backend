@@ -18,6 +18,7 @@ namespace KronoxAPI.Model.Users
 
         private readonly bool _isRegistered;
         private readonly bool _supportAvailable;
+        private readonly bool _requiresChoosingLocation;
         public string Id => _id;
 
         public string? ParticipatorId => _participatorId;
@@ -30,15 +31,17 @@ namespace KronoxAPI.Model.Users
 
         public bool SupportAvailable => _supportAvailable;
 
+        public bool RequiresChoosingLocation => _requiresChoosingLocation;
+
         public DateTime LastSignupDate => _lastSignupDate;
 
         /// <summary>
         /// For use as default or in case an event is not found/can't be parsed.
         /// </summary>
         /// <returns><see cref="AvailableUserEvent"/> wiht all values set as "N/A".</returns>
-        public static AvailableUserEvent NotAvailable => new("N/A", "N/A", DateTime.MinValue, DateTime.MinValue, DateTime.MinValue, "N/A", null, null, "N/A", false, false);
+        public static AvailableUserEvent NotAvailable => new("N/A", "N/A", DateTime.MinValue, DateTime.MinValue, DateTime.MinValue, "N/A", null, null, "N/A", false, false, false);
 
-        public AvailableUserEvent(string title, string type, DateTime lastSignupDate, DateTime eventStart, DateTime eventEnd, string id, string? participatorId, string? supportId, string anonymousCode, bool isRegistered, bool supportAvailable) : base(title, type, eventStart, eventEnd)
+        public AvailableUserEvent(string title, string type, DateTime lastSignupDate, DateTime eventStart, DateTime eventEnd, string id, string? participatorId, string? supportId, string anonymousCode, bool isRegistered, bool supportAvailable, bool requiresChoosingLocation) : base(title, type, eventStart, eventEnd)
         {
             _id = id;
             _participatorId = participatorId;
@@ -47,6 +50,7 @@ namespace KronoxAPI.Model.Users
             _supportAvailable = supportAvailable;
             _isRegistered = isRegistered;
             _lastSignupDate = lastSignupDate;
+            _requiresChoosingLocation = requiresChoosingLocation;
         }
 
         /// <summary>
