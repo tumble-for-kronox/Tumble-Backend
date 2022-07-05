@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Coding\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj": {}
+    "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj": {}
   },
   "projects": {
-    "D:\\Coding\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj": {
+    "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj",
+        "projectUniqueName": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj",
         "projectName": "KronoxAPI",
-        "projectPath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj",
+        "projectPath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj",
         "packagesPath": "C:\\Users\\workl\\.nuget\\packages\\",
-        "outputPath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\obj\\",
+        "outputPath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\workl\\AppData\\Roaming\\NuGet\\NuGet.Config",

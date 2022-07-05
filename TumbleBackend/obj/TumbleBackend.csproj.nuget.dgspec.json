@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Coding\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\TumbleBackend.csproj": {}
+    "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\TumbleBackend.csproj": {}
   },
   "projects": {
-    "D:\\Coding\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\TumbleBackend.csproj": {
+    "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\TumbleBackend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\TumbleBackend.csproj",
+        "projectUniqueName": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\TumbleBackend.csproj",
         "projectName": "TumbleBackend",
-        "projectPath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\TumbleBackend.csproj",
+        "projectPath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\TumbleBackend.csproj",
         "packagesPath": "C:\\Users\\workl\\.nuget\\packages\\",
-        "outputPath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\obj\\",
+        "outputPath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\workl\\AppData\\Roaming\\NuGet\\NuGet.Config",

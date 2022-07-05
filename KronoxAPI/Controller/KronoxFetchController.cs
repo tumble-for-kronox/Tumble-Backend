@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using KronoxAPI.Utilities;
+using KronoxAPI.Model.Users;
 
 namespace KronoxAPI.Controller
 {
@@ -70,11 +71,11 @@ namespace KronoxAPI.Controller
         }
 
         /// <summary>
-        /// Https fetch to Kronox, getting the HTML page with <see cref="Model.User.UserEvent"/> information.
+        /// Https fetch to Kronox, getting the HTML page with <see cref="UserEvent"/> information.
         /// </summary>
         /// <param name="schoolUrl"></param>
         /// <param name="sessionToken"></param>
-        /// <returns><see cref="string"/> HTML page, which carries <see cref="Model.User.UserEvent"/> data.</returns>
+        /// <returns><see cref="string"/> HTML page, which carries <see cref="UserEvent"/> data.</returns>
         public static async Task<string> GetUserEvents(string schoolUrl, string sessionToken)
         {
             Uri uri = new($"https://{schoolUrl}/aktivitetsanmalan.jsp");

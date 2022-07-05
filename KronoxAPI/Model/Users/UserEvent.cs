@@ -13,27 +13,22 @@ namespace KronoxAPI.Model.Users
     {
         private readonly string _title;
         private readonly string _type;
-        private readonly DateTime _lastSignupDate;
         private readonly DateTime _eventStart;
         private readonly DateTime _eventEnd;
-
-        public UserEvent(string title, string type, DateTime lastSignupDate, DateTime eventStart, DateTime eventEnd)
-        {
-            _title = title;
-            _type = type;
-            _lastSignupDate = lastSignupDate;
-            _eventStart = eventStart;
-            _eventEnd = eventEnd;
-        }
-
         public string Title => _title;
 
         public string Type => _type;
 
-        public DateTime LastSignupDate => _lastSignupDate;
-
         public DateTime EventStart => _eventStart;
 
         public DateTime EventEnd => _eventEnd;
+
+        public UserEvent(string title, string type, DateTime eventStart, DateTime eventEnd)
+        {
+            _title = title;
+            _type = type;
+            _eventStart = eventStart;
+            _eventEnd = eventEnd;
+        }
     }
 }
