@@ -4,31 +4,30 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KronoxAPI.Model.Scheduling
+namespace KronoxAPI.Model.Scheduling;
+
+/// <summary>
+/// Model for storing schedule data fetched from Kronox's database.
+/// </summary>
+public class Schedule
 {
+    private readonly string _id;
+    private readonly List<Day> _days;
+
     /// <summary>
-    /// Model for storing schedule data fetched from Kronox's database.
+    /// 
     /// </summary>
-    public class Schedule
+    /// <param name="id"></param>
+    /// <param name="days"></param>
+    /// <param name="teachers"></param>
+    public Schedule(string id, List<Day> days)
     {
-        private readonly string _id;
-        private readonly List<Day> _days;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="days"></param>
-        /// <param name="teachers"></param>
-        public Schedule(string id, List<Day> days)
-        {
-            _id = id;
-            _days = days;
-        }
-
-        public string Id => _id;
-
-        public List<Day> Days => _days;
-
+        _id = id;
+        _days = days;
     }
+
+    public string Id => _id;
+
+    public List<Day> Days => _days;
+
 }

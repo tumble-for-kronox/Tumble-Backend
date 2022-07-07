@@ -7,84 +7,83 @@ using System.Text.RegularExpressions;
 using KronoxAPI.Model.Scheduling;
 using HtmlAgilityPack;
 
-namespace KronoxAPI.Parser
+namespace KronoxAPI.Parser;
+
+/// <summary>
+/// Manages all parsing of search results from Kronox as well as related methods.
+/// </summary>
+public class SearchParser
 {
     /// <summary>
-    /// Manages all parsing of search results from Kronox as well as related methods.
+    /// Parse search results given in Kronox's standard HTML endpoint response (not page grab) format.
     /// </summary>
-    public class SearchParser
+    /// <param name="htmlSearchResults"></param>
+    /// <returns>The corresponding objects <see cref="List{Programme}"/> to the search results found in <paramref name="htmlSearchResults"/>.
+    /// Any value within the <see cref="Programme"/> objects that could not be parsed correctly will output as <see cref="string"/> "N/A".</returns>
+    public static List<Programme> ParseToProgrammes(string htmlSearchResults)
     {
-        /// <summary>
-        /// Parse search results given in Kronox's standard HTML endpoint response (not page grab) format.
-        /// </summary>
-        /// <param name="htmlSearchResults"></param>
-        /// <returns>The corresponding objects <see cref="List{Programme}"/> to the search results found in <paramref name="htmlSearchResults"/>.
-        /// Any value within the <see cref="Programme"/> objects that could not be parsed correctly will output as <see cref="string"/> "N/A".</returns>
-        public static List<Programme> ParseToProgrammes(string htmlSearchResults)
+        HtmlDocument document = new();
+        document.LoadHtml(htmlSearchResults);
+
+        List<Programme> foundProgrammes = new();
+
+        // Get all links in the return html (as per Kronox's standard). Skip the first two as they link to non-programme entities
+        IEnumerable<HtmlNode> hyperLinksInPage = document.DocumentNode.Descendants("a").Skip(2);
+
+        foreach (HtmlNode hyperlink in hyperLinksInPage)
         {
-            HtmlDocument document = new();
-            document.LoadHtml(htmlSearchResults);
+            if (hyperlink.GetAttributeValue("target", "no") != "_blank")
+                continue;
 
-            List<Programme> foundProgrammes = new();
+            // Get href value from link
+            string hyperlinkHref = hyperlink.GetAttributeValue("href", "N/A");
+            string id;
 
-            // Get all links in the return html (as per Kronox's standard). Skip the first two as they link to non-programme entities
-            IEnumerable<HtmlNode> hyperLinksInPage = document.DocumentNode.Descendants("a").Skip(2);
-
-            foreach (HtmlNode hyperlink in hyperLinksInPage)
+            if (hyperlinkHref == "N/A")
             {
-                if (hyperlink.GetAttributeValue("target", "no") != "_blank")
-                    continue;
-
-                // Get href value from link
-                string hyperlinkHref = hyperlink.GetAttributeValue("href", "N/A");
-                string id;
-
-                if (hyperlinkHref == "N/A")
-                {
-                    id = "N/A";
-                }
-                else
-                {
-                    // Match the part that contains the id
-                    Match idMatch = Regex.Match(hyperlinkHref, "resurser=(?<scheduleId>.*)$");
-                    // Make sure the regex group exists
-                    idMatch.Groups.TryGetValue("scheduleId", out Group? idGroup);
-
-                    if (idGroup != null)
-                        id = idGroup.Value;
-                    else
-                        id = "N/A";
-                }
-                string[] splitTitles = hyperlink.InnerText.Split(",");
-
-                string title = splitTitles.Count() < 1 ? "N/A" : splitTitles[0];
-                string subtitle = splitTitles.Count() < 2 ? "N/A" : RemoveDuplicateWords(splitTitles[1]);
-
-                foundProgrammes.Add(new Programme(title, subtitle, id));
+                id = "N/A";
             }
+            else
+            {
+                // Match the part that contains the id
+                Match idMatch = Regex.Match(hyperlinkHref, "resurser=(?<scheduleId>.*)$");
+                // Make sure the regex group exists
+                idMatch.Groups.TryGetValue("scheduleId", out Group? idGroup);
 
-            return foundProgrammes;
+                if (idGroup != null)
+                    id = idGroup.Value;
+                else
+                    id = "N/A";
+            }
+            string[] splitTitles = hyperlink.InnerText.Split(",");
+
+            string title = splitTitles.Count() < 1 ? "N/A" : splitTitles[0];
+            string subtitle = splitTitles.Count() < 2 ? "N/A" : RemoveDuplicateWords(splitTitles[1]);
+
+            foundProgrammes.Add(new Programme(title, subtitle, id));
         }
 
-        /// <summary>
-        /// <para>
-        /// Removes duplicate words from the given string.
-        /// </para>
-        /// <para>
-        /// Source code found:
-        /// https://stackoverflow.com/a/1058850/18690430
-        /// </para>
-        /// </summary>
-        /// <param name="stringWithDuplicates"></param>
-        /// <returns></returns>
-        public static string RemoveDuplicateWords(string stringWithDuplicates)
-        {
-            var words = new HashSet<string>();
-            return Regex.Replace(stringWithDuplicates, "\\w+", m =>
-                                 words.Add(m.Value.ToUpperInvariant())
-                                     ? m.Value
-                                     : String.Empty);
-        }
-
+        return foundProgrammes;
     }
+
+    /// <summary>
+    /// <para>
+    /// Removes duplicate words from the given string.
+    /// </para>
+    /// <para>
+    /// Source code found:
+    /// https://stackoverflow.com/a/1058850/18690430
+    /// </para>
+    /// </summary>
+    /// <param name="stringWithDuplicates"></param>
+    /// <returns></returns>
+    public static string RemoveDuplicateWords(string stringWithDuplicates)
+    {
+        var words = new HashSet<string>();
+        return Regex.Replace(stringWithDuplicates, "\\w+", m =>
+                             words.Add(m.Value.ToUpperInvariant())
+                                 ? m.Value
+                                 : String.Empty);
+    }
+
 }

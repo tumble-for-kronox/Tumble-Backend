@@ -4,20 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KronoxAPI.Exceptions
+namespace KronoxAPI.Exceptions;
+
+public class LoginException : Exception
 {
-    public class LoginException : Exception
+    public LoginException()
     {
-        public LoginException()
-        {
-        }
+    }
 
-        public LoginException(string message) : base(message)
-        {
-        }
+    public LoginException(string message) : base(message)
+    {
+    }
 
-        public LoginException(string message, Exception inner) : base(message, inner)
-        {
-        }
+    public LoginException(string message, Exception inner) : base(message, inner)
+    {
     }
 }
