@@ -23,9 +23,9 @@ public static class UserParser
     public static Dictionary<string, string> ParseToNames(HtmlDocument loginLandingPageHtml)
     {
         // Check if login was successful by trying to parse the website
-        string? nameAndUsername = loginLandingPageHtml.DocumentNode.SelectSingleNode("//*[@id='topnav']/span").InnerHtml;
+        HtmlNode? nameAndUsername = loginLandingPageHtml.DocumentNode.SelectSingleNode("//*[@id='topnav']/span");
 
-        if (nameAndUsername == null)    
+        if (nameAndUsername == null)
         {
             if (loginLandingPageHtml.DocumentNode.SelectSingleNode("/html/body/div[2]/div[4]/div/span") != null)
             {
@@ -35,7 +35,7 @@ public static class UserParser
             throw new ParseException("An error occurred while parsing the login page information. Please ensure the format of the given HTML conforms with Kronox's default structure.");
         }
 
-        Match nameAndUsernameMatch = Regex.Match(nameAndUsername, @"Inloggad som: (?<name>\D*)\d* \[(?<username>.*)\]");
+        Match nameAndUsernameMatch = Regex.Match(nameAndUsername.InnerHtml, @"Inloggad som: (?<name>\D*)\d* \[(?<username>.*)\]");
         string name = "N/A";
         string username = "N/A";
 

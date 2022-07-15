@@ -308,11 +308,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\TumbleBackend.csproj",
+      "projectUniqueName": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\TumbleBackend.csproj",
       "projectName": "TumbleBackend",
-      "projectPath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\TumbleBackend.csproj",
+      "projectPath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\TumbleBackend.csproj",
       "packagesPath": "C:\\Users\\workl\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\obj\\",
+      "outputPath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\TumbleBackend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\workl\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -329,11 +329,11 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj": {
-              "projectPath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj"
+            "D:\\Coding\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj": {
+              "projectPath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj"
             },
-            "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\Models\\WebAPIModels.csproj": {
-              "projectPath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\Models\\WebAPIModels.csproj"
+            "D:\\Coding\\tumbleRebuild\\TumbleBackend\\Models\\WebAPIModels.csproj": {
+              "projectPath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\Models\\WebAPIModels.csproj"
             }
           }
         }

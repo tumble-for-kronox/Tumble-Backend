@@ -1,0 +1,15 @@
+D:\Coding\tumbleRebuild\TumbleBackend\Models\bin\Debug\net6.0\WebAPIModels.deps.json
+D:\Coding\tumbleRebuild\TumbleBackend\Models\bin\Debug\net6.0\WebAPIModels.dll
+D:\Coding\tumbleRebuild\TumbleBackend\Models\bin\Debug\net6.0\WebAPIModels.pdb
+D:\Coding\tumbleRebuild\TumbleBackend\Models\bin\Debug\net6.0\KronoxAPI.dll
+D:\Coding\tumbleRebuild\TumbleBackend\Models\bin\Debug\net6.0\KronoxAPI.pdb
+D:\Coding\tumbleRebuild\TumbleBackend\Models\obj\Debug\net6.0\WebAPIModels.csproj.AssemblyReference.cache
+D:\Coding\tumbleRebuild\TumbleBackend\Models\obj\Debug\net6.0\WebAPIModels.GeneratedMSBuildEditorConfig.editorconfig
+D:\Coding\tumbleRebuild\TumbleBackend\Models\obj\Debug\net6.0\WebAPIModels.AssemblyInfoInputs.cache
+D:\Coding\tumbleRebuild\TumbleBackend\Models\obj\Debug\net6.0\WebAPIModels.AssemblyInfo.cs
+D:\Coding\tumbleRebuild\TumbleBackend\Models\obj\Debug\net6.0\WebAPIModels.csproj.CoreCompileInputs.cache
+D:\Coding\tumbleRebuild\TumbleBackend\Models\obj\Debug\net6.0\WebAPIModels.csproj.CopyComplete
+D:\Coding\tumbleRebuild\TumbleBackend\Models\obj\Debug\net6.0\WebAPIModels.dll
+D:\Coding\tumbleRebuild\TumbleBackend\Models\obj\Debug\net6.0\refint\WebAPIModels.dll
+D:\Coding\tumbleRebuild\TumbleBackend\Models\obj\Debug\net6.0\WebAPIModels.pdb
+D:\Coding\tumbleRebuild\TumbleBackend\Models\obj\Debug\net6.0\ref\WebAPIModels.dll

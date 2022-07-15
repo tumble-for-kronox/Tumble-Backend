@@ -629,11 +629,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\DatabaseAPI\\DatabaseAPI.csproj",
+      "projectUniqueName": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\DatabaseAPI\\DatabaseAPI.csproj",
       "projectName": "DatabaseAPI",
-      "projectPath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\DatabaseAPI\\DatabaseAPI.csproj",
+      "projectPath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\DatabaseAPI\\DatabaseAPI.csproj",
       "packagesPath": "C:\\Users\\workl\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\DatabaseAPI\\obj\\",
+      "outputPath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\DatabaseAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\workl\\AppData\\Roaming\\NuGet\\NuGet.Config",

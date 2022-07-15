@@ -52,3 +52,9 @@ C:\Users\workl\Documents\git\tumbleRebuild\TumbleBackend\TumbleBackend\obj\Debug
 C:\Users\workl\Documents\git\tumbleRebuild\TumbleBackend\TumbleBackend\obj\Debug\net6.0\TumbleBackend.pdb
 C:\Users\workl\Documents\git\tumbleRebuild\TumbleBackend\TumbleBackend\obj\Debug\net6.0\TumbleBackend.genruntimeconfig.cache
 C:\Users\workl\Documents\git\tumbleRebuild\TumbleBackend\TumbleBackend\obj\Debug\net6.0\ref\TumbleBackend.dll
+D:\Coding\tumbleRebuild\TumbleBackend\TumbleBackend\bin\Debug\net6.0\libman.json
+D:\Coding\tumbleRebuild\TumbleBackend\TumbleBackend\bin\Debug\net6.0\HtmlAgilityPack.dll
+D:\Coding\tumbleRebuild\TumbleBackend\TumbleBackend\bin\Debug\net6.0\KronoxAPI.dll
+D:\Coding\tumbleRebuild\TumbleBackend\TumbleBackend\bin\Debug\net6.0\WebAPIModels.dll
+D:\Coding\tumbleRebuild\TumbleBackend\TumbleBackend\bin\Debug\net6.0\KronoxAPI.pdb
+D:\Coding\tumbleRebuild\TumbleBackend\TumbleBackend\bin\Debug\net6.0\WebAPIModels.pdb

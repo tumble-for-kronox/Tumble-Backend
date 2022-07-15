@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\TestingConsole\\TestingConsole.csproj": {}
+    "D:\\Coding\\tumbleRebuild\\TumbleBackend\\TestingConsole\\TestingConsole.csproj": {}
   },
   "projects": {
-    "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj": {
+    "D:\\Coding\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj",
+        "projectUniqueName": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj",
         "projectName": "KronoxAPI",
-        "projectPath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj",
+        "projectPath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj",
         "packagesPath": "C:\\Users\\workl\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\obj\\",
+        "outputPath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\workl\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -64,14 +64,14 @@
         }
       }
     },
-    "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\TestingConsole\\TestingConsole.csproj": {
+    "D:\\Coding\\tumbleRebuild\\TumbleBackend\\TestingConsole\\TestingConsole.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\TestingConsole\\TestingConsole.csproj",
+        "projectUniqueName": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\TestingConsole\\TestingConsole.csproj",
         "projectName": "TestingConsole",
-        "projectPath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\TestingConsole\\TestingConsole.csproj",
+        "projectPath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\TestingConsole\\TestingConsole.csproj",
         "packagesPath": "C:\\Users\\workl\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\TestingConsole\\obj\\",
+        "outputPath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\TestingConsole\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\workl\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -88,8 +88,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj": {
-                "projectPath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj"
+              "D:\\Coding\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj": {
+                "projectPath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\KronoxAPI\\KronoxAPI.csproj"
               }
             }
           }

@@ -9,6 +9,7 @@ using KronoxAPI.Model.Users;
 using KronoxAPI.Model.Scheduling;
 using KronoxAPI.Utilities;
 using KronoxAPI.Parser;
+using HtmlAgilityPack;
 
 
 namespace KronoxAPI.Model.Schools;
@@ -119,7 +120,10 @@ public class School
     public User Login(string username, string password)
     {
         Response.LoginResponse loginResponse = KronoxPushController.Login(username, password, Url).Result;
-        Dictionary<string, string> result = UserParser.ParseToNames(loginResponse.htmlResult);
+        HtmlDocument loginResponseHtmlDocument = new();
+        loginResponseHtmlDocument.LoadHtml(loginResponse.htmlResult);
+
+        Dictionary<string, string> result = UserParser.ParseToNames(loginResponseHtmlDocument);
 
         return new User(result["name"], result["username"], loginResponse.sessionToken);
     }
