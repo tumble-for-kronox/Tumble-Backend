@@ -32,33 +32,29 @@ public class SearchParser
 
         foreach (HtmlNode hyperlink in hyperLinksInPage)
         {
-            if (hyperlink.GetAttributeValue("target", "no") != "_blank")
-                continue;
+            if (hyperlink.GetAttributeValue("target", "") != "_blank") continue;
 
             // Get href value from link
             string hyperlinkHref = hyperlink.GetAttributeValue("href", "N/A");
             string id;
 
-            if (hyperlinkHref == "N/A")
-            {
-                id = "N/A";
-            }
-            else
-            {
-                // Match the part that contains the id
-                Match idMatch = Regex.Match(hyperlinkHref, "resurser=(?<scheduleId>.*)$");
-                // Make sure the regex group exists
-                idMatch.Groups.TryGetValue("scheduleId", out Group? idGroup);
+            // If the link can't be found we can' use the entry, hence we don't wish to continue parsing it
+            if (hyperlinkHref == "N/A") continue;
 
-                if (idGroup != null)
-                    id = idGroup.Value;
-                else
-                    id = "N/A";
-            }
+            // Match the part that contains the id
+            Match idMatch = Regex.Match(hyperlinkHref, "resurser=(?<scheduleId>.*)$");
+            // Make sure the regex group exists
+            idMatch.Groups.TryGetValue("scheduleId", out Group? idGroup);
+
+            // If the ID can't be matched we can't use the entry, hence we move on
+            if (idGroup == null) continue;
+            
+            id = idGroup.Value;
+
             string[] splitTitles = hyperlink.InnerText.Split(",");
 
-            string title = splitTitles.Count() < 1 ? "N/A" : splitTitles[0];
-            string subtitle = splitTitles.Count() < 2 ? "N/A" : RemoveDuplicateWords(splitTitles[1]);
+            string title = splitTitles[0];
+            string subtitle = RemoveDuplicateWords(splitTitles[1]);
 
             foundProgrammes.Add(new Programme(title, subtitle, id));
         }

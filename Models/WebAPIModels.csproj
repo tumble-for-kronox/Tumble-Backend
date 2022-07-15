@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\KronoxAPI\KronoxAPI.csproj" />
+  </ItemGroup>
+
 </Project>

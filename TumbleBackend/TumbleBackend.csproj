@@ -10,4 +10,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\KronoxAPI\KronoxAPI.csproj" />
+    <ProjectReference Include="..\Models\WebAPIModels.csproj" />
+  </ItemGroup>
+
 </Project>

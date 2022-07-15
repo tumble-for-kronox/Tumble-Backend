@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using KronoxAPI.Model.Scheduling;
+using KronoxAPI.Exceptions;
 
 namespace KronoxAPI.Parser;
 
@@ -89,8 +90,8 @@ public static class ScheduleParser
 
         // Parse and translate the gathered info from above into correct types and formats
         Course course = coursesDict.GetValueOrDefault(courseId, Course.NotAvailable);
-        DateTime timeStart = DateTime.ParseExact(timeStartIsoString, new string[] { "yyyyMMddTHHmmssZ" }, CultureInfo.InvariantCulture, DateTimeStyles.None);
-        DateTime timeEnd = DateTime.ParseExact(timeEndIsoString, new string[] { "yyyyMMddTHHmmssZ" }, CultureInfo.InvariantCulture, DateTimeStyles.None);
+        DateTime.TryParseExact(timeStartIsoString, new string[] { "yyyyMMddTHHmmssZ" }, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime timeStart);
+        DateTime.TryParseExact(timeEndIsoString, new string[] { "yyyyMMddTHHmmssZ" }, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime timeEnd);
         List<Teacher> teachers = new();
         List<Location> locations = new();
 
@@ -119,10 +120,15 @@ public static class ScheduleParser
                   .Where(el => el.Attribute("typ") != null && el.Attribute("typ")!.Value == "UTB_KURSINSTANS_GRUPPER")
                   .Elements();
 
+        // Parse each course's data into a Teacher object and add it to teachersDict
         foreach (XElement course in courses)
         {
-            string courseId = course.Elements().Where(el => el.Attribute("rubrik")!.Value == "Id").First().Value;
-            string courseName = course.Elements().Where(el => el.Attribute("rubrik")!.Value == "KursNamn_SV").First().Value;
+            // Set default values for the remaining attributes if they're not found in the data
+            string courseId = course.Elements().Where(el => el.Attribute("rubrik")!.Value == "Id").FirstOrDefault(new XElement("")).Value;
+            string courseName = course.Elements().Where(el => el.Attribute("rubrik")!.Value == "KursNamn_SV").FirstOrDefault(new XElement("", new XText("N/A"))).Value;
+
+            // If no course ID was parsed, we don't want to add it to the dict as we can't access it
+            if (courseId == string.Empty) continue;
 
             coursesDict.Add(courseId, new Course(courseName, courseId));
         }
@@ -142,16 +148,22 @@ public static class ScheduleParser
     {
         Dictionary<string, Teacher> teachersDict = new();
 
+        // Get all teacher signatures from the XML
         IEnumerable<XElement> signatures =
             xmlDoc.Descendants("forklaringsrader")
-                  .Where(el => el.Attribute("typ") != null && el.Attribute("typ")!.Value == "RESURSER_SIGNATURER")
-                  .Elements();
+                    .Where(el => el.Attribute("typ") != null && el.Attribute("typ")!.Value == "RESURSER_SIGNATURER")
+                    .Elements();
 
+        // Parse each teacher's data into a Teacher object and add it to teachersDict
         foreach (XElement signature in signatures)
         {
-            string teacherId = signature.Elements().Where(el => el.Attribute("rubrik")!.Value == "Id").First().Value;
-            string teacherFirstName = signature.Elements().Where(el => el.Attribute("rubrik")!.Value == "ForNamn").First().Value;
-            string teacherLastName = signature.Elements().Where(el => el.Attribute("rubrik")!.Value == "EfterNamn").First().Value;
+            // Set default values for the remaining attributes if they're not found in the data
+            string teacherId = signature.Elements().Where(el => el.Attribute("rubrik")!.Value == "Id").FirstOrDefault(new XElement("N/A")).Value;
+            string teacherFirstName = signature.Elements().Where(el => el.Attribute("rubrik")!.Value == "ForNamn").FirstOrDefault(new XElement("N/A", new XText("N/A"))).Value;
+            string teacherLastName = signature.Elements().Where(el => el.Attribute("rubrik")!.Value == "EfterNamn").FirstOrDefault(new XElement("N/A", new XText("N/A"))).Value;
+
+            // If no teacher ID was parsed, we don't want to add it to the dict as we can't access it
+            if (teacherId == string.Empty) continue;
 
             teachersDict.Add(teacherId, new Teacher(teacherId, teacherFirstName, teacherLastName));
         }
@@ -178,11 +190,14 @@ public static class ScheduleParser
 
         foreach (XElement location in locations)
         {
-            string locationId = location.Elements().Where(el => el.Attribute("rubrik")!.Value == "Id").First().Value;
-            string locationName = location.Elements().Where(el => el.Attribute("rubrik")!.Value == "Lokalnamn").First().Value;
-            string locationFloor = location.Elements().Where(el => el.Attribute("rubrik")!.Value == "Vaning").First().Value;
-            string locationMaxSeats = location.Elements().Where(el => el.Attribute("rubrik")!.Value == "Antalplatser").First().Value;
-            string locationBuilding = location.Elements().Where(el => el.Attribute("rubrik")!.Value == "Hus").First().Value;
+            // Set default values for the remaining attributes if they're not found in the data
+            string locationId = location.Elements().Where(el => el.Attribute("rubrik")!.Value == "Id").FirstOrDefault(new XElement("")).Value;
+            string locationName = location.Elements().Where(el => el.Attribute("rubrik")!.Value == "Lokalnamn").FirstOrDefault(new XElement("", new XText("N/A"))).Value;
+            string locationFloor = location.Elements().Where(el => el.Attribute("rubrik")!.Value == "Vaning").FirstOrDefault(new XElement("", new XText("N/A"))).Value;
+            string locationMaxSeats = location.Elements().Where(el => el.Attribute("rubrik")!.Value == "Antalplatser").FirstOrDefault(new XElement("", new XText("N/A"))).Value;
+            string locationBuilding = location.Elements().Where(el => el.Attribute("rubrik")!.Value == "Hus").FirstOrDefault(new XElement("", new XText("N/A"))).Value;
+
+            if (locationId == string.Empty) continue;
 
             locationsDict.Add(locationId, new Location(locationId, locationName, locationBuilding, locationFloor, locationMaxSeats));
         }
@@ -208,6 +223,8 @@ public static class ScheduleParser
 
         foreach (XElement teacherElement in teacherElements)
         {
+            // Skipt any teacher entries that don't contain the necessary data
+            if (teacherElement.Element("resursId") == null) continue;
             teacherIds.Add(teacherElement.Element("resursId")!.Value);
         }
 
@@ -232,6 +249,8 @@ public static class ScheduleParser
 
         foreach (XElement locationElement in locationElements)
         {
+            // Skipt any teacher entries that don't contain the necessary data
+            if (locationElement.Element("resursId") == null) continue;
             locationIds.Add(locationElement.Element("resursId")!.Value);
         }
 
@@ -248,7 +267,7 @@ public static class ScheduleParser
         return eventElement.Element("resursTrad")!
              .Elements("resursNod")
              .Where(el => el.Attribute("resursTypId") != null && el.Attribute("resursTypId")!.Value == "UTB_KURSINSTANS_GRUPPER")
-             .First()
+             .FirstOrDefault(new XElement("N/A"))
              .Element("resursId")!
              .Value;
     }

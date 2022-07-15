@@ -20,24 +20,19 @@ public static class UserParser
     /// <param name="loginLandingPageHtml"></param>
     /// <returns>Dictionary with two keys: <c>name</c> and <c>username</c> each containing the name and username of the user logged in.</returns>
     /// <exception cref="LoginException"></exception>
-    public static Dictionary<string, string> ParseToNames(string loginLandingPageHtml)
+    public static Dictionary<string, string> ParseToNames(HtmlDocument loginLandingPageHtml)
     {
-        HtmlDocument document = new();
-        document.LoadHtml(loginLandingPageHtml);
-
         // Check if login was successful by trying to parse the website
-        string nameAndUsername;
+        string? nameAndUsername = loginLandingPageHtml.DocumentNode.SelectSingleNode("//*[@id='topnav']/span").InnerHtml;
 
-        try
+        if (nameAndUsername == null)    
         {
-            nameAndUsername = document.DocumentNode
-                .SelectNodes("//*[@id='topnav']/span")
-                .First()
-                .InnerHtml;
-        }
-        catch (ArgumentNullException)
-        {
-            throw new LoginException("Login failed.");
+            if (loginLandingPageHtml.DocumentNode.SelectSingleNode("/html/body/div[2]/div[4]/div/span") != null)
+            {
+                throw new LoginException("Kronox rejected the login attempt due to bad credentials or something else on their end.");
+            }
+
+            throw new ParseException("An error occurred while parsing the login page information. Please ensure the format of the given HTML conforms with Kronox's default structure.");
         }
 
         Match nameAndUsernameMatch = Regex.Match(nameAndUsername, @"Inloggad som: (?<name>\D*)\d* \[(?<username>.*)\]");

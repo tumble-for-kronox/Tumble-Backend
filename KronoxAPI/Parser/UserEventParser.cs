@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Web;
 using KronoxAPI.Model.Users;
+using KronoxAPI.Exceptions;
 using HtmlAgilityPack;
 
 namespace KronoxAPI.Parser;
@@ -93,7 +94,15 @@ public class UserEventParser
         string rawLastSignupDate;
 
         // Scrape title directly.
-        title = userEventHtmlDiv.Descendants("b").First().InnerText.Trim();
+        try
+        {
+            title = userEventHtmlDiv.Descendants("b").First().InnerText.Trim();
+        }
+        catch (ArgumentNullException ex)
+        {
+            Console.WriteLine(ex);
+            throw new ParseException("An error occured while parsing the title of a user event.", ex);
+        }
         
         // Get the button elements. This will fetch things like the "signup" and "support" buttons.
         IEnumerable<HtmlNode> buttonElements = userEventHtmlDiv.Descendants("a");
@@ -133,19 +142,36 @@ public class UserEventParser
         List<HtmlNode> dataNodes = userEventHtmlDiv.Descendants("div").SkipWhile(el => !el.InnerText.ToLowerInvariant().Contains("datum")).ToList();
 
         // Scrape all the raw data directly from the HTML nodes.
-        rawDate = Regex.Match(dataNodes[0].InnerText, @"Datum\s*:\s*(.*)").Groups[1].Value;
-        rawStartTime = Regex.Match(dataNodes[1].InnerText, @"Start\s*:\s*(.*)").Groups[1].Value;
-        rawEndTime = Regex.Match(dataNodes[2].InnerText, @"Slut\s*:\s*(.*)").Groups[1].Value;
-        rawLastSignupDate = Regex.Match(dataNodes[3].InnerText, @"Sista anmdatum\s*:\s*(.*)").Groups[1].Value;
-        type = Regex.Match(dataNodes[4].InnerText, @"Typ\s*:\s*(.*)").Groups[1].Value;
+        try
+        {
+            rawDate = Regex.Match(dataNodes[0].InnerText, @"Datum\s*:\s*(.*)").Groups[1].Value;
+            rawStartTime = Regex.Match(dataNodes[1].InnerText, @"Start\s*:\s*(.*)").Groups[1].Value;
+            rawEndTime = Regex.Match(dataNodes[2].InnerText, @"Slut\s*:\s*(.*)").Groups[1].Value;
+            rawLastSignupDate = Regex.Match(dataNodes[3].InnerText, @"Sista anmdatum\s*:\s*(.*)").Groups[1].Value;
+            type = Regex.Match(dataNodes[4].InnerText, @"Typ\s*:\s*(.*)").Groups[1].Value;
 
-        if (registered)
-            anonymousCode = Regex.Match(dataNodes[5].InnerText, @"Anonym kod\s*:\s*(.*)").Groups[1].Value;
+            if (registered)
+                anonymousCode = Regex.Match(dataNodes[5].InnerText, @"Anonym kod\s*:\s*(.*)").Groups[1].Value;
+
+        }
+        catch (IndexOutOfRangeException ex)
+        {
+            Console.WriteLine(ex);
+            throw new ParseException("An error occured while scraping the date, start/end times, last signup date, type of event, or anonymous user code.", ex);
+        }
 
         // Start turning raw data into usable types.
-        lastSignupDate = DateTime.Parse(rawLastSignupDate);
-        startTime = DateTime.Parse(rawDate + " " + rawStartTime);
-        endTime = DateTime.Parse(rawDate + " " + rawEndTime);
+        try
+        {
+            lastSignupDate = DateTime.Parse(rawLastSignupDate);
+            startTime = DateTime.Parse(rawDate + " " + rawStartTime);
+            endTime = DateTime.Parse(rawDate + " " + rawEndTime);
+        }
+        catch (FormatException ex)
+        {
+            Console.WriteLine(ex);
+            throw new ParseException("An error occured while parsing the format of the last signup date or the start/end times and dates.");
+        }
 
         return new AvailableUserEvent(title, type, lastSignupDate, startTime, endTime, id, participatorId, supportId, anonymousCode, registered, supportAvailable, mustChooseLocation);
     }
@@ -171,21 +197,45 @@ public class UserEventParser
         string rawFirstSignupDate;
 
         // Scrape title directly.
-        title = userEventHtmlDiv.Descendants("b").First().InnerText.Trim();
+        try
+        {
+            title = userEventHtmlDiv.Descendants("b").First().InnerText.Trim();
+        }
+        catch (ArgumentNullException ex)
+        {
+            Console.WriteLine(ex);
+            throw new ParseException("An error occured while scraping the title of a user event.", ex);
+        }
 
         List<HtmlNode> dataNodes = userEventHtmlDiv.Descendants("div").Skip(1).ToList();
 
         // Scrape all the raw data directly from the HTML nodes.
-        rawDate = Regex.Match(dataNodes[0].InnerText, @"Datum\s*:\s*(.*)").Groups[1].Value;
-        rawStartTime = Regex.Match(dataNodes[1].InnerText, @"Start\s*:\s*(.*)").Groups[1].Value;
-        rawEndTime = Regex.Match(dataNodes[2].InnerText, @"Slut\s*:\s*(.*)").Groups[1].Value;
-        rawFirstSignupDate = Regex.Match(dataNodes[3].InnerText, @"Första anmdatum\s*:\s*(.*)").Groups[1].Value;
-        type = Regex.Match(dataNodes[4].InnerText, @"Typ\s*:\s*(.*)").Groups[1].Value;
+        try
+        {
+            rawDate = Regex.Match(dataNodes[0].InnerText, @"Datum\s*:\s*(.*)").Groups[1].Value;
+            rawStartTime = Regex.Match(dataNodes[1].InnerText, @"Start\s*:\s*(.*)").Groups[1].Value;
+            rawEndTime = Regex.Match(dataNodes[2].InnerText, @"Slut\s*:\s*(.*)").Groups[1].Value;
+            rawFirstSignupDate = Regex.Match(dataNodes[3].InnerText, @"Första anmdatum\s*:\s*(.*)").Groups[1].Value;
+            type = Regex.Match(dataNodes[4].InnerText, @"Typ\s*:\s*(.*)").Groups[1].Value;
+        }
+        catch (IndexOutOfRangeException ex)
+        {
+            Console.WriteLine(ex);
+            throw new ParseException("An error occured while scraping the date, start/end times, last signup date, or type of event.", ex);
+        }
 
         // Start turning raw data into usable types.
-        firstSignupDate = DateTime.Parse(rawFirstSignupDate);
-        startTime = DateTime.Parse(rawDate + " " + rawStartTime);
-        endTime = DateTime.Parse(rawDate + " " + rawEndTime);
+        try
+        {
+            firstSignupDate = DateTime.Parse(rawFirstSignupDate);
+            startTime = DateTime.Parse(rawDate + " " + rawStartTime);
+            endTime = DateTime.Parse(rawDate + " " + rawEndTime);
+        }
+        catch (FormatException ex)
+        {
+            Console.WriteLine(ex);
+            throw new ParseException("An error occured while parsing the last signup date or start/end times and dates.", ex);
+        }
 
         return new UpcomingUserEvent(title, type, firstSignupDate, startTime, endTime);
     }

@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "n+twBlSprEPyVQK5Uj9irbJKKJ3v9U8gpbxJjC79gdQosBk3qA7mCf9P9k9z6Qgpks/tHBXsC1Fq4043lx2kNA==",
+  "dgSpecHash": "7qGKxe90rDT0NiFtWNPbDrlQHjfGqiN51Rc8Ky2GzfMMn1EXcmC67IAfr6KOpmHeYv4k2k+oB+egpiHmlkTO+A==",
   "success": true,
   "projectFilePath": "C:\\Users\\workl\\Documents\\git\\tumbleRebuild\\TumbleBackend\\Models\\WebAPIModels.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\workl\\.nuget\\packages\\htmlagilitypack\\1.11.43\\htmlagilitypack.1.11.43.nupkg.sha512"
+  ],
   "logs": []
 }
