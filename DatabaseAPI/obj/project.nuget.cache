@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "lZIAv0iMmtMsftrnUvxfbr+GA5W3ZJ+tNY/zBEYcFLj96a5HX5hkbkas4qNqzkWaxFi95c55qocIRvQnYpUqjw==",
+  "dgSpecHash": "OPaGvjlnSs6S+cyzoEFunhKFp8pvFf6xGqXeHTSrKFEwXzxsqemAHA1CdbqlvmG79+w6TVP1NPT3nqp7n3reig==",
   "success": true,
   "projectFilePath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\DatabaseAPI\\DatabaseAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\workl\\.nuget\\packages\\dnsclient\\1.6.1\\dnsclient.1.6.1.nupkg.sha512",
+    "C:\\Users\\workl\\.nuget\\packages\\htmlagilitypack\\1.11.43\\htmlagilitypack.1.11.43.nupkg.sha512",
     "C:\\Users\\workl\\.nuget\\packages\\microsoft.netcore.platforms\\5.0.0\\microsoft.netcore.platforms.5.0.0.nupkg.sha512",
     "C:\\Users\\workl\\.nuget\\packages\\microsoft.win32.registry\\5.0.0\\microsoft.win32.registry.5.0.0.nupkg.sha512",
     "C:\\Users\\workl\\.nuget\\packages\\mongodb.bson\\2.16.1\\mongodb.bson.2.16.1.nupkg.sha512",

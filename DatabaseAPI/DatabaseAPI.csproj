@@ -10,4 +10,9 @@
     <PackageReference Include="MongoDB.Driver" Version="2.16.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\KronoxAPI\KronoxAPI.csproj" />
+    <ProjectReference Include="..\Models\WebAPIModels.csproj" />
+  </ItemGroup>
+
 </Project>

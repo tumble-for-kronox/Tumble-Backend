@@ -1,0 +1,17 @@
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\bin\Debug\net6.0\DatabaseAPI.deps.json
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\bin\Debug\net6.0\DatabaseAPI.dll
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\bin\Debug\net6.0\DatabaseAPI.pdb
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\bin\Debug\net6.0\KronoxAPI.dll
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\bin\Debug\net6.0\WebAPIModels.dll
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\bin\Debug\net6.0\KronoxAPI.pdb
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\bin\Debug\net6.0\WebAPIModels.pdb
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\obj\Debug\net6.0\DatabaseAPI.csproj.AssemblyReference.cache
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\obj\Debug\net6.0\DatabaseAPI.GeneratedMSBuildEditorConfig.editorconfig
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\obj\Debug\net6.0\DatabaseAPI.AssemblyInfoInputs.cache
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\obj\Debug\net6.0\DatabaseAPI.AssemblyInfo.cs
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\obj\Debug\net6.0\DatabaseAPI.csproj.CoreCompileInputs.cache
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\obj\Debug\net6.0\DatabaseAPI.csproj.CopyComplete
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\obj\Debug\net6.0\DatabaseAPI.dll
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\obj\Debug\net6.0\refint\DatabaseAPI.dll
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\obj\Debug\net6.0\DatabaseAPI.pdb
+D:\Coding\tumbleRebuild\TumbleBackend\DatabaseAPI\obj\Debug\net6.0\ref\DatabaseAPI.dll

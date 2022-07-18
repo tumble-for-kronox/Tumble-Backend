@@ -8,7 +8,8 @@
     ".NETCoreApp,Version=v6.0": {
       "WebAPIModels/1.0.0": {
         "dependencies": {
-          "KronoxAPI": "1.0.0"
+          "KronoxAPI": "1.0.0",
+          "MongoDB.Bson": "2.16.1"
         },
         "runtime": {
           "WebAPIModels.dll": {}
@@ -22,6 +23,18 @@
           }
         }
       },
+      "MongoDB.Bson/2.16.1": {
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "5.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.1/MongoDB.Bson.dll": {
+            "assemblyVersion": "2.16.1.0",
+            "fileVersion": "2.16.1.0"
+          }
+        }
+      },
+      "System.Runtime.CompilerServices.Unsafe/5.0.0": {},
       "KronoxAPI/1.0.0": {
         "dependencies": {
           "HtmlAgilityPack": "1.11.43"
@@ -44,6 +57,20 @@
       "sha512": "sha512-C2gpt+S2tdFlQMOC3DK7rHZ8iv6EpDuIo4v0UTUSGX1F1bZ+NAQ3gp77HK8/JfCDszUm3Y2rHoyTp/TpO4KOIA==",
       "path": "htmlagilitypack/1.11.43",
       "hashPath": "htmlagilitypack.1.11.43.nupkg.sha512"
+    },
+    "MongoDB.Bson/2.16.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-d647KTPQ7hWqJmvCg80iiVdm239llaUwMyIeRF/0zKpN+ddRWh9jT/g6R6WQrmi4qd7yodvv/Jn0rpEqh4QN8g==",
+      "path": "mongodb.bson/2.16.1",
+      "hashPath": "mongodb.bson.2.16.1.nupkg.sha512"
+    },
+    "System.Runtime.CompilerServices.Unsafe/5.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ZD9TMpsmYJLrxbbmdvhwt9YEgG5WntEnZ/d1eH8JBX9LBp+Ju8BSBhUGbZMNVHHomWo2KVImJhTDl2hIgw/6MA==",
+      "path": "system.runtime.compilerservices.unsafe/5.0.0",
+      "hashPath": "system.runtime.compilerservices.unsafe.5.0.0.nupkg.sha512"
     },
     "KronoxAPI/1.0.0": {
       "type": "project",

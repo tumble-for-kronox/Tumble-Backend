@@ -14,12 +14,12 @@ public class Day
     private readonly string _id;
     private readonly string _name;
     private readonly int _weekNumber;
-    private readonly DateOnly _date;
+    private readonly DateTime _date;
     private readonly List<Event> _events;
 
     public string Name => _name;
 
-    public DateOnly Date => _date;
+    public DateTime Date => _date;
 
     public int WeekNumber => _weekNumber;
 
@@ -33,13 +33,13 @@ public class Day
     /// <param name="name"></param>
     /// <param name="date"></param>
     /// <param name="events"></param>
-    public Day(string name, DateOnly date, List<Event> events)
+    public Day(string name, DateTime date, List<Event> events)
     {
         _id = Guid.NewGuid().ToString();
         _name = name;
         _date = date;
         _events = events;
 
-        _weekNumber = Utilities.DateUtils.GetIso8601WeekOfYear(date.ToDateTime(TimeOnly.MinValue));
+        _weekNumber = Utilities.DateUtils.GetIso8601WeekOfYear(date);
     }
 }

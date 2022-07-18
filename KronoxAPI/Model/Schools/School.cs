@@ -87,7 +87,7 @@ public class School
     /// <param name="sessionToken"></param>
     /// <param name="startDate"></param>
     /// <returns></returns>
-    public Schedule FetchSchedule(string id, LangEnum? language, string? sessionToken, DateTime? startDate)
+    public Schedule FetchSchedule(string id, LangEnum? language = null, string? sessionToken = null, DateTime? startDate = null)
     {
         string scheduleXmlString = KronoxFetchController.GetSchedule(id, Url, language, sessionToken, startDate).Result;
         XDocument scheduleXml = XDocument.Parse(scheduleXmlString);

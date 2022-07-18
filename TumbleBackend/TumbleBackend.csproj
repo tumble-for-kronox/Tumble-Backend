@@ -12,8 +12,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DatabaseAPI\DatabaseAPI.csproj" />
     <ProjectReference Include="..\KronoxAPI\KronoxAPI.csproj" />
     <ProjectReference Include="..\Models\WebAPIModels.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Utilities\" />
+    <Folder Include="Routes\" />
   </ItemGroup>
 
 </Project>

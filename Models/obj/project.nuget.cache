@@ -1,10 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "XCjYGqRfahiU0QWK12Leo0x9GWa3xotqMNIvG1Yd9ZGnM/ht9XfSPhoSygoUVPzEXndPdQafvSQx59rFAi3cdA==",
+  "dgSpecHash": "HF0pQSlsjeFPjuw6qpAowozf/Ao9R70Bc+tCqSEZYxmz4An3r+v1I7RuxqOAWLTKLiP9K0MxJsQ0QzkxbV4ufQ==",
   "success": true,
   "projectFilePath": "D:\\Coding\\tumbleRebuild\\TumbleBackend\\Models\\WebAPIModels.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\workl\\.nuget\\packages\\htmlagilitypack\\1.11.43\\htmlagilitypack.1.11.43.nupkg.sha512"
+    "C:\\Users\\workl\\.nuget\\packages\\htmlagilitypack\\1.11.43\\htmlagilitypack.1.11.43.nupkg.sha512",
+    "C:\\Users\\workl\\.nuget\\packages\\mongodb.bson\\2.16.1\\mongodb.bson.2.16.1.nupkg.sha512",
+    "C:\\Users\\workl\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\5.0.0\\system.runtime.compilerservices.unsafe.5.0.0.nupkg.sha512"
   ],
   "logs": []
 }

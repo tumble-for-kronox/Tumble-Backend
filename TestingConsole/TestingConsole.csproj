@@ -5,10 +5,17 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>dc559d16-4bb1-4fef-8bed-1583cc83bde6</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="2.16.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DatabaseAPI\DatabaseAPI.csproj" />
     <ProjectReference Include="..\KronoxAPI\KronoxAPI.csproj" />
+    <ProjectReference Include="..\Models\WebAPIModels.csproj" />
   </ItemGroup>
 
 </Project>

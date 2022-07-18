@@ -19,7 +19,7 @@ public class User
     private readonly string _username;
     private string _sessionToken;
 
-    public User(string name, string username, string? sessionToken)
+    public User(string name, string username, string sessionToken)
     {
         _name = name;
         _username = username;
@@ -44,7 +44,7 @@ public class User
     {
         if (SessionToken == null)
             throw new NullReferenceException("SessionToken was null when attempting to fetch user info. Make sure the user is logged in and that the sessionToken is not expired.");
-        
+
         string userEventsHtmlResult = KronoxFetchController.GetUserEvents(school.Url, SessionToken).Result;
         HtmlDocument userEventHtmlDoc = new();
         userEventHtmlDoc.LoadHtml(userEventsHtmlResult);

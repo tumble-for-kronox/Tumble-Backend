@@ -12,9 +12,9 @@ public class Location
     private readonly string _name;
     private readonly string _building;
     private readonly string _floor;
-    private readonly string _maxSeats;
+    private readonly int _maxSeats;
 
-    public Location(string id, string name, string building, string floor, string maxSeats)
+    public Location(string id, string name, string building, string floor, int maxSeats)
     {
         _id = id;
         _name = name;
@@ -27,7 +27,7 @@ public class Location
     /// For use as default or in case a location is not found.
     /// </summary>
     /// <returns><see cref="Location"/> wiht all values set as "N/A".</returns>
-    public static Location NotAvailable => new("N/A", "N/A", "N/A", "N/A", "N/A");
+    public static Location NotAvailable => new("N/A", "N/A", "N/A", "N/A", 0);
 
     public override string? ToString()
     {
@@ -42,5 +42,5 @@ public class Location
 
     public string Floor => _floor;
 
-    public string MaxSeats => _maxSeats;
+    public int MaxSeats => _maxSeats;
 }

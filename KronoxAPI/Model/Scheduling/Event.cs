@@ -18,6 +18,7 @@ public class Event
     private readonly DateTime _timeStart;
     private readonly DateTime _timeEnd;
     private readonly List<Location> _locations;
+    private readonly bool _isSpecial;
 
     public string Title => _title;
 
@@ -33,6 +34,8 @@ public class Event
 
     public string Id => _id;
 
+    public bool IsSpecial => _isSpecial;
+
     /// <summary>
     /// 
     /// </summary>
@@ -42,7 +45,7 @@ public class Event
     /// <param name="timeStart"></param>
     /// <param name="timeEnd"></param>
     /// <param name="locations"></param>
-    public Event(string title, Course course, List<Teacher> teachers, DateTime timeStart, DateTime timeEnd, List<Location> locations)
+    public Event(string title, Course course, List<Teacher> teachers, DateTime timeStart, DateTime timeEnd, List<Location> locations, bool isSpecial)
     {
         _id = Guid.NewGuid().ToString();
         _title = title;
@@ -51,6 +54,7 @@ public class Event
         _timeEnd = timeEnd;
         _locations = locations;
         _teachers = teachers;
+        _isSpecial = isSpecial;
     }
 
     public override string? ToString()

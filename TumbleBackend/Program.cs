@@ -8,13 +8,21 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+string? dbConnectionString = null;
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    dbConnectionString = builder.Configuration["DbConnectionString"];
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else if (app.Environment.IsProduction())
+{
+    dbConnectionString = Environment.GetEnvironmentVariable("DbConnectionString");
+}
+
+
 
 app.UseHttpsRedirection();
 
