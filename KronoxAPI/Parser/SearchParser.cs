@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using KronoxAPI.Model.Scheduling;
+using KronoxAPI.Extensions;
 using HtmlAgilityPack;
+using KronoxAPI.Exceptions;
 
 namespace KronoxAPI.Parser;
 
@@ -20,10 +22,14 @@ public class SearchParser
     /// <param name="htmlSearchResults"></param>
     /// <returns>The corresponding objects <see cref="List{Programme}"/> to the search results found in <paramref name="htmlSearchResults"/>.
     /// Any value within the <see cref="Programme"/> objects that could not be parsed correctly will output as <see cref="string"/> "N/A".</returns>
+    /// <exception cref="LoginException"></exception>
     public static List<Programme> ParseToProgrammes(string htmlSearchResults)
     {
         HtmlDocument document = new();
         document.LoadHtml(htmlSearchResults);
+
+        if (document.SesssionExpired())
+            throw new LoginException("Invalid credentials or expired session.");
 
         List<Programme> foundProgrammes = new();
 
@@ -48,7 +54,7 @@ public class SearchParser
 
             // If the ID can't be matched we can't use the entry, hence we move on
             if (idGroup == null) continue;
-            
+
             id = idGroup.Value;
 
             string[] splitTitles = hyperlink.InnerText.Split(",");

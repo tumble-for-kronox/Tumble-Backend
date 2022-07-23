@@ -76,6 +76,7 @@ public static class KronoxFetchController
     /// <param name="schoolUrl"></param>
     /// <param name="sessionToken"></param>
     /// <returns><see cref="string"/> HTML page, which carries <see cref="UserEvent"/> data.</returns>
+    /// <exception cref="HttpRequestException"></exception>
     public static async Task<string> GetUserEvents(string schoolUrl, string sessionToken)
     {
         Uri uri = new($"https://{schoolUrl}/aktivitetsanmalan.jsp");

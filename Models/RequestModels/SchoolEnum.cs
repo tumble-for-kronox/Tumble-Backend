@@ -1,4 +1,4 @@
-﻿namespace TumbleBackend.Utilities
+﻿namespace WebAPIModels.RequestModels
 {
     public enum SchoolEnum
     {

@@ -12,7 +12,7 @@ namespace KronoxAPI.Model.Scheduling;
 public class Schedule
 {
     private readonly string _id;
-    private readonly List<Day> _days;
+    private List<Day> _days;
     private readonly Dictionary<string, Course> _courses;
 
     /// <summary>
@@ -30,7 +30,7 @@ public class Schedule
 
     public string Id => _id;
 
-    public List<Day> Days => _days;
-
     public Dictionary<string, Course> Courses => _courses;
+
+    public List<Day> Days { get => _days; set => _days = value; }
 }

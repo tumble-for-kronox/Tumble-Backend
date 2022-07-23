@@ -26,11 +26,6 @@ public static class KronoxPushController
     /// <returns><see cref="string"/> containing the login session token.</returns>
     public static async Task<LoginResponse> Login(string username, string password, string schoolUrl)
     {
-        // Create CookieContainer to store eventual response cookies in
-        CookieContainer cookies = new();
-        // Make sure the client has a new, empty CookieContainer
-        clientHandler.CookieContainer = cookies;
-
         Uri uri = new($"https://{schoolUrl}/login_do.jsp");
 
         // Perform web request
@@ -44,7 +39,7 @@ public static class KronoxPushController
         string sessionToken = string.Empty;
 
         // Fetch cookies as iterable from CookieContainer
-        IEnumerable<Cookie> responseCookies = cookies.GetCookies(uri).Cast<Cookie>();
+        IEnumerable<Cookie> responseCookies = clientHandler.CookieContainer.GetCookies(uri).Cast<Cookie>();
         foreach (Cookie cookie in responseCookies)
         {
             if (cookie.Name == "JSESSIONID") sessionToken = cookie.Value;
@@ -156,7 +151,7 @@ public static class KronoxPushController
         // Perform web request
         HttpRequestMessage request = BuildGetRequestWithQueryParams(uri, query.ToString(), sessionToken);
         HttpResponseMessage response = await client.SendAsync(request);
-        
+
         if (response.StatusCode != HttpStatusCode.OK) return false;
 
         return true;

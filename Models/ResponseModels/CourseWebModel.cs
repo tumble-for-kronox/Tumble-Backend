@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace WebAPIModels;
+namespace WebAPIModels.ResponseModels;
 
 public class CourseWebModel
 {

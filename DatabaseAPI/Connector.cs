@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using WebAPIModels;
+using WebAPIModels.ResponseModels;
 
 namespace DatabaseAPI;
 

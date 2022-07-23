@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using KronoxAPI.Model.Users;
 
-namespace WebAPIModels;
+namespace WebAPIModels.ResponseModels;
 
 public class UserEventCollection
 {

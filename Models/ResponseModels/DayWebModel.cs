@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using KronoxAPI.Model.Scheduling;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace WebAPIModels
+namespace WebAPIModels.ResponseModels
 {
     public class DayWebModel
     {

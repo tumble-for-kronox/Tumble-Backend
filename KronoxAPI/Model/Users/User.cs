@@ -7,6 +7,7 @@ using HtmlAgilityPack;
 using KronoxAPI.Controller;
 using KronoxAPI.Model.Schools;
 using KronoxAPI.Parser;
+using KronoxAPI.Exceptions;
 
 namespace KronoxAPI.Model.Users;
 
@@ -35,20 +36,4 @@ public class User
     /// </summary>
     /// <returns><see cref="User"/> with all values set as "N/A".</returns>
     public static User NotAvailable => new("N/A", "N/A", "N/A");
-
-    /// <summary>
-    /// Fetch a list of <see cref="UserEvent"/> from Kronox's database.
-    /// </summary>
-    /// <returns>List of events connected to the User.</returns>
-    public Dictionary<string, List<UserEvent>> GetUserEvents(School school)
-    {
-        if (SessionToken == null)
-            throw new NullReferenceException("SessionToken was null when attempting to fetch user info. Make sure the user is logged in and that the sessionToken is not expired.");
-
-        string userEventsHtmlResult = KronoxFetchController.GetUserEvents(school.Url, SessionToken).Result;
-        HtmlDocument userEventHtmlDoc = new();
-        userEventHtmlDoc.LoadHtml(userEventsHtmlResult);
-
-        return UserEventParser.ParseToDict(userEventHtmlDoc);
-    }
 }

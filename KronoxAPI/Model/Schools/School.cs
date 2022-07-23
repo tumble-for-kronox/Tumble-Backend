@@ -9,8 +9,9 @@ using KronoxAPI.Model.Users;
 using KronoxAPI.Model.Scheduling;
 using KronoxAPI.Utilities;
 using KronoxAPI.Parser;
+using KronoxAPI.Exceptions;
 using HtmlAgilityPack;
-
+using System.Xml;
 
 namespace KronoxAPI.Model.Schools;
 
@@ -87,14 +88,24 @@ public class School
     /// <param name="sessionToken"></param>
     /// <param name="startDate"></param>
     /// <returns></returns>
+    /// <exception cref="ParseException"></exception>
     public Schedule FetchSchedule(string id, LangEnum? language = null, string? sessionToken = null, DateTime? startDate = null)
     {
         string scheduleXmlString = KronoxFetchController.GetSchedule(id, Url, language, sessionToken, startDate).Result;
-        XDocument scheduleXml = XDocument.Parse(scheduleXmlString);
-        List<Day> scheduleDaysOfEvents = ScheduleParser.ParseToDays(scheduleXml);
-        Dictionary<string, Course> courseDict = ScheduleParser.GetScheduleCourses(scheduleXml);
+        try
+        {
+            XDocument scheduleXml = XDocument.Parse(scheduleXmlString);
+            List<Day> scheduleDaysOfEvents = ScheduleParser.ParseToDays(scheduleXml);
+            Dictionary<string, Course> courseDict = ScheduleParser.GetScheduleCourses(scheduleXml);
 
-        return new Schedule(id, scheduleDaysOfEvents, courseDict);
+            return new Schedule(id, scheduleDaysOfEvents, courseDict);
+
+        }
+        catch (XmlException e)
+        {
+            Console.WriteLine(e.Message);
+            throw new ParseException("The requested schedule could not be found or was corrupted.", e);
+        }
     }
 
     /// <summary>
@@ -103,6 +114,7 @@ public class School
     /// <param name="searchQuery"></param>
     /// <param name="sessionToken"></param>
     /// <returns>The <see cref="List{Programme}"/> objects equivalent to the search results found in Kronox's database.</returns>
+    /// <exception cref="LoginException"></exception>
     public List<Programme> SearchProgrammes(string searchQuery, string? sessionToken)
     {
         string searchResultsHtml = KronoxFetchController.GetProgrammes(searchQuery, Url, sessionToken).Result;
@@ -118,6 +130,8 @@ public class School
     /// The <see cref="User"/> object with the found name, username (shortened username, that Kronox uses) and the active session token.
     /// Be aware that Kronox's session tokens expire after 15 minutes.
     /// </returns>
+    /// <exception cref="LoginException"></exception>
+    /// <exception cref="ParseException"></exception>
     public User Login(string username, string password)
     {
         Response.LoginResponse loginResponse = KronoxPushController.Login(username, password, Url).Result;
@@ -127,5 +141,24 @@ public class School
         Dictionary<string, string> result = UserParser.ParseToNames(loginResponseHtmlDocument);
 
         return new User(result["name"], result["username"], loginResponse.sessionToken);
+    }
+
+    /// <summary>
+    /// Fetch a list of <see cref="UserEvent"/> from Kronox's database.
+    /// </summary>
+    /// <returns>List of events connected to the User.</returns>
+    /// <exception cref="ParseException"></exception>
+    /// <exception cref="LoginException"></exception>
+    /// <exception cref="HttpRequestException"></exception>
+    public Dictionary<string, List<UserEvent>> GetUserEvents(string sessionToken)
+    {
+        if (sessionToken == null)
+            throw new NullReferenceException("SessionToken was null when attempting to fetch user info. Make sure the user is logged in and that the sessionToken is not expired.");
+
+        string userEventsHtmlResult = KronoxFetchController.GetUserEvents(this.Url, sessionToken).Result;
+        HtmlDocument userEventHtmlDoc = new();
+        userEventHtmlDoc.LoadHtml(userEventsHtmlResult);
+
+        return UserEventParser.ParseToDict(userEventHtmlDoc);
     }
 }

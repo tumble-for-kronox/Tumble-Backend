@@ -1,12 +1,13 @@
 ﻿using KronoxAPI.Model.Scheduling;
 using KronoxAPI.Model.Schools;
-using KronoxAPI.Utilities;
 using Microsoft.AspNetCore.Mvc;
-using TumbleBackend.Utilities;
 using TumbleBackend.Extensions;
 using WebAPIModels.Extensions;
-using WebAPIModels;
+using WebAPIModels.ResponseModels;
+using WebAPIModels.RequestModels;
 using DatabaseAPI;
+using static TumbleBackend.Library.ScheduleManagement;
+using KronoxAPI.Exceptions;
 
 namespace TumbleBackend.Controllers;
 
@@ -38,6 +39,9 @@ public class ScheduleController : ControllerBase
         if (school == null)
             return BadRequest(new Error("Invalid school value."));
 
+        if (school.LoginRequired && sessionToken == null)
+            return BadRequest(new Error($"Login required to access {school.Id} schedules."));
+
         // If given specific start date that parses correctly, simply fetch schedule directly from KronoxAPI and return it.
         if (startDateISO != null && DateTime.TryParse(startDateISO, out DateTime startDate))
             return Ok(BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken));
@@ -48,28 +52,36 @@ public class ScheduleController : ControllerBase
         // Attempt to get cached schedule.
         ScheduleWebModel? cachedSchedule = SchedulesCache.GetSchedule(scheduleId);
 
-        // On cached hit.
-        if (cachedSchedule != null)
+        try
         {
-            // Make sure cache TTL isn't passed.
-            if (Math.Abs(cachedSchedule.CachedAt.Subtract(DateTime.Now).TotalSeconds) >= int.Parse(config["CacheTTLInSeconds"]))
+            // On cached hit.
+            if (cachedSchedule != null)
             {
-                // Fetch and re-cache schedule if TTL has passed, making sure not to override/change course colors 
-                Schedule newScheduleData = school.FetchSchedule(scheduleId, null, sessionToken, startDate);
-                cachedSchedule = newScheduleData.ToWebModel(ConcatCourseDataForReCache(cachedSchedule.Courses, newScheduleData.Courses));
+                // Make sure cache TTL isn't passed.
+                if (Math.Abs(cachedSchedule.CachedAt.Subtract(DateTime.Now).TotalSeconds) >= int.Parse(config["CacheTTLInSeconds"]))
+                {
+                    // Fetch and re-cache schedule if TTL has passed, making sure not to override/change course colors 
+                    Schedule newScheduleData = school.FetchSchedule(scheduleId, null, sessionToken, startDate);
+                    cachedSchedule = newScheduleData.ToWebModel(ConcatCourseDataForReCache(cachedSchedule.Courses, newScheduleData.Courses));
+                    cachedSchedule.Days = cachedSchedule.Days.PadScheduleDays(startDate);
+                    SchedulesCache.UpdateSchedule(scheduleId, cachedSchedule);
+                }
 
-                SchedulesCache.UpdateSchedule(scheduleId, cachedSchedule);
+                // Return schedule (at this point up-to-date).
+                return Ok(cachedSchedule);
             }
 
-            // Return schedule (at this point up-to-date).
-            return Ok(cachedSchedule);
+            // On cache miss, fetch, cache, and return schedule from scratch.
+            ScheduleWebModel webSafeSchedule = BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken);
+            SchedulesCache.SaveSchedule(webSafeSchedule);
+
+            return Ok(webSafeSchedule);
         }
-
-        // On cache miss, fetch, cache, and return schedule from scratch.
-        ScheduleWebModel webSafeSchedule = BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken);
-        SchedulesCache.SaveSchedule(webSafeSchedule);
-
-        return Ok(webSafeSchedule);
+        catch (ParseException e)
+        {
+            _logger.LogError(e.Message);
+            return NotFound(new Error("Schedule wasn't found or may have been corrupted."));
+        }
     }
 
     /// <summary>
@@ -80,72 +92,21 @@ public class ScheduleController : ControllerBase
     /// <param name="sessionToken"></param>
     /// <returns>A list of <see cref="Programme"/> objects and an <see cref="int"/> Count. Although the name is "programme" they also map to individuals and schedules correctly.</returns>
     [HttpGet("search", Name = "SearchProgrammes")]
-    public IActionResult Search([FromQuery] string searchQuery, [FromQuery] SchoolEnum schoolId, [FromQuery] string? sessionToken = null)
+    public IActionResult Search([FromQuery] string searchQuery, [FromQuery] SchoolEnum? schoolId = null, [FromQuery] string? sessionToken = null)
     {
-        School? school = schoolId.GetSchool();
+        School? school = schoolId?.GetSchool();
 
         if (school == null)
             return BadRequest(new Error("Invalid school value."));
-
-        List<Programme> searchResult = school.SearchProgrammes(searchQuery, sessionToken);
-
-        return Ok(new { searchResult.Count, Items = searchResult });
-    }
-
-    /// <summary>
-    /// Method for fetching a schedule, generating colors for courses, and bundling courses into a dictionary. Used when a schedule is needed as "built from scratch".
-    /// </summary>
-    /// <param name="scheduleId"></param>
-    /// <param name="school"></param>
-    /// <param name="startDate"></param>
-    /// <param name="sessionToken"></param>
-    /// <returns></returns>
-    private static ScheduleWebModel BuildWebSafeSchedule(string scheduleId, School school, DateTime startDate, string? sessionToken)
-    {
-        Schedule schedule = school.FetchSchedule(scheduleId, null, sessionToken, startDate);
-        string[] courseColors = CourseColorUtil.GetScheduleColors(schedule.Courses.Count);
-
-        Dictionary<string, CourseWebModel> courses = schedule.Courses.Select((kvp, index) => kvp.Value.ToWebModel(courseColors[index], TranslatorUtil.SwedishToEnglish(kvp.Value.Name).Result)).ToDictionary(course => course.Id);
-
-        return schedule.ToWebModel(courses);
-    }
-
-    /// <summary>
-    /// A utility method used for concatenating two dicts of relatively <see cref="Dictionary{string, CourseWebModel}"/> and <see cref="Dictionary{string, Course}"/> into one, while generating new colors only for the courses that needs it.
-    /// <para>
-    /// Lot of side effects including: populating new courses with random colors and removing courses from dict1 that are not present in dict2. Should only be used when re-caching an already cached schedule with new data.
-    /// </para>
-    /// </summary>
-    /// <param name="dict1"></param>
-    /// <param name="dict2"></param>
-    /// <returns>Concatenated <see cref="Dictionary{string, CourseWebModel}"/> containing the updated and combined course information from both input dicts.</returns>
-    private static Dictionary<string, CourseWebModel> ConcatCourseDataForReCache(Dictionary<string, CourseWebModel> dict1, Dictionary<string, Course> dict2)
-    {
-        List<string> oldColors = new();
-        List<string> keysToRemoveFromDict1 = new();
-        foreach (string key in dict1.Keys)
+        try
         {
-            if (!dict2.ContainsKey(key))
-            {
-                keysToRemoveFromDict1.Add(key);
-                continue;
-            }
-
-            dict2.Remove(key);
-            oldColors.Add(dict1[key].Color);
+            List<Programme> searchResult = school.SearchProgrammes(searchQuery, sessionToken);
+            return Ok(new { searchResult.Count, Items = searchResult });
         }
-
-        string[] newColors = new string[dict2.Count].Concat(oldColors.ToArray()).ToArray();
-        for (int i = oldColors.Count; i < oldColors.Count + dict2.Count; i++)
+        catch (LoginException e)
         {
-            string curColor = CourseColorUtil.GetSingleRandColor();
-
-            while (newColors.Contains(curColor))
-                curColor = CourseColorUtil.GetSingleRandColor();
+            _logger.LogError(e.Message);
+            return Unauthorized(new Error("Invalid credentials, please login again."));
         }
-
-        Dictionary<string, CourseWebModel> dict2Converted = dict2.Select((kvp, i) => kvp.Value.ToWebModel(newColors[i], TranslatorUtil.SwedishToEnglish(kvp.Value.Name).Result)).ToDictionary(course => course.Id);
-
-        return dict1.Concat(dict2Converted).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     }
 }

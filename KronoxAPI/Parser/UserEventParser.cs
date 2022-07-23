@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using KronoxAPI.Model.Users;
 using KronoxAPI.Exceptions;
+using KronoxAPI.Extensions;
 using HtmlAgilityPack;
 
 namespace KronoxAPI.Parser;
@@ -30,40 +31,53 @@ public class UserEventParser
     /// </list>
     /// </para>
     /// </returns>
+    /// <exception cref="ParseException"></exception>
+    /// <exception cref="LoginException"></exception>
     public static Dictionary<string, List<UserEvent>> ParseToDict(HtmlDocument userEventsHtml)
     {
         Dictionary<string, List<UserEvent>> userEvents = new() { { "registered", new() }, { "unregistered", new() }, { "upcoming", new() } };
 
         // Fetch all individual user event div nodes for scraping.
-        IEnumerable<HtmlNode> registeredEvents = userEventsHtml.DocumentNode.SelectSingleNode("/html/body/div[2]/div[4]/div/div[1]/div").SelectNodes("*");
-        IEnumerable<HtmlNode> unregisteredEvents = userEventsHtml.DocumentNode.SelectSingleNode("/html/body/div[2]/div[4]/div/div[2]/div").SelectNodes("*");
-        IEnumerable<HtmlNode> upcomingEvents = userEventsHtml.DocumentNode.SelectSingleNode("/html/body/div[2]/div[4]/div/div[3]/div").SelectNodes("*");
-
-        if (registeredEvents != null)
+        try
         {
-            foreach (HtmlNode registeredEvent in registeredEvents)
+            IEnumerable<HtmlNode> registeredEvents = userEventsHtml.DocumentNode.SelectSingleNode("/html/body/div[2]/div[4]/div/div[1]/div").SelectNodes("*");
+            IEnumerable<HtmlNode> unregisteredEvents = userEventsHtml.DocumentNode.SelectSingleNode("/html/body/div[2]/div[4]/div/div[2]/div").SelectNodes("*");
+            IEnumerable<HtmlNode> upcomingEvents = userEventsHtml.DocumentNode.SelectSingleNode("/html/body/div[2]/div[4]/div/div[3]/div").SelectNodes("*");
+
+            if (registeredEvents != null)
             {
-                userEvents["registered"].Add(ParseAvailableEvent(registeredEvent));
+                foreach (HtmlNode registeredEvent in registeredEvents)
+                {
+                    userEvents["registered"].Add(ParseAvailableEvent(registeredEvent));
+                }
             }
+
+            if (unregisteredEvents != null)
+            {
+                foreach (HtmlNode unregisteredEvent in unregisteredEvents)
+                {
+                    userEvents["unregistered"].Add(ParseAvailableEvent(unregisteredEvent));
+                }
+            }
+
+            if (upcomingEvents != null)
+            {
+                foreach (HtmlNode upcomingEvent in upcomingEvents)
+                {
+                    userEvents["upcoming"].Add(ParseUpcomingEvent(upcomingEvent));
+                }
+            }
+
+            return userEvents;
+        }
+        catch (NullReferenceException e)
+        {
+            if (userEventsHtml.SesssionExpired())
+                throw new LoginException("Kronox rejected the login attempt due to bad credentials or something else on their end.", e);
+
+            throw new ParseException("An error occurred while attempting to parse registered, unregistered, and upcoming events.", e);
         }
 
-        if (unregisteredEvents != null)
-        {
-            foreach (HtmlNode unregisteredEvent in unregisteredEvents)
-            {
-                userEvents["unregistered"].Add(ParseAvailableEvent(unregisteredEvent));
-            }
-        }
-        
-        if (upcomingEvents != null)
-        {
-            foreach (HtmlNode upcomingEvent in upcomingEvents)
-            {
-                userEvents["upcoming"].Add(ParseUpcomingEvent(upcomingEvent));
-            }
-        }
-
-        return userEvents;
     }
 
     /// <summary>
@@ -71,6 +85,7 @@ public class UserEventParser
     /// </summary>
     /// <param name="userEventHtmlDiv"></param>
     /// <returns>The <see cref="AvailableUserEvent"/> object with the same data as the user event div from <paramref name="userEventHtmlDiv"/>.</returns>
+    /// <exception cref="ParseException"></exception>
     public static AvailableUserEvent ParseAvailableEvent(HtmlNode userEventHtmlDiv)
     {
         // Variables needed to construct the AvailableUserEvent in the end.
@@ -103,7 +118,7 @@ public class UserEventParser
             Console.WriteLine(ex);
             throw new ParseException("An error occured while parsing the title of a user event.", ex);
         }
-        
+
         // Get the button elements. This will fetch things like the "signup" and "support" buttons.
         IEnumerable<HtmlNode> buttonElements = userEventHtmlDiv.Descendants("a");
 
@@ -133,7 +148,10 @@ public class UserEventParser
             // The button is a "sign up" button.
             if (button.GetAttributeValue("onclick", "").ToLowerInvariant().Contains("anmal"))
             {
-                Match eventIdAndLocationChoice = Regex.Match(HttpUtility.HtmlDecode(button.GetAttributeValue("onclick", "").ToLowerInvariant()), @"anmal\('(.*?)', (.*?)\)");
+                Console.WriteLine("SIGNUP CASE");
+                Console.WriteLine(HttpUtility.HtmlDecode(button.GetAttributeValue("onclick", "").ToLowerInvariant()));
+
+                Match eventIdAndLocationChoice = Regex.Match(HttpUtility.HtmlDecode(button.GetAttributeValue("onclick", "").ToLowerInvariant()), @"anmal\('(.*?)',\s*(.*?)\)");
                 id = eventIdAndLocationChoice.Groups[1].Value;
                 if (eventIdAndLocationChoice.Groups[2].Value == "true") mustChooseLocation = true;
             }
@@ -181,6 +199,7 @@ public class UserEventParser
     /// </summary>
     /// <param name="userEventHtmlDiv"></param>
     /// <returns>The <see cref="UpcomingUserEvent"/> corresponding to the input <paramref name="userEventHtmlDiv"/>.</returns>
+    /// <exception cref="ParseException"></exception>
     public static UpcomingUserEvent ParseUpcomingEvent(HtmlNode userEventHtmlDiv)
     {
         // Variables needed to construct the UpcomingUserEvent in the end.

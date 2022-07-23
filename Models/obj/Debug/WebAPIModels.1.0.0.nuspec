@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>WebAPIModels</id>
+    <version>1.0.0</version>
+    <authors>WebAPIModels</authors>
+    <description>Package Description</description>
+    <dependencies>
+      <group targetFramework="net6.0">
+        <dependency id="KronoxAPI" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="MongoDB.Bson" version="2.16.1" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="D:\Coding\tumbleRebuild\TumbleBackend\Models\bin\Debug\net6.0\WebAPIModels.dll" target="lib\net6.0\WebAPIModels.dll" />
+  </files>
+</package>

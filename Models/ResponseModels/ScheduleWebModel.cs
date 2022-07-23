@@ -9,22 +9,22 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace WebAPIModels;
+namespace WebAPIModels.ResponseModels;
 
 public class ScheduleWebModel
 {
     private readonly string _id;
     private DateTime _cachedAt;
-    private readonly List<DayWebModel> _days;
-    private readonly Dictionary<string, CourseWebModel> _courses;
+    private List<DayWebModel> _days;
+    private Dictionary<string, CourseWebModel> _courses;
 
     public string Id => _id;
 
     public DateTime CachedAt { get => _cachedAt; private set => _cachedAt = value; }
 
-    public List<DayWebModel> Days => _days;
+    public List<DayWebModel> Days { get => _days; set => _days = value; }
 
-    public Dictionary<string, CourseWebModel> Courses => _courses;
+    public Dictionary<string, CourseWebModel> Courses { get => _courses; set => _courses = value; }
 
 
     public void UpdateCachedAt()

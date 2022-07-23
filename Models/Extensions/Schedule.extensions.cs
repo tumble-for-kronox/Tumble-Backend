@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebAPIModels.ResponseModels;
 
 namespace WebAPIModels.Extensions;
 
-public static class ScheduleWebModelExtension
+public static class ScheduleExtensions
 {
     /// <summary>
     /// Create a Web Model object from a given <see cref="Schedule"/> object with the current time as the CachedAt value.

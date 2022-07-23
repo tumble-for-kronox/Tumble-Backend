@@ -1,5 +1,5 @@
 ﻿using MongoDB.Driver;
-using WebAPIModels;
+using WebAPIModels.ResponseModels;
 
 namespace DatabaseAPI;
 

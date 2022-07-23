@@ -1,0 +1,17 @@
+﻿using HtmlAgilityPack;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace KronoxAPI.Extensions;
+
+public static class HtmlDocumentExtensions
+{
+    public static bool SesssionExpired(this HtmlDocument doc)
+    {
+        return doc.DocumentNode.SelectSingleNode("//*[@id=\"inaktiv\"]") != null;
+    }
+
+}
