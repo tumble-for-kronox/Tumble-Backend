@@ -92,8 +92,9 @@ public class School
         string scheduleXmlString = KronoxFetchController.GetSchedule(id, Url, language, sessionToken, startDate).Result;
         XDocument scheduleXml = XDocument.Parse(scheduleXmlString);
         List<Day> scheduleDaysOfEvents = ScheduleParser.ParseToDays(scheduleXml);
+        Dictionary<string, Course> courseDict = ScheduleParser.GetScheduleCourses(scheduleXml);
 
-        return new Schedule(id, scheduleDaysOfEvents);
+        return new Schedule(id, scheduleDaysOfEvents, courseDict);
     }
 
     /// <summary>

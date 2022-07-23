@@ -15,7 +15,6 @@ public static class Connector
     private static MongoClient? _client;
     private static MongoDatabaseBase? _database;
     private static MongoCollectionBase<ScheduleWebModel>? _schedules;
-    private static MongoCollectionBase<CourseWebModel>? _courses;
 
     public static void Init(string connectionString)
     {
@@ -29,11 +28,8 @@ public static class Connector
         _client = new MongoClient(connectionString);
         _database = (MongoDatabaseBase)_client.GetDatabase("test_db");
         _schedules = (MongoCollectionBase<ScheduleWebModel>)_database.GetCollection<ScheduleWebModel>("schedules");
-        _courses = (MongoCollectionBase<CourseWebModel>)_database.GetCollection<CourseWebModel>("course_colors");
 
     }
 
     internal static MongoCollectionBase<ScheduleWebModel>? Schedules => _schedules;
-
-    internal static MongoCollectionBase<CourseWebModel>? Courses => _courses;
 }

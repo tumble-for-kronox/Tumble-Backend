@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
@@ -15,11 +16,6 @@
     <ProjectReference Include="..\DatabaseAPI\DatabaseAPI.csproj" />
     <ProjectReference Include="..\KronoxAPI\KronoxAPI.csproj" />
     <ProjectReference Include="..\Models\WebAPIModels.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Utilities\" />
-    <Folder Include="Routes\" />
   </ItemGroup>
 
 </Project>

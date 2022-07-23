@@ -23,13 +23,12 @@ public static class ScheduleParser
     {
         Dictionary<string, Teacher> teachersDict = GetScheduleTeachers(scheduleXml);
         Dictionary<string, Location> locationsDict = GetScheduleLocations(scheduleXml);
-        Dictionary<string, Course> coursesDict = GetScheduleCourses(scheduleXml);
 
         List<Event> events = new();
 
         foreach (XElement e in scheduleXml.Descendants("schemaPost"))
         {
-            events.Add(XmlToEvent(e, teachersDict, locationsDict, coursesDict));
+            events.Add(XmlToEvent(e, teachersDict, locationsDict));
         }
 
         return events;
@@ -44,13 +43,12 @@ public static class ScheduleParser
     {
         Dictionary<string, Teacher> teachersDict = GetScheduleTeachers(scheduleXml);
         Dictionary<string, Location> locationsDict = GetScheduleLocations(scheduleXml);
-        Dictionary<string, Course> coursesDict = GetScheduleCourses(scheduleXml);
 
         List<Day> days = new();
 
         foreach (XElement element in scheduleXml.Descendants("schemaPost"))
         {
-            Event currentEvent = XmlToEvent(element, teachersDict, locationsDict, coursesDict);
+            Event currentEvent = XmlToEvent(element, teachersDict, locationsDict);
 
             if (days.Count == 0 || currentEvent.TimeStart.Date != days.Last().Date)
             {
@@ -75,9 +73,8 @@ public static class ScheduleParser
     /// <param name="eventElement"></param>
     /// <param name="teachersDict"></param>
     /// <param name="locationsDict"></param>
-    /// <param name="coursesDict"></param>
     /// <returns></returns>
-    public static Event XmlToEvent(XElement eventElement, Dictionary<string, Teacher> teachersDict, Dictionary<string, Location> locationsDict, Dictionary<string, Course> coursesDict)
+    public static Event XmlToEvent(XElement eventElement, Dictionary<string, Teacher> teachersDict, Dictionary<string, Location> locationsDict)
     {
         // Parse all needed Event info from the xml document into strings
         string title = eventElement.Element("moment") == null ? "" : eventElement.Element("moment")!.Value;
@@ -89,7 +86,6 @@ public static class ScheduleParser
         string timeEndIsoString = eventElement.Element("bokadeDatum")!.Attribute("slutDatumTid_iCal")!.Value;
 
         // Parse and translate the gathered info from above into correct types and formats
-        Course course = coursesDict.GetValueOrDefault(courseId, Course.NotAvailable);
         string parsedTitle = Regex.Replace(title, "<.*?>", str => "");
         DateTime.TryParseExact(timeStartIsoString, new string[] { "yyyyMMddTHHmmssZ" }, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime timeStart);
         DateTime.TryParseExact(timeEndIsoString, new string[] { "yyyyMMddTHHmmssZ" }, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime timeEnd);
@@ -101,7 +97,7 @@ public static class ScheduleParser
         // Translate the event's location ids into location objects
         locationIds.ForEach(id => locations.Add(locationsDict.GetValueOrDefault(id, Location.NotAvailable)));
 
-        return new Event(parsedTitle, course, teachers, timeStart, timeEnd, locations, eventType == "A");
+        return new Event(parsedTitle, courseId, teachers, timeStart, timeEnd, locations, eventType == "A");
     }
 
     /// <summary>

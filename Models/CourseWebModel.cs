@@ -12,19 +12,23 @@ namespace WebAPIModels;
 public class CourseWebModel
 {
     private readonly string _id;
-    private readonly string _name;
+    private readonly string _swedishName;
+    private readonly string _englishName;
     private readonly string _color;
 
     public string Id => _id;
 
-    public string Name => _name;
+    public string SwedishName => _swedishName;
+
+    public string EnglishName => _englishName;
 
     public string Color => _color;
 
-    public CourseWebModel(string id, string name, string color)
+    public CourseWebModel(string id, string swedishName, string color, string englishName)
     {
         _id = id;
-        _name = name;
+        _swedishName = swedishName;
+        _englishName = englishName;
         _color = color;
     }
 

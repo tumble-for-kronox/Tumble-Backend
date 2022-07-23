@@ -14,26 +14,30 @@ namespace WebAPIModels;
 public class ScheduleWebModel
 {
     private readonly string _id;
-    private string _cachedAt;
+    private DateTime _cachedAt;
     private readonly List<DayWebModel> _days;
+    private readonly Dictionary<string, CourseWebModel> _courses;
 
     public string Id => _id;
 
-    public string CachedAt { get => _cachedAt; private set => _cachedAt = value; }
+    public DateTime CachedAt { get => _cachedAt; private set => _cachedAt = value; }
 
     public List<DayWebModel> Days => _days;
+
+    public Dictionary<string, CourseWebModel> Courses => _courses;
 
 
     public void UpdateCachedAt()
     {
-        CachedAt = DateTime.Now.ToString("o");
+        CachedAt = DateTime.Now;
     }
 
-    public ScheduleWebModel(string id, string cachedAt, List<DayWebModel> days)
+    public ScheduleWebModel(string id, DateTime cachedAt, List<DayWebModel> days, Dictionary<string, CourseWebModel> courses)
     {
         _id = id;
         _cachedAt = cachedAt;
         _days = days;
+        _courses = courses;
     }
     public string ToJson() => JsonSerializer.Serialize(this, new JsonSerializerOptions() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 

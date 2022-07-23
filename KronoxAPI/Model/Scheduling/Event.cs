@@ -13,7 +13,7 @@ public class Event
 {
     private readonly string _id;
     private readonly string _title;
-    private readonly Course _course;
+    private readonly string _courseId;
     private readonly List<Teacher> _teachers;
     private readonly DateTime _timeStart;
     private readonly DateTime _timeEnd;
@@ -22,7 +22,7 @@ public class Event
 
     public string Title => _title;
 
-    public Course Course => _course;
+    public string CourseId => _courseId;
 
     public DateTime TimeStart => _timeStart;
 
@@ -45,11 +45,11 @@ public class Event
     /// <param name="timeStart"></param>
     /// <param name="timeEnd"></param>
     /// <param name="locations"></param>
-    public Event(string title, Course course, List<Teacher> teachers, DateTime timeStart, DateTime timeEnd, List<Location> locations, bool isSpecial)
+    public Event(string title, string courseId, List<Teacher> teachers, DateTime timeStart, DateTime timeEnd, List<Location> locations, bool isSpecial)
     {
         _id = Guid.NewGuid().ToString();
         _title = title;
-        _course = course;
+        _courseId = courseId;
         _timeStart = timeStart;
         _timeEnd = timeEnd;
         _locations = locations;
@@ -59,7 +59,7 @@ public class Event
 
     public override string? ToString()
     {
-        return $"Id: {_id}\nCourse: {_course.Name}\nTitle: {_title}\nStarts: {_timeStart:yyyy-MM-dd HH:mm}" +
+        return $"Id: {_id}\nCourse: {_courseId}\nTitle: {_title}\nStarts: {_timeStart:yyyy-MM-dd HH:mm}" +
             $"\nEnds: {_timeEnd:yyyy-MM-dd HH:mm}\nTeachers: [{String.Join(", ", _teachers)}]\nLocations: [{String.Join(", ", _locations)}]";
     }
 }

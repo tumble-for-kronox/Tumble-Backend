@@ -14,13 +14,11 @@ public static class ScheduleWebModelExtension
     /// </summary>
     /// <param name="schedule"></param>
     /// <returns>A <see cref="ScheduleWebModel"/> with the current time as its CachedAt value.</returns>
-    public static ScheduleWebModel ToWebModel(this Schedule schedule)
+    public static ScheduleWebModel ToWebModel(this Schedule schedule, Dictionary<string, CourseWebModel> convertedCourses)
     {
-        List<DayWebModel> days = new List<DayWebModel>();
+        List<DayWebModel> convertedDays = schedule.Days.Select(day => day.ToWebModel()).ToList();
 
-        schedule.Days.ForEach(day => days.Add(day.ToWebModel()));
-
-        return new ScheduleWebModel(schedule.Id, DateTime.Now.ToString("o"), days);
+        return new ScheduleWebModel(schedule.Id, DateTime.Now, convertedDays, convertedCourses);
     }
 
     /// <summary>
@@ -29,11 +27,10 @@ public static class ScheduleWebModelExtension
     /// <param name="schedule"></param>
     /// <param name="cachedAt"></param>
     /// <returns>A <see cref="ScheduleWebModel"/> with the passed datetime as its CachedAt value.</returns>
-    public static ScheduleWebModel ToWebModel(this Schedule schedule, DateTime cachedAt)
+    public static ScheduleWebModel ToWebModel(this Schedule schedule, DateTime cachedAt, Dictionary<string, CourseWebModel> convertedCourses)
     {
-        List<DayWebModel> days = new List<DayWebModel>();
-        schedule.Days.ForEach(day => days.Add(day.ToWebModel()));
+        List<DayWebModel> convertedDays = schedule.Days.Select(day => day.ToWebModel()).ToList();
 
-        return new ScheduleWebModel(schedule.Id, cachedAt.ToString("o"), days);
+        return new ScheduleWebModel(schedule.Id, cachedAt, convertedDays, convertedCourses);
     }
 }
