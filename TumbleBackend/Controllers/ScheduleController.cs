@@ -8,6 +8,7 @@ using WebAPIModels.RequestModels;
 using DatabaseAPI;
 using static TumbleBackend.Library.ScheduleManagement;
 using KronoxAPI.Exceptions;
+using TumbleBackend.Utilities;
 
 namespace TumbleBackend.Controllers;
 
@@ -54,17 +55,15 @@ public class ScheduleController : ControllerBase
 
         try
         {
-            // On cached hit.
+            // On cache hit.
             if (cachedSchedule != null)
             {
                 // Make sure cache TTL isn't passed.
                 if (Math.Abs(cachedSchedule.CachedAt.Subtract(DateTime.Now).TotalSeconds) >= int.Parse(config["CacheTTLInSeconds"]))
                 {
                     // Fetch and re-cache schedule if TTL has passed, making sure not to override/change course colors 
-                    Schedule newScheduleData = school.FetchSchedule(scheduleId, null, sessionToken, startDate);
-                    cachedSchedule = newScheduleData.ToWebModel(ConcatCourseDataForReCache(cachedSchedule.Courses, newScheduleData.Courses));
-                    cachedSchedule.Days = cachedSchedule.Days.PadScheduleDays(startDate);
-                    SchedulesCache.UpdateSchedule(scheduleId, cachedSchedule);
+                    ScheduleWebModel scheduleFetchForRecache = BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken);
+                    SchedulesCache.UpdateSchedule(scheduleId, scheduleFetchForRecache);
                 }
 
                 // Return schedule (at this point up-to-date).
@@ -72,10 +71,10 @@ public class ScheduleController : ControllerBase
             }
 
             // On cache miss, fetch, cache, and return schedule from scratch.
-            ScheduleWebModel webSafeSchedule = BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken);
-            SchedulesCache.SaveSchedule(webSafeSchedule);
+            ScheduleWebModel newScheduleFetch = BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken);
+            SchedulesCache.SaveSchedule(newScheduleFetch);
 
-            return Ok(webSafeSchedule);
+            return Ok(newScheduleFetch);
         }
         catch (ParseException e)
         {

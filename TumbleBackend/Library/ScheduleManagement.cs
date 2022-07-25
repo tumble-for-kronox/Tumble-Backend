@@ -24,9 +24,8 @@ public class ScheduleManagement
         try
         {
             Schedule schedule = school.FetchSchedule(scheduleId, null, sessionToken, startDate);
-            string[] courseColors = CourseColorUtil.GetScheduleColors(schedule.Courses.Count);
 
-            Dictionary<string, CourseWebModel> courses = schedule.Courses.Select((kvp, index) => kvp.Value.ToWebModel(courseColors[index], TranslatorUtil.SwedishToEnglish(kvp.Value.Name).Result)).ToDictionary(course => course.Id);
+            Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(TranslatorUtil.SwedishToEnglish(kvp.Value.Name).Result)).ToDictionary(course => course.Id);
             ScheduleWebModel webSafeSchedule = schedule.ToWebModel(courses);
             webSafeSchedule.Days = webSafeSchedule.Days.PadScheduleDays(startDate);
 
@@ -37,44 +36,5 @@ public class ScheduleManagement
             Console.WriteLine(e.Message);
             throw;
         }
-    }
-
-    /// <summary>
-    /// A utility method used for concatenating two dicts of relatively <see cref="Dictionary{string, CourseWebModel}"/> and <see cref="Dictionary{string, Course}"/> into one, while generating new colors only for the courses that needs it.
-    /// <para>
-    /// Lot of side effects including: populating new courses with random colors and removing courses from dict1 that are not present in dict2. Should only be used when re-caching an already cached schedule with new data.
-    /// </para>
-    /// </summary>
-    /// <param name="dict1"></param>
-    /// <param name="dict2"></param>
-    /// <returns>Concatenated <see cref="Dictionary{string, CourseWebModel}"/> containing the updated and combined course information from both input dicts.</returns>
-    public static Dictionary<string, CourseWebModel> ConcatCourseDataForReCache(Dictionary<string, CourseWebModel> dict1, Dictionary<string, Course> dict2)
-    {
-        List<string> oldColors = new();
-        List<string> keysToRemoveFromDict1 = new();
-        foreach (string key in dict1.Keys)
-        {
-            if (!dict2.ContainsKey(key))
-            {
-                keysToRemoveFromDict1.Add(key);
-                continue;
-            }
-
-            dict2.Remove(key);
-            oldColors.Add(dict1[key].Color);
-        }
-
-        string[] newColors = new string[dict2.Count].Concat(oldColors.ToArray()).ToArray();
-        for (int i = oldColors.Count; i < oldColors.Count + dict2.Count; i++)
-        {
-            string curColor = CourseColorUtil.GetSingleRandColor();
-
-            while (newColors.Contains(curColor))
-                curColor = CourseColorUtil.GetSingleRandColor();
-        }
-
-        Dictionary<string, CourseWebModel> dict2Converted = dict2.Select((kvp, i) => kvp.Value.ToWebModel(newColors[i], TranslatorUtil.SwedishToEnglish(kvp.Value.Name).Result)).ToDictionary(course => course.Id);
-
-        return dict1.Concat(dict2Converted).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     }
 }

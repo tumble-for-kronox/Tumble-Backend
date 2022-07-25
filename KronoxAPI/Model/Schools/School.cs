@@ -96,9 +96,8 @@ public class School
         {
             XDocument scheduleXml = XDocument.Parse(scheduleXmlString);
             List<Day> scheduleDaysOfEvents = ScheduleParser.ParseToDays(scheduleXml);
-            Dictionary<string, Course> courseDict = ScheduleParser.GetScheduleCourses(scheduleXml);
 
-            return new Schedule(id, scheduleDaysOfEvents, courseDict);
+            return new Schedule(id, scheduleDaysOfEvents);
 
         }
         catch (XmlException e)

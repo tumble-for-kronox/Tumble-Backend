@@ -10,8 +10,8 @@ namespace WebAPIModels.Extensions;
 
 public static class CourseExtensions
 {
-    public static CourseWebModel ToWebModel(this Course course, string color, string englishName)
+    public static CourseWebModel ToWebModel(this Course course, string englishName)
     {
-        return new CourseWebModel(course.Id, course.Name, color, englishName);
+        return new CourseWebModel(course.Id, course.Name, englishName);
     }
 }

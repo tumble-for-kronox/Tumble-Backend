@@ -16,7 +16,6 @@ public class ScheduleWebModel
     private readonly string _id;
     private DateTime _cachedAt;
     private List<DayWebModel> _days;
-    private Dictionary<string, CourseWebModel> _courses;
 
     public string Id => _id;
 
@@ -24,20 +23,17 @@ public class ScheduleWebModel
 
     public List<DayWebModel> Days { get => _days; set => _days = value; }
 
-    public Dictionary<string, CourseWebModel> Courses { get => _courses; set => _courses = value; }
-
 
     public void UpdateCachedAt()
     {
         CachedAt = DateTime.Now;
     }
 
-    public ScheduleWebModel(string id, DateTime cachedAt, List<DayWebModel> days, Dictionary<string, CourseWebModel> courses)
+    public ScheduleWebModel(string id, DateTime cachedAt, List<DayWebModel> days)
     {
         _id = id;
         _cachedAt = cachedAt;
         _days = days;
-        _courses = courses;
     }
     public string ToJson() => JsonSerializer.Serialize(this, new JsonSerializerOptions() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 

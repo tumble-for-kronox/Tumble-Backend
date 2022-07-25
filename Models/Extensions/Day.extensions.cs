@@ -11,8 +11,10 @@ namespace WebAPIModels.Extensions;
 
 public static class DayExtensions
 {
-    public static DayWebModel ToWebModel(this Day day)
+    public static DayWebModel ToWebModel(this Day day, Dictionary<string, CourseWebModel> convertedCourses)
     {
-        return new DayWebModel(day.Name, day.Date.ToString("d/M", CultureInfo.InvariantCulture), day.Date.Year, day.Date.Month, day.Date.Day, (int)day.Date.DayOfWeek, day.WeekNumber, day.Events);
+        List<EventWebModel> convertedEvents = day.Events.Select(e => e.ToWebModel(convertedCourses[e.Course.Id])).ToList();
+
+        return new DayWebModel(day.Name, day.Date.ToString("d/M", CultureInfo.InvariantCulture), day.Date.ToString("o", CultureInfo.InvariantCulture), day.WeekNumber, convertedEvents);
     }
 }

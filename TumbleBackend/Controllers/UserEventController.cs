@@ -11,11 +11,11 @@ namespace TumbleBackend.Controllers;
 
 [ApiController]
 [Route("users/events")]
-public class EventController : ControllerBase
+public class UserEventController : ControllerBase
 {
-    private readonly ILogger<EventController> _logger;
+    private readonly ILogger<UserEventController> _logger;
 
-    public EventController(ILogger<EventController> logger)
+    public UserEventController(ILogger<UserEventController> logger)
     {
         _logger = logger;
     }

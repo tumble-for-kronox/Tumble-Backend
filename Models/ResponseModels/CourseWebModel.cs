@@ -14,7 +14,6 @@ public class CourseWebModel
     private readonly string _id;
     private readonly string _swedishName;
     private readonly string _englishName;
-    private readonly string _color;
 
     public string Id => _id;
 
@@ -22,14 +21,11 @@ public class CourseWebModel
 
     public string EnglishName => _englishName;
 
-    public string Color => _color;
-
-    public CourseWebModel(string id, string swedishName, string color, string englishName)
+    public CourseWebModel(string id, string swedishName, string englishName)
     {
         _id = id;
         _swedishName = swedishName;
         _englishName = englishName;
-        _color = color;
     }
 
     public string ToJson() => JsonSerializer.Serialize(this, new JsonSerializerOptions() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });

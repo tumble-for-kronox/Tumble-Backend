@@ -22,7 +22,7 @@ public static class ListExtensions
                 continue;
             }
 
-            paddedDays.Add(new Day(date.DayOfWeek.ToString(), date, new()).ToWebModel());
+            paddedDays.Add(new Day(date.DayOfWeek.ToString(), date, new()).ToWebModel(new()));
         }
 
         return paddedDays;

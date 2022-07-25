@@ -13,7 +13,6 @@ public class Schedule
 {
     private readonly string _id;
     private List<Day> _days;
-    private readonly Dictionary<string, Course> _courses;
 
     /// <summary>
     /// 
@@ -21,16 +20,13 @@ public class Schedule
     /// <param name="id"></param>
     /// <param name="days"></param>
     /// <param name="courses"></param>
-    public Schedule(string id, List<Day> days, Dictionary<string, Course> courses)
+    public Schedule(string id, List<Day> days)
     {
         _id = id;
         _days = days;
-        _courses = courses;
     }
 
     public string Id => _id;
-
-    public Dictionary<string, Course> Courses => _courses;
 
     public List<Day> Days { get => _days; set => _days = value; }
 }
