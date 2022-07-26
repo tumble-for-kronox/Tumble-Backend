@@ -1,2 +1,5 @@
 .vs/
 TestingConsole/
+
+bin/
+obj/
