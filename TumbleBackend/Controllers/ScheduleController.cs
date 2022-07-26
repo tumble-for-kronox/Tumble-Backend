@@ -48,7 +48,7 @@ public class ScheduleController : ControllerBase
             return Ok(BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken));
 
         // Reset the given start date as it's either null or an invalid format. Ensures that all cached schedules start at the beginning of the week.
-        startDate = DateTime.Now.StartOfWeek();
+        startDate = DateTime.Now.FirstDayOfWeek();
 
         // Attempt to get cached schedule.
         ScheduleWebModel? cachedSchedule = SchedulesCache.GetSchedule(scheduleId);
