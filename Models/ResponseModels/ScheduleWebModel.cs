@@ -13,12 +13,11 @@ namespace WebAPIModels.ResponseModels;
 
 public class ScheduleWebModel
 {
-    [BsonId]
     private string _id;
     private DateTime _cachedAt;
     private List<DayWebModel> _days;
 
-    public string Id { get => _id; private set => _id = value; }
+    public string Id { get => _id; set => _id = value; }
 
     public DateTime CachedAt { get => _cachedAt; private set => _cachedAt = value; }
 
@@ -30,9 +29,9 @@ public class ScheduleWebModel
         CachedAt = DateTime.Now;
     }
 
-    public ScheduleWebModel(string _id, DateTime cachedAt, List<DayWebModel> days)
+    public ScheduleWebModel(string id, DateTime cachedAt, List<DayWebModel> days)
     {
-        this._id = _id;
+        _id = id;
         _cachedAt = cachedAt;
         _days = days;
     }
