@@ -37,12 +37,12 @@ public class UserController : ControllerBase
         catch (LoginException e)
         {
             _logger.LogError(e.Message);
-            return Unauthorized();
+            return Unauthorized(new Error("Username or password incorrect."));
         }
         catch (ParseException e)
         {
             _logger.LogError(e.Message);
-            return StatusCode(500);
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while logging in, please try again later."));
         }
     }
 }

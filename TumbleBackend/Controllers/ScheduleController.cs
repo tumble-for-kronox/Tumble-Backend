@@ -100,6 +100,10 @@ public class ScheduleController : ControllerBase
         try
         {
             List<Programme> searchResult = school.SearchProgrammes(searchQuery, sessionToken);
+
+            if (searchResult.Count <= 0)
+                return NoContent();
+
             return Ok(new { searchResult.Count, Items = searchResult });
         }
         catch (LoginException e)
