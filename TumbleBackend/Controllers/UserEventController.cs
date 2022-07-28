@@ -54,7 +54,7 @@ public class UserEventController : ControllerBase
         }
     }
 
-    [HttpPost("register/{eventId}")]
+    [HttpPut("register/{eventId}")]
     public IActionResult RegisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken)
     {
         School? school = schoolId.GetSchool();
@@ -99,7 +99,7 @@ public class UserEventController : ControllerBase
         }
     }
 
-    [HttpPost("unregister/{eventId}")]
+    [HttpPut("unregister/{eventId}")]
     public IActionResult UnregisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken)
     {
         School? school = schoolId.GetSchool();
