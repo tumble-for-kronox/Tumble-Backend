@@ -1,15 +1,15 @@
 ﻿using KronoxAPI.Model.Schools;
 using Microsoft.AspNetCore.Mvc;
-using TumbleBackend.Utilities;
+using System.Web.Http.Cors;
 using TumbleBackend.Extensions;
 using WebAPIModels.ResponseModels;
 using WebAPIModels.RequestModels;
 using KronoxAPI.Model.Users;
 using KronoxAPI.Exceptions;
-using System.Text.Json;
 
 namespace TumbleBackend.Controllers;
 
+[EnableCors(origins: "*", headers: "*", methods: "*")]
 [ApiController]
 [Route("users")]
 public class UserController : ControllerBase
@@ -24,6 +24,10 @@ public class UserController : ControllerBase
     [HttpPost("login")]
     public IActionResult LoginKronoxUser([FromQuery] SchoolEnum schoolId, [FromBody] LoginRequest body)
     {
+        Request.EnableBuffering();
+        var reader = new StreamReader(Request.Body);
+        reader.BaseStream.Seek(0, SeekOrigin.Begin);
+        cvar rawMessage = reader.ReadToEndAsync().Result;
         School? school = schoolId.GetSchool();
 
         if (school == null)
