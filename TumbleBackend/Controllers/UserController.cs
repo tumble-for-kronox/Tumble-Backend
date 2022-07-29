@@ -24,10 +24,6 @@ public class UserController : ControllerBase
     [HttpPost("login")]
     public IActionResult LoginKronoxUser([FromQuery] SchoolEnum schoolId, [FromBody] LoginRequest body)
     {
-        Request.EnableBuffering();
-        var reader = new StreamReader(Request.Body);
-        reader.BaseStream.Seek(0, SeekOrigin.Begin);
-        cvar rawMessage = reader.ReadToEndAsync().Result;
         School? school = schoolId.GetSchool();
 
         if (school == null)
