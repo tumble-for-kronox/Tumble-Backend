@@ -6,9 +6,11 @@ using WebAPIModels.ResponseModels;
 using WebAPIModels.Extensions;
 using KronoxAPI.Model.Users;
 using KronoxAPI.Exceptions;
+using System.Web.Http.Cors;
 
 namespace TumbleBackend.Controllers;
 
+[EnableCors(origins: "*", headers: "*", methods: "*")]
 [ApiController]
 [Route("users/events")]
 public class UserEventController : ControllerBase
@@ -69,7 +71,7 @@ public class UserEventController : ControllerBase
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
 
-            foreach (AvailableUserEvent userEvent in webSafeUserEvents.UnregisteredUserEvents)
+            foreach (AvailableUserEvent userEvent in webSafeUserEvents.UnregisteredEvents)
             {
                 if (userEvent.Id == eventId)
                 {
@@ -114,7 +116,7 @@ public class UserEventController : ControllerBase
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
 
-            foreach (AvailableUserEvent userEvent in webSafeUserEvents.RegisteredUserEvents)
+            foreach (AvailableUserEvent userEvent in webSafeUserEvents.RegisteredEvents)
             {
                 if (userEvent.Id == eventId)
                 {

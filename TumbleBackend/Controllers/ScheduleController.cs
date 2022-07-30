@@ -9,6 +9,7 @@ using DatabaseAPI;
 using static TumbleBackend.Library.ScheduleManagement;
 using KronoxAPI.Exceptions;
 using TumbleBackend.Utilities;
+using TumbleBackend.StringConstants;
 
 namespace TumbleBackend.Controllers;
 
@@ -59,7 +60,7 @@ public class ScheduleController : ControllerBase
             if (cachedSchedule != null)
             {
                 // Make sure cache TTL isn't passed.
-                if (Math.Abs(cachedSchedule.CachedAt.Subtract(DateTime.Now).TotalSeconds) >= int.Parse(config["CacheTTLInSeconds"]))
+                if (Math.Abs(cachedSchedule.CachedAt.Subtract(DateTime.Now).TotalSeconds) >= int.Parse(config[AppSettings.ScheduleCacheTTL]))
                 {
                     // Fetch and re-cache schedule if TTL has passed, making sure not to override/change course colors 
                     ScheduleWebModel scheduleFetchForRecache = BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken);

@@ -1,3 +1,4 @@
+using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,22 +11,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-string? dbConnectionString = null;
-string? translationKey = null;
+string? dbConnectionString = app.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.DbConnection] : Environment.GetEnvironmentVariable(EnvVar.DbConnection);
+string? translationKey = app.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.AzureTranslatorKey] : Environment.GetEnvironmentVariable(EnvVar.AzureTranslatorKey);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    dbConnectionString = builder.Configuration["DbConnectionString"];
-    translationKey = builder.Configuration["AzureTranslatorKey"];
 
     app.UseSwagger();
     app.UseSwaggerUI();
-}
-else if (app.Environment.IsProduction())
-{
-    dbConnectionString = Environment.GetEnvironmentVariable("DbConnectionString");
-    translationKey = Environment.GetEnvironmentVariable("AzureTranslatorKey");
 }
 
 DatabaseAPI.Connector.Init(dbConnectionString!);

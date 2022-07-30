@@ -1,0 +1,10 @@
+﻿namespace TumbleBackend.StringConstants;
+
+public static class EnvVar
+{
+    public static string JwtEncryptionKey => "JwtEncKey";
+    public static string JwtSignatureKey => "JwtSigKey";
+    public static string JwtRefreshTokenExpiration => "JwtExpiration";
+    public static string DbConnection => "DbConnectionString";
+    public static string AzureTranslatorKey => "AzureTranslatorKey";
+}
