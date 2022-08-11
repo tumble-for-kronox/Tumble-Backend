@@ -56,6 +56,56 @@ public class UserEventController : ControllerBase
         }
     }
 
+    [HttpPut("register/all")]
+    public IActionResult RegisterAllAvailableResults([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken)
+    {
+        School? school = schoolId.GetSchool();
+
+        if (school == null)
+        {
+            return BadRequest(new Error("Invalid school value."));
+        }
+
+        try
+        {
+            Dictionary<string, List<UserEvent>> userEvents = school.GetUserEvents(sessionToken);
+            UserEventCollection? webSafeUserEvents = userEvents.ToWebModel();
+            
+            if (webSafeUserEvents == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
+
+            if (!webSafeUserEvents.UnregisteredEvents.Any())
+                return NotFound(new Error("No unregistered events."));
+
+            List<AvailableUserEvent> failedRegistrations = new();
+            List<AvailableUserEvent> successfulRegistrations = new();
+            foreach (AvailableUserEvent availableUserEvent in webSafeUserEvents.UnregisteredEvents)
+            {
+                if (!availableUserEvent.Register(school, sessionToken))
+                    failedRegistrations.Add(availableUserEvent);
+                else
+                    successfulRegistrations.Add(availableUserEvent);
+            }
+
+            return Ok(new MultiRegistrationResult(successfulRegistrations, failedRegistrations));
+        }
+        catch (ParseException e)
+        {
+            _logger.LogError(e.ToString());
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
+        }
+        catch (LoginException e)
+        {
+            _logger.LogError(e.ToString());
+            return Unauthorized(new Error("There was an issue with your login information, please log back in or try again later."));
+        }
+        catch (HttpRequestException e)
+        {
+            _logger.LogError(e.ToString());
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
+        }
+    }
+
     [HttpPut("register/{eventId}")]
     public IActionResult RegisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken)
     {
@@ -145,4 +195,5 @@ public class UserEventController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
         }
     }
+
 }
