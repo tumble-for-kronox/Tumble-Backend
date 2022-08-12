@@ -2,6 +2,7 @@
 using WebAPIModels.Extensions;
 using System.Globalization;
 using WebAPIModels.ResponseModels;
+using KronoxAPI.Model.Schools;
 
 namespace TumbleBackend.Extensions;
 
@@ -26,5 +27,12 @@ public static class ListExtensions
         }
 
         return paddedDays;
+    }
+
+    public static List<Programme> FilterWorkingProgrammeLinks(this List<Programme> programmes, School school, string? sessionToken)
+    {
+        bool[] programmeAvailability = Task.WhenAll(programmes.Select(programme => programme.ScheduleAvailable(school, sessionToken))).Result;
+
+        return programmes.Where((programme, i) => programmeAvailability[i]).ToList();
     }
 }

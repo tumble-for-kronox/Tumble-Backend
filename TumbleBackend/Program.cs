@@ -1,9 +1,13 @@
+using System.Diagnostics;
 using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+var dbglistener = new TextWriterTraceListener(Console.Out);
+Trace.Listeners.Add(dbglistener);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
