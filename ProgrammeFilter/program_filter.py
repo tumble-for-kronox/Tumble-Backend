@@ -1,0 +1,116 @@
+import os
+from typing import List
+import re
+import requests
+import scrapy
+from pymongo import MongoClient
+from dotenv import load_dotenv
+from datetime import datetime
+
+SCHOOL_DICT = {
+    "hkr": "schema.hkr.se",
+    "mau": "schema.mau.se",
+    "oru": "schema.oru.se",
+    # ! "ltu": "schema.ltu.se" requires login,
+    "hig": "schema.hig.se",
+    # ! "sh": "kronox.sh.se" requires login,
+    "hv": "schema.hv.se",
+    "hb": "schema.hb.se",
+    # ! "mdh": "schema.mdh.se" requires login,
+}
+
+SCHOOL_YEAR_REGEX_DICT = {
+    "hkr": r"\d{2}(\d{2})",
+    "mau": r"^\D*(\d{2})",
+    "hig": r"\d{2}$",
+    "hv": r"(\d{2})-$",
+    "hb": r"^\D*\d*(?=\d{2})(\d{2})",
+}
+
+YEAR_REGEX_GROUP_DICT = {
+    "hkr": 1,
+    "mau": 1,
+    "hig": 0,
+    "hv": 1,
+    "hb": 1,
+}
+
+if os.path.exists(os.path.join(os.path.dirname(__file__), ".env")):
+    load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+
+MONGO_CLIENT = MongoClient(os.environ.get("DbConnectionString"))
+FILTER_DB = MONGO_CLIENT["test_db"].get_collection("programme_filters")
+
+
+def main():
+    for (schoolId, schoolUrl) in SCHOOL_DICT.items():
+        updateFilterForSchool(schoolId, schoolUrl)
+
+
+def updateFilterForSchool(schoolId: str, schoolUrl: str):
+    """
+    docstring
+    """
+    allScheduleIds = getAllIds(schoolUrl)
+
+    activeIds = []
+
+    for id in allScheduleIds:
+        if scheduleActive(schoolId, schoolUrl, id):
+            activeIds.append(id)
+
+    saveSchoolFilterList(schoolId, activeIds)
+
+
+def saveSchoolFilterList(schoolId: str, activeIds: List[str]):
+    """
+    docstring
+    """
+    print(activeIds)
+    FILTER_DB.update_one(
+        {"_id": schoolId},
+        {
+            "$set": {
+                "filter": activeIds,
+            }
+        },
+        upsert=True,
+    )
+
+
+def getAllIds(schoolUrl: str) -> List[str]:
+    """
+    docstring
+    """
+    resp = requests.get(
+        f"https://{schoolUrl}/ajax/ajax_resurser.jsp?op=hamtaResursDialog&resurstyp=UTB_PROGRAMINSTANS_KLASSER"
+    )
+
+    selector = scrapy.Selector(text=resp.text)
+
+    return ["p." + x.replace(" ", "+") for x in selector.xpath("//tr/td[2]/text()").getall()]
+
+
+def scheduleActive(schoolId: str, schoolUrl: str, scheduleId: str) -> bool:
+    """
+    docstring
+    """
+    # print(scheduleId)
+    if (
+        schoolId != "oru"
+        and re.search(SCHOOL_YEAR_REGEX_DICT[schoolId], scheduleId)
+        and int(str(datetime.now().year)[2:])
+        - int(re.search(SCHOOL_YEAR_REGEX_DICT[schoolId], scheduleId).group(YEAR_REGEX_GROUP_DICT[schoolId]))
+        > 5
+    ):
+        return False
+
+    resp = requests.get(
+        f"https://{schoolUrl}/setup/jsp/SchemaXML.jsp?startDatum=idag&intervallTyp=m&intervallAntal=6&sprak=SV&sokMedAND=true&forklaringar=true&resurser={scheduleId}"  # noqa: E501
+    )
+
+    return len(resp.content) > 1565
+
+
+if __name__ == "__main__":
+    main()
