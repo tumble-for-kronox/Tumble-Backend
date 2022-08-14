@@ -1,4 +1,5 @@
 ﻿using KronoxAPI.Model.Scheduling;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,7 @@ public class EventWebModel
     public List<Location> Locations => _locations;
 
     public List<Teacher> Teachers => _teachers;
-
+    
     public string Id => _id;
 
     public bool IsSpecial => _isSpecial;
@@ -46,9 +47,9 @@ public class EventWebModel
     /// <param name="from"></param>
     /// <param name="to"></param>
     /// <param name="locations"></param>
-    public EventWebModel(string title, CourseWebModel course, List<Teacher> teachers, DateTime from, DateTime to, List<Location> locations, bool isSpecial, DateTime lastModified)
+    public EventWebModel(string id, string title, CourseWebModel course, List<Teacher> teachers, DateTime from, DateTime to, List<Location> locations, bool isSpecial, DateTime lastModified)
     {
-        _id = Guid.NewGuid().ToString();
+        _id = id;
         _title = title;
         _course = course;
         _from = from;

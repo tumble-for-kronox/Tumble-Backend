@@ -1,6 +1,8 @@
+using MongoDB.Bson.Serialization;
 using System.Diagnostics;
 using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
+using WebAPIModels.ResponseModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 var dbglistener = new TextWriterTraceListener(Console.Out);
 Trace.Listeners.Add(dbglistener);
+
+BsonClassMap.RegisterClassMap<EventWebModel>(cm =>
+{
+    cm.AutoMap();
+    cm.UnmapProperty(c => c.Id);
+    cm.MapMember(c => c.Id)
+        .SetElementName("id")
+        .SetOrder(0)
+        .SetIsRequired(true);
+});
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
