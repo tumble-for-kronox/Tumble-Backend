@@ -48,7 +48,7 @@ public class UserEventParser
             {
                 foreach (HtmlNode registeredEvent in registeredEvents)
                 {
-                    userEvents["registered"].Add(ParseAvailableEvent(registeredEvent));
+                    userEvents["registered"].Add(ParseAvailableEvent(registeredEvent, true));
                 }
             }
 
@@ -56,7 +56,7 @@ public class UserEventParser
             {
                 foreach (HtmlNode unregisteredEvent in unregisteredEvents)
                 {
-                    userEvents["unregistered"].Add(ParseAvailableEvent(unregisteredEvent));
+                    userEvents["unregistered"].Add(ParseAvailableEvent(unregisteredEvent, false));
                 }
             }
 
@@ -86,10 +86,9 @@ public class UserEventParser
     /// <param name="userEventHtmlDiv"></param>
     /// <returns>The <see cref="AvailableUserEvent"/> object with the same data as the user event div from <paramref name="userEventHtmlDiv"/>.</returns>
     /// <exception cref="ParseException"></exception>
-    public static AvailableUserEvent ParseAvailableEvent(HtmlNode userEventHtmlDiv)
+    public static AvailableUserEvent ParseAvailableEvent(HtmlNode userEventHtmlDiv, bool isRegistered)
     {
         // Variables needed to construct the AvailableUserEvent in the end.
-        bool registered = false;
         bool supportAvailable = false;
         bool mustChooseLocation = false;
         string id = string.Empty;
@@ -140,7 +139,6 @@ public class UserEventParser
             // The button is a "sign off" button.
             if (button.GetAttributeValue("onclick", "").ToLowerInvariant().Contains("avanmal"))
             {
-                registered = true;
                 id = Regex.Match(HttpUtility.HtmlDecode(button.GetAttributeValue("onclick", "").ToLowerInvariant()), @"avanmal\('(.*?)'\)").Groups[1].Value;
                 continue;
             }
@@ -168,7 +166,7 @@ public class UserEventParser
             rawLastSignupDate = Regex.Match(dataNodes[3].InnerText, @"Sista anmdatum\s*:\s*(.*)").Groups[1].Value;
             type = Regex.Match(dataNodes[4].InnerText, @"Typ\s*:\s*(.*)").Groups[1].Value;
 
-            if (registered)
+            if (isRegistered)
                 anonymousCode = Regex.Match(dataNodes[5].InnerText, @"Anonym kod\s*:\s*(.*)").Groups[1].Value;
 
         }
@@ -191,7 +189,7 @@ public class UserEventParser
             throw new ParseException("An error occured while parsing the format of the last signup date or the start/end times and dates.");
         }
 
-        return new AvailableUserEvent(title, type, lastSignupDate, startTime, endTime, id, participatorId, supportId, anonymousCode, registered, supportAvailable, mustChooseLocation);
+        return new AvailableUserEvent(title, type, lastSignupDate, startTime, endTime, id, participatorId, supportId, anonymousCode, isRegistered, supportAvailable, mustChooseLocation);
     }
 
     /// <summary>
