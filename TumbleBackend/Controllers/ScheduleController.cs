@@ -101,9 +101,12 @@ public class ScheduleController : ControllerBase
         try
         {
             List<Programme> searchResult = school.SearchProgrammes(searchQuery, sessionToken);
+            HashSet<string> filter = ProgrammeFilters.GetProgrammeFilter(school);
 
             if (searchResult.Count <= 0)
                 return NoContent();
+
+            searchResult.RemoveAll(programme => filter.Contains(programme.Id));
 
             return Ok(new { searchResult.Count, Items = searchResult });
         }

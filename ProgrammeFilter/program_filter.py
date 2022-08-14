@@ -53,29 +53,29 @@ def updateFilterForSchool(schoolId: str, schoolUrl: str):
     """
     allScheduleIds = getAllIds(schoolUrl)
 
-    activeIds = []
+    inactiveIds = []
 
     for id in allScheduleIds:
-        if scheduleActive(schoolId, schoolUrl, id):
-            activeIds.append(id)
+        if scheduleInactive(schoolId, schoolUrl, id):
+            inactiveIds.append(id)
 
-    saveSchoolFilterList(schoolId, activeIds)
+    saveSchoolFilterList(schoolId, inactiveIds)
 
 
-def saveSchoolFilterList(schoolId: str, activeIds: List[str]):
+def saveSchoolFilterList(schoolId: str, inactiveIds: List[str]):
     """
     docstring
     """
-    print(activeIds)
     FILTER_DB.update_one(
         {"_id": schoolId},
         {
             "$set": {
-                "filter": activeIds,
+                "filter": inactiveIds,
             }
         },
         upsert=True,
     )
+    print(f"Saved filter for {schoolId}")
 
 
 def getAllIds(schoolUrl: str) -> List[str]:
@@ -91,11 +91,10 @@ def getAllIds(schoolUrl: str) -> List[str]:
     return ["p." + x.replace(" ", "+") for x in selector.xpath("//tr/td[2]/text()").getall()]
 
 
-def scheduleActive(schoolId: str, schoolUrl: str, scheduleId: str) -> bool:
+def scheduleInactive(schoolId: str, schoolUrl: str, scheduleId: str) -> bool:
     """
     docstring
     """
-    # print(scheduleId)
     if (
         schoolId != "oru"
         and re.search(SCHOOL_YEAR_REGEX_DICT[schoolId], scheduleId)
@@ -103,13 +102,13 @@ def scheduleActive(schoolId: str, schoolUrl: str, scheduleId: str) -> bool:
         - int(re.search(SCHOOL_YEAR_REGEX_DICT[schoolId], scheduleId).group(YEAR_REGEX_GROUP_DICT[schoolId]))
         > 5
     ):
-        return False
+        return True
 
     resp = requests.get(
         f"https://{schoolUrl}/setup/jsp/SchemaXML.jsp?startDatum=idag&intervallTyp=m&intervallAntal=6&sprak=SV&sokMedAND=true&forklaringar=true&resurser={scheduleId}"  # noqa: E501
     )
 
-    return len(resp.content) > 1565
+    return len(resp.content) <= 1565
 
 
 if __name__ == "__main__":
