@@ -22,11 +22,8 @@ public static class TranslatorUtil
 
     public static async Task<string> SwedishToEnglish(string s)
     {
-        if (subscriptionKey == null)
-            throw new TranslatorUninitializedException("Translation utility was not initialized before being accessed.");
-
-        string route = "/translate?api-version=3.0&from=sv&to=en";
-        object[] body = new object[] { new { Text = s } };
+        string route = "https://libretranslate.com/translate";
+        object[] body = new object[] { new { q = s, source = "sv", target = "en", format = "text" } };
         var requestBody = System.Text.Json.JsonSerializer.Serialize(body);
 
         using var client = new HttpClient();
@@ -35,8 +32,6 @@ public static class TranslatorUtil
         request.Method = HttpMethod.Post;
         request.RequestUri = new Uri(endpoint + route);
         request.Content = new StringContent(requestBody, Encoding.UTF8, "application/json");
-        request.Headers.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
-        request.Headers.Add("Ocp-Apim-Subscription-Region", location);
 
         // Send the request and get response.
         HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(false);
@@ -44,7 +39,7 @@ public static class TranslatorUtil
         string responseString = response.Content.ReadAsStringAsync().Result;
 
         JObject jsonObject = JsonConvert.DeserializeObject<JObject>(responseString.TrimEnd(']').TrimStart('['))!;
-        JToken token = jsonObject.SelectToken("$.translations[:1].text")!;
+        JToken token = jsonObject.SelectToken("$.translatedText")!;
 
         return token.Value<string>()!;
     }

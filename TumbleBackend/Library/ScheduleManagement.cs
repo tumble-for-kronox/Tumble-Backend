@@ -25,7 +25,8 @@ public class ScheduleManagement
         {
             Schedule schedule = school.FetchSchedule(scheduleId, null, sessionToken, startDate);
 
-            Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(TranslatorUtil.SwedishToEnglish(kvp.Value.Name).Result)).ToDictionary(course => course.Id);
+            //Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(TranslatorUtil.SwedishToEnglish(kvp.Value.Name).Result)).ToDictionary(course => course.Id);
+            Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(kvp.Value.Name)).ToDictionary(course => course.Id);
             ScheduleWebModel webSafeSchedule = schedule.ToWebModel(courses);
             webSafeSchedule.Days = webSafeSchedule.Days.PadScheduleDays(startDate);
 

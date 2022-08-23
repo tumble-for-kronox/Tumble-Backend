@@ -82,7 +82,7 @@ public static class ScheduleParser
         // Parse all needed Event info from the xml document into strings
         string title = eventElement.Element("moment") == null ? "" : eventElement.Element("moment")!.Value;
         string eventType = eventElement.Element("aktivitetsTyp") == null ? "" : eventElement.Element("aktivitetsTyp")!.FirstAttribute!.Value;
-        string eventId = ((eventElement.Element("resursTrad")!.FirstNode as XElement)!.FirstNode as XElement)!.Value;
+        string eventId = eventElement.Element("bokningsId")!.Value;
         string courseId = GetEventCourseId(eventElement);
         List<string> teacherIds = GetEventTeacherIds(eventElement);
         List<string> locationIds = GetEventLocationIds(eventElement);
