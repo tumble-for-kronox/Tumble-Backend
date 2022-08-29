@@ -6,5 +6,6 @@ public static class EnvVar
     public static string JwtSignatureKey => "JwtSigKey";
     public static string JwtRefreshTokenExpiration => "JwtExpiration";
     public static string DbConnection => "DbConnectionString";
-    public static string AzureTranslatorKey => "AzureTranslatorKey";
+    public static string AwsAccessKey => "AwsAccessKey";
+    public static string AwsSecretKey => "AwsSecretKey";
 }

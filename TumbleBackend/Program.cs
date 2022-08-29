@@ -29,7 +29,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 string? dbConnectionString = app.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.DbConnection] : Environment.GetEnvironmentVariable(EnvVar.DbConnection);
-string? translationKey = app.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.AzureTranslatorKey] : Environment.GetEnvironmentVariable(EnvVar.AzureTranslatorKey);
+string? awsAccessKey = app.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.AwsAccessKey] : Environment.GetEnvironmentVariable(EnvVar.AwsAccessKey);
+string? awsSecretKey = app.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.AwsSecretKey] : Environment.GetEnvironmentVariable(EnvVar.AwsSecretKey);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -40,7 +41,7 @@ if (app.Environment.IsDevelopment())
 }
 
 DatabaseAPI.Connector.Init(dbConnectionString!);
-TranslatorUtil.Init(translationKey!);
+EmailUtil.Init(awsAccessKey!, awsSecretKey!);
 
 app.UseHttpsRedirection();
 
