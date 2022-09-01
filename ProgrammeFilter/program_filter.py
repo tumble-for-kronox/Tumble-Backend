@@ -92,6 +92,7 @@ def saveSchoolFilterList(schoolId: str, inactiveIds: List[str]):
         },
         upsert=True,
     )
+    print("\033[K")
     print(f"\rSaved filter for {schoolId}")
 
 
