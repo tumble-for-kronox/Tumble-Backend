@@ -122,17 +122,17 @@ def scheduleInactive(schoolId: str, schoolUrl: str, scheduleId: str) -> bool:
             > 5
         ):
             return True
+
+        if (
+            schoolId != "oru"
+            and re.search(SCHOOL_YEAR_REGEX_DICT[schoolId], scheduleId)
+            and int(str(datetime.now().year)[2:])
+            - int(re.search(SCHOOL_YEAR_REGEX_DICT[schoolId], scheduleId).group(YEAR_REGEX_GROUP_DICT[schoolId]))
+            < 0
+        ):
+            return False
     except ValueError:
         pass
-
-    if (
-        schoolId != "oru"
-        and re.search(SCHOOL_YEAR_REGEX_DICT[schoolId], scheduleId)
-        and int(str(datetime.now().year)[2:])
-        - int(re.search(SCHOOL_YEAR_REGEX_DICT[schoolId], scheduleId).group(YEAR_REGEX_GROUP_DICT[schoolId]))
-        < 0
-    ):
-        return False
 
     resp = requests.get(
         f"https://{schoolUrl}/setup/jsp/SchemaXML.jsp?startDatum=idag&intervallTyp=m&intervallAntal=6&sprak=SV&sokMedAND=true&forklaringar=true&resurser={scheduleId}"  # noqa: E501
