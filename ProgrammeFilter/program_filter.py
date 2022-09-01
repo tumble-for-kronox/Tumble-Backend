@@ -11,9 +11,9 @@ from datetime import datetime
 import certifi
 
 SCHOOL_DICT = {
-    "hkr": "schema.hkr.se",
-    "mau": "schema.mau.se",
-    "oru": "schema.oru.se",
+    # "hkr": "schema.hkr.se",
+    # "mau": "schema.mau.se",
+    # "oru": "schema.oru.se",
     # ! "ltu": "schema.ltu.se" requires login,
     "hig": "schema.hig.se",
     # ! "sh": "kronox.sh.se" requires login,
@@ -92,8 +92,8 @@ def saveSchoolFilterList(schoolId: str, inactiveIds: List[str]):
         },
         upsert=True,
     )
-    print("\033[K")
-    print(f"\rSaved filter for {schoolId}")
+    print("\033[2K\033[1G")
+    print(f"Saved filter for {schoolId}")
 
 
 def getAllIds(schoolUrl: str) -> List[str]:
