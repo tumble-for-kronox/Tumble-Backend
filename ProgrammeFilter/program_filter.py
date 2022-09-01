@@ -1,11 +1,14 @@
 import os
+import sys
 from typing import List
 import re
 import requests
 import scrapy
 from pymongo import MongoClient
+from pymongo.errors import ConnectionFailure, OperationFailure
 from dotenv import load_dotenv
 from datetime import datetime
+import certifi
 
 SCHOOL_DICT = {
     "hkr": "schema.hkr.se",
@@ -38,7 +41,19 @@ YEAR_REGEX_GROUP_DICT = {
 if os.path.exists(os.path.join(os.path.dirname(__file__), ".env")):
     load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
-MONGO_CLIENT = MongoClient(os.environ.get("DbConnectionString"))
+ca = certifi.where()
+MONGO_CLIENT = MongoClient(os.environ.get("DbConnectionString"), tlsCAFile=ca)
+
+try:
+    MONGO_CLIENT.admin.command("ping")
+except ConnectionFailure as err:
+    print(f"Connection to DB failed. Error: {err}")
+    sys.exit()
+except OperationFailure as err:
+    print(f"Connection to DB failed. Error: {err}")
+    sys.exit()
+
+
 FILTER_DB = MONGO_CLIENT["test_db"].get_collection("programme_filters")
 
 
@@ -55,9 +70,11 @@ def updateFilterForSchool(schoolId: str, schoolUrl: str):
 
     inactiveIds = []
 
-    for id in allScheduleIds:
+    for (i, id) in enumerate(allScheduleIds):
         if scheduleInactive(schoolId, schoolUrl, id):
             inactiveIds.append(id)
+        if i % 10 == 0:
+            print(f"\r{((i / len(allScheduleIds)) * 100):.2f}% of {schoolId} completed!", end="")
 
     saveSchoolFilterList(schoolId, inactiveIds)
 
@@ -75,7 +92,7 @@ def saveSchoolFilterList(schoolId: str, inactiveIds: List[str]):
         },
         upsert=True,
     )
-    print(f"Saved filter for {schoolId}")
+    print(f"\rSaved filter for {schoolId}")
 
 
 def getAllIds(schoolUrl: str) -> List[str]:
@@ -95,14 +112,26 @@ def scheduleInactive(schoolId: str, schoolUrl: str, scheduleId: str) -> bool:
     """
     docstring
     """
+    try:
+        if (
+            schoolId != "oru"
+            and re.search(SCHOOL_YEAR_REGEX_DICT[schoolId], scheduleId)
+            and int(str(datetime.now().year)[2:])
+            - int(re.search(SCHOOL_YEAR_REGEX_DICT[schoolId], scheduleId).group(YEAR_REGEX_GROUP_DICT[schoolId]))
+            > 5
+        ):
+            return True
+    except ValueError:
+        pass
+
     if (
         schoolId != "oru"
         and re.search(SCHOOL_YEAR_REGEX_DICT[schoolId], scheduleId)
         and int(str(datetime.now().year)[2:])
         - int(re.search(SCHOOL_YEAR_REGEX_DICT[schoolId], scheduleId).group(YEAR_REGEX_GROUP_DICT[schoolId]))
-        > 5
+        < 0
     ):
-        return True
+        return False
 
     resp = requests.get(
         f"https://{schoolUrl}/setup/jsp/SchemaXML.jsp?startDatum=idag&intervallTyp=m&intervallAntal=6&sprak=SV&sokMedAND=true&forklaringar=true&resurser={scheduleId}"  # noqa: E501
