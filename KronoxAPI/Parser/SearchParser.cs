@@ -28,7 +28,7 @@ public class SearchParser
         HtmlDocument document = new();
         document.LoadHtml(htmlSearchResults);
 
-        if (document.SesssionExpired())
+        if (document.SessionExpired())
             throw new LoginException("Invalid credentials or expired session.");
 
         List<Programme> foundProgrammes = new();

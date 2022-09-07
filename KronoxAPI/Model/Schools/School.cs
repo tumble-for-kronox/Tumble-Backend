@@ -12,6 +12,7 @@ using KronoxAPI.Parser;
 using KronoxAPI.Exceptions;
 using HtmlAgilityPack;
 using System.Xml;
+using KronoxAPI.Model.Booking;
 
 namespace KronoxAPI.Model.Schools;
 
@@ -33,6 +34,7 @@ public class School
     private readonly string _name;
     private readonly string _url;
     private readonly bool _loginRequired;
+    private readonly SchoolResources _resources;
 
     public string Id => _id;
 
@@ -41,6 +43,8 @@ public class School
     public string Url => _url;
 
     public bool LoginRequired => _loginRequired;
+
+    public SchoolResources Resources => _resources;
 
     /// <summary>
     /// <para>
@@ -66,6 +70,7 @@ public class School
         this._url = url;
         this._loginRequired = loginRequired;
         this._name = name;
+        this._resources = new SchoolResources(this);
     }
 
     /// <summary>

@@ -72,7 +72,7 @@ public class UserEventParser
         }
         catch (NullReferenceException e)
         {
-            if (userEventsHtml.SesssionExpired())
+            if (userEventsHtml.SessionExpired())
                 throw new LoginException("Kronox rejected the login attempt due to bad credentials or something else on their end.", e);
 
             throw new ParseException("An error occurred while attempting to parse registered, unregistered, and upcoming events.", e);
@@ -146,24 +146,21 @@ public class UserEventParser
             // The button is a "sign up" button.
             if (button.GetAttributeValue("onclick", "").ToLowerInvariant().Contains("anmal"))
             {
-                Console.WriteLine("SIGNUP CASE");
-                Console.WriteLine(HttpUtility.HtmlDecode(button.GetAttributeValue("onclick", "").ToLowerInvariant()));
-
                 Match eventIdAndLocationChoice = Regex.Match(HttpUtility.HtmlDecode(button.GetAttributeValue("onclick", "").ToLowerInvariant()), @"anmal\('(.*?)',\s*(.*?)\)");
                 id = eventIdAndLocationChoice.Groups[1].Value;
                 if (eventIdAndLocationChoice.Groups[2].Value == "true") mustChooseLocation = true;
             }
         }
 
-        List<HtmlNode> dataNodes = userEventHtmlDiv.Descendants("div").SkipWhile(el => !el.InnerText.ToLowerInvariant().Contains("datum")).ToList();
+        List<HtmlNode> dataNodes = userEventHtmlDiv.Descendants("div").SkipWhile(el => !el.InnerText.ToLowerInvariant().Contains("test date")).ToList();
 
         // Scrape all the raw data directly from the HTML nodes.
         try
         {
-            rawDate = Regex.Match(dataNodes[0].InnerText, @"Datum\s*:\s*(.*)").Groups[1].Value;
+            rawDate = Regex.Match(dataNodes[0].InnerText, @"Test Date\s*:\s*(.*)").Groups[1].Value;
             rawStartTime = Regex.Match(dataNodes[1].InnerText, @"Start\s*:\s*(.*)").Groups[1].Value;
-            rawEndTime = Regex.Match(dataNodes[2].InnerText, @"Slut\s*:\s*(.*)").Groups[1].Value;
-            rawLastSignupDate = Regex.Match(dataNodes[3].InnerText, @"Sista anmdatum\s*:\s*(.*)").Groups[1].Value;
+            rawEndTime = Regex.Match(dataNodes[2].InnerText, @"End\s*:\s*(.*)").Groups[1].Value;
+            rawLastSignupDate = Regex.Match(dataNodes[3].InnerText, @"Registration closes\s*:\s*(.*)").Groups[1].Value;
             type = Regex.Match(dataNodes[4].InnerText, @"Typ\s*:\s*(.*)").Groups[1].Value;
 
             if (isRegistered)
@@ -229,11 +226,11 @@ public class UserEventParser
         // Scrape all the raw data directly from the HTML nodes.
         try
         {
-            rawDate = Regex.Match(dataNodes[0].InnerText, @"Datum\s*:\s*(.*)").Groups[1].Value;
+            rawDate = Regex.Match(dataNodes[0].InnerText, @"Test Date\s*:\s*(.*)").Groups[1].Value;
             rawStartTime = Regex.Match(dataNodes[1].InnerText, @"Start\s*:\s*(.*)").Groups[1].Value;
-            rawEndTime = Regex.Match(dataNodes[2].InnerText, @"Slut\s*:\s*(.*)").Groups[1].Value;
-            rawFirstSignupDate = Regex.Match(dataNodes[3].InnerText, @"Första anmdatum\s*:\s*(.*)").Groups[1].Value;
-            type = Regex.Match(dataNodes[4].InnerText, @"Typ\s*:\s*(.*)").Groups[1].Value;
+            rawEndTime = Regex.Match(dataNodes[2].InnerText, @"End\s*:\s*(.*)").Groups[1].Value;
+            rawFirstSignupDate = Regex.Match(dataNodes[3].InnerText, @"Registration opens\s*:\s*(.*)").Groups[1].Value;
+            type = Regex.Match(dataNodes[4].InnerText, @"Test Type\s*:\s*(.*)").Groups[1].Value;
         }
         catch (IndexOutOfRangeException ex)
         {
