@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using KronoxAPI.Controller;
+using KronoxAPI.Exceptions;
 using KronoxAPI.Model.Schools;
 using KronoxAPI.Parser;
 using Newtonsoft.Json;
@@ -68,9 +69,19 @@ public class SchoolResources
     /// <param name="resourceId"></param>
     /// <param name="date"></param>
     /// <param name="slot"></param>
-    public void BookResource(string sessionToken, string resourceId, DateTime date, AvailabilitySlot slot)
+    /// <returns></returns>
+    /// <exception cref="LoginException"></exception>
+    /// <exception cref="BookingCollisionException"></exception>
+    /// <exception cref="MaxBookingsException"></exception>
+    /// <exception cref="ParseException"></exception>
+    public async Task BookResource(string sessionToken, string resourceId, DateTime date, AvailabilitySlot slot)
     {
-        BookingController.BookResourceLocation(_school.Url, date, resourceId, sessionToken, slot.LocationId!, slot.TimeSlotId!, slot.ResourceType!);
+        if (slot.Availability != Availability.AVAILABLE)
+            throw new BookingCollisionException($"The resource could not be booked because the availability was not AVAILABLE. Availability was: {slot.Availability}");
+        if (slot.LocationId == null || slot.ResourceType == null || slot.TimeSlotId == null)
+            throw new BookingCollisionException($"The resource could not be booked because either locationId, resourceType, or timeSlotId was null. Values:\n\nlocationId: {slot.LocationId}\nresourceType: {slot.ResourceType}\ntimeSlotId: {slot.TimeSlotId}");
+
+        await BookingController.BookResourceLocation(_school.Url, date, resourceId, sessionToken, slot.LocationId!, slot.TimeSlotId!, slot.ResourceType!);
     }
 
     /// <summary>
@@ -78,8 +89,12 @@ public class SchoolResources
     /// </summary>
     /// <param name="sessionToken"></param>
     /// <param name="bookingId"></param>
-    public void UnbookResource(string sessionToken, string bookingId)
+    /// <returns></returns>
+    /// <exception cref="LoginException"></exception>
+    /// <exception cref="BookingCollisionException"></exception>
+    /// <exception cref="ParseException"></exception>
+    public async Task UnbookResource(string sessionToken, string bookingId)
     {
-        BookingController.UnbookResourceLocation(_school.Url, sessionToken, bookingId);
+        await BookingController.UnbookResourceLocation(_school.Url, sessionToken, bookingId);
     }
 }

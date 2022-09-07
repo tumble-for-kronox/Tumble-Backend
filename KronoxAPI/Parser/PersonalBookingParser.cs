@@ -26,7 +26,7 @@ public static class PersonalBookingParser
             foreach (HtmlNode bookingNode in personalBookingsNodes)
             {
                 // Get raw data, some will need processing before being built into data object
-                string bookingId = bookingNode.GetAttributeValue("id", "").Trim();
+                string bookingId = bookingNode.GetAttributeValue("id", "").Trim().Replace("post_", "");
                 string date = bookingNode.SelectSingleNode("div[1]/a").InnerText.Trim();
                 string combinedTime = bookingNode.SelectSingleNode("div[1]/text()").InnerText.Trim();
                 string locationId = bookingNode.SelectSingleNode("div[1]/b").InnerText.Split(",").Last().Trim();

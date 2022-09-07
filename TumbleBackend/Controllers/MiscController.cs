@@ -6,7 +6,7 @@ namespace TumbleBackend.Controllers;
 
 [ApiController]
 [Route("misc")]
-public class MiscController
+public class MiscController : ControllerBase
 {
 
     [HttpPost("submitIssue")]

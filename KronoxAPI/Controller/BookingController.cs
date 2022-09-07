@@ -63,6 +63,21 @@ public static class BookingController
         return await response.Content.ReadAsStringAsync();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="schoolUrl"></param>
+    /// <param name="date"></param>
+    /// <param name="resourceId"></param>
+    /// <param name="sessionToken"></param>
+    /// <param name="locationId"></param>
+    /// <param name="timeSlotId"></param>
+    /// <param name="resourceType"></param>
+    /// <returns></returns>
+    /// <exception cref="LoginException"></exception>
+    /// <exception cref="BookingCollisionException"></exception>
+    /// <exception cref="MaxBookingsException"></exception>
+    /// <exception cref="ParseException"></exception>
     public static async Task BookResourceLocation(string schoolUrl, DateTime date, string resourceId, string sessionToken, string locationId, string timeSlotId, string resourceType)
     {
         KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
@@ -84,14 +99,29 @@ public static class BookingController
 
             if (responseBody.Contains("The booking was not saved because of the following colliding resources:"))
             {
-                throw new BookingException("Couldn't book resource.");
+                throw new BookingCollisionException("Couldn't book resource.");
+            }
+
+            if (responseBody == "You have already created max number of bookings.")
+            {
+                throw new MaxBookingsException("");
             }
 
             throw new ParseException($"Something went wrong while parsing or handling the requset to book a resource. Resource details:\n\nschoolUrl: {schoolUrl}\ndate: {date:dd-MM-yy}\nresourceId: {resourceId}\nlocationId: {locationId}\nresourceType: {resourceType}\ntimeSlotId: {timeSlotId}");
         }
     }
 
-    public static void UnbookResourceLocation(string schoolUrl, string sessionToken, string bookingId)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="schoolUrl"></param>
+    /// <param name="sessionToken"></param>
+    /// <param name="bookingId"></param>
+    /// <returns></returns>
+    /// <exception cref="LoginException"></exception>
+    /// <exception cref="BookingCollisionException"></exception>
+    /// <exception cref="ParseException"></exception>
+    public static async Task UnbookResourceLocation(string schoolUrl, string sessionToken, string bookingId)
     {
         KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
 
@@ -99,9 +129,9 @@ public static class BookingController
 
         using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
         request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
-        HttpResponseMessage response = client.SendAsync(request).Result;
+        HttpResponseMessage response = await client.SendAsync(request);
 
-        string responseBody = response.Content.ReadAsStringAsync().Result;
+        string responseBody = await response.Content.ReadAsStringAsync();
         if (responseBody != "OK")
         {
             if (responseBody == "Din användare har inte rättigheter att skapa resursbokningar.")
@@ -109,12 +139,12 @@ public static class BookingController
                 throw new LoginException("Kronox failed to authorize the user credentials.");
             }
 
-            if (responseBody.Contains("The booking was not saved because of the following colliding resources:"))
+            if (responseBody == "Du kan inte radera resursbokningar där du inte är bokare eller deltagare")
             {
-                throw new BookingException("Couldn't book resource.");
+                throw new BookingCollisionException($"Couldn't unbook resource. Resource details:\n\nschoolUrl: {schoolUrl}\nbookingId: {bookingId}");
             }
 
-            throw new ParseException($"Something went wrong while parsing or handling the requset to book a resource. Resource details:\n\nschoolUrl: {schoolUrl}\nbookingId: {bookingId}");
+            throw new ParseException($"Something went wrong while parsing or handling the requset to unbook a resource. Resource details:\n\nschoolUrl: {schoolUrl}\nbookingId: {bookingId}");
         }
     }
 }
