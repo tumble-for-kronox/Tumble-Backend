@@ -82,23 +82,29 @@ public static class ResourceParser
             resource.LocationIds = ParseResourceLocationIds(resourceAvailableHtml);
 
             // Put together location ids, timeslots and their availability
-            Dictionary<string, Dictionary<TimeSlot, AvailabilitySlot>> availability = new();
+            Dictionary<string, Dictionary<int, AvailabilitySlot>> availability = new();
             for (int i = 0; i < resource.LocationIds.Count; i++)
             {
                 availability.Add(resource.LocationIds[i], new());
                 for (int j = 0; j < resource.TimeSlots.Count; j++)
                 {
+                    if (resource.TimeSlots[j].Id == null)
+                    {
+                        throw new ParseException($"A TimeSlot didn't have an Id which is required for parsing availability. TimeSlot: {resource.TimeSlots[j]}");
+                    }
+
                     HtmlNode availabilityNode = resourceAvailableHtml.DocumentNode.SelectSingleNode($"//tr[{i + 2}]/td[{j + 2}]");
                     switch (availabilityNode.GetAttributeValue("class", " ").Split(" ")[0])
                     {
+
                         case "grupprum-passerad":
-                            availability[resource.LocationIds[i]].Add(resource.TimeSlots[j], ParseUnavailable());
+                            availability[resource.LocationIds[i]].Add(resource.TimeSlots[j].Id!.Value, ParseUnavailable());
                             break;
                         case "grupprum-upptagen":
-                            availability[resource.LocationIds[i]].Add(resource.TimeSlots[j], ParseBooked(availabilityNode));
+                            availability[resource.LocationIds[i]].Add(resource.TimeSlots[j].Id!.Value, ParseBooked(availabilityNode));
                             break;
                         case "grupprum-ledig":
-                            availability[resource.LocationIds[i]].Add(resource.TimeSlots[j], ParseAvailable(availabilityNode));
+                            availability[resource.LocationIds[i]].Add(resource.TimeSlots[j].Id!.Value, ParseAvailable(availabilityNode));
                             break;
                         default:
                             break;
@@ -158,12 +164,12 @@ public static class ResourceParser
 
             IEnumerable<string> timeRangeStrings = resourceHtml.DocumentNode.SelectNodes("//tr[1]/td/b").Select(e => e.InnerText.Trim());
 
-            foreach (string timeRange in timeRangeStrings)
+            foreach ((string timeRange, int i) in timeRangeStrings.WithIndex())
             {
                 DateTime from = resourceDate.ToDateTime(TimeOnly.ParseExact(timeRange.Split(" - ")[0], "HH:mm", CultureInfo.InvariantCulture));
                 DateTime to = resourceDate.ToDateTime(TimeOnly.ParseExact(timeRange.Split(" - ")[1], "HH:mm", CultureInfo.InvariantCulture));
 
-                timeSlots.Add(new TimeSlot(from: from, to: to));
+                timeSlots.Add(new TimeSlot(id: i, from: from, to: to));
             }
 
             return timeSlots;
@@ -215,7 +221,7 @@ public static class ResourceParser
     {
         HtmlNode loginNode = resourceHtml.DocumentNode.SelectSingleNode("//div[@id='boka-dialog-login']");
 
-        if (loginNode == null || resourceHtml.DocumentNode.InnerText == "Din användare har inte rättigheter att skapa resursbokningar.")
+        if (loginNode != null || resourceHtml.DocumentNode.InnerText == "Din användare har inte rättigheter att skapa resursbokningar.")
         {
             throw new LoginException("Kronox rejected the login attempt due to bad credentials or something else on their end.", e);
         }

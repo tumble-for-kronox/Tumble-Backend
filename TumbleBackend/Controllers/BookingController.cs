@@ -39,6 +39,30 @@ public class BookingController : ControllerBase
         catch (ParseException e)
         {
             _logger.LogError(e.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while attempting to parse school resources, please try again later."));
+        }
+    }
+
+    [HttpGet("userbookings")]
+    public IActionResult GetUserBookings([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken)
+    {
+        School? school = schoolId.GetSchool();
+
+        if (school == null)
+            return BadRequest(new Error("Invalid school value."));
+
+        try
+        {
+            return Ok(school.Resources.GetUserBookings(sessionToken));
+        }
+        catch (LoginException e)
+        {
+            _logger.LogError(e.Message);
+            return Unauthorized(new Error("Username or password incorrect."));
+        }
+        catch (ParseException e)
+        {
+            _logger.LogError(e.Message);
             return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while logging in, please try again later."));
         }
     }
@@ -65,7 +89,12 @@ public class BookingController : ControllerBase
         catch (ParseException e)
         {
             _logger.LogError(e.Message);
-            return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while logging in, please try again later."));
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while attempting to parse resource availability, please try again later."));
+        }
+        catch (ResourceInavailableException e)
+        {
+            _logger.LogError(e.Message);
+            return StatusCode(StatusCodes.Status404NotFound, new Error("The resourece you attempted to access is completely inavailable. This may be because you are trying to access it on a weekend."));
         }
     }
 
@@ -129,7 +158,7 @@ public class BookingController : ControllerBase
         catch (ParseException e)
         {
             _logger.LogError(e.Message);
-            return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while logging in, please try again later."));
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while attempting to unbook a resource, please try again later."));
         }
         catch (BookingCollisionException e)
         {
