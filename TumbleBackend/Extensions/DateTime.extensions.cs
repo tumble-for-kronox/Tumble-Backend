@@ -4,6 +4,8 @@ public static class DateTimeExtensions
 {
     public static DateTime FirstDayOfWeek(this DateTime date)
     {
-        return date.AddDays(-(int)date.DayOfWeek + (int)DayOfWeek.Monday);
+        while (date.DayOfWeek != DayOfWeek.Monday)
+            date = date.AddDays(-1);
+        return date;
     }
 }
