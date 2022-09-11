@@ -63,13 +63,13 @@ public class SchoolFactory
     /// schoolId     : "ltu"
     /// schoolName   : "Luleå University of Technology"
     /// url          : "schema.ltu.se"
-    /// loginRequired: true
+    /// loginRequired: false
     /// </code>
     /// </summary>
     /// <returns></returns>
     public static School Ltu()
     {
-        return new School("ltu", "Luleå University of Technology", "schema.ltu.se", true);
+        return new School("ltu", "Luleå University of Technology", "schema.ltu.se", false);
     }
 
     /// <summary>
