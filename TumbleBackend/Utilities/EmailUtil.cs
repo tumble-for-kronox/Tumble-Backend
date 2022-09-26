@@ -46,8 +46,16 @@ public class EmailUtil
             }
         };
 
-        SendEmailResponse response = await emailClient.SendEmailAsync(sendRequest);
+        try
+        {
+            SendEmailResponse response = await emailClient.SendEmailAsync(sendRequest);
+            return response.HttpStatusCode;
+        }
+        catch (Exception)
+        {
+            return HttpStatusCode.InternalServerError;
+        }
 
-        return response.HttpStatusCode;
+
     }
 }

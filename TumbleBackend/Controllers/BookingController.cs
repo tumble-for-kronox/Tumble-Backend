@@ -2,12 +2,14 @@
 using KronoxAPI.Model.Booking;
 using KronoxAPI.Model.Schools;
 using Microsoft.AspNetCore.Mvc;
+using System.Web.Http.Cors;
 using TumbleBackend.Extensions;
 using WebAPIModels.RequestModels;
 using WebAPIModels.ResponseModels;
 
 namespace TumbleBackend.Controllers;
 
+[EnableCors(origins: "*", headers: "*", methods: "*")]
 [ApiController]
 [Route("resources")]
 public class BookingController : ControllerBase
@@ -108,8 +110,6 @@ public class BookingController : ControllerBase
 
         try
         {
-            List<Booking> userBookings = school.Resources.GetUserBookings(sessionToken);
-
             await school.Resources.BookResource(sessionToken, bookingRequest.ResourceId, bookingRequest.Date, bookingRequest.Slot);
 
             return Ok();
@@ -127,12 +127,12 @@ public class BookingController : ControllerBase
         catch (BookingCollisionException e)
         {
             _logger.LogError(e.Message);
-            return StatusCode(StatusCodes.Status409Conflict, new Error("Couldn't book resource because of a conflict. It may already be booked or unavaiable."));
+            return StatusCode(StatusCodes.Status409Conflict, new Error("Couldn't book resource because of a conflict. You may already have a room booked at the same time."));
         }
         catch (MaxBookingsException e)
         {
             _logger.LogError(e.Message);
-            return StatusCode(StatusCodes.Status403Forbidden, new Error("Couldn't book resource because of a conflict. It may already be booked or unavaiable."));
+            return StatusCode(StatusCodes.Status403Forbidden, new Error("Couldn't book resource because you already have the max number of allowed bookings."));
         }
     }
 
@@ -163,7 +163,7 @@ public class BookingController : ControllerBase
         catch (BookingCollisionException e)
         {
             _logger.LogError(e.Message);
-            return StatusCode(StatusCodes.Status409Conflict, new Error("Couldn't book resource because of a conflict. It may already be booked or unavaiable."));
+            return StatusCode(StatusCodes.Status404NotFound, new Error("Couldn't unbook resource because you don't have the bookingId."));
         }
     }
 }
