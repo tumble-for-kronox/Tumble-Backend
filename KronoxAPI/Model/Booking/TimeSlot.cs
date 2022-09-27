@@ -29,10 +29,6 @@ public class TimeSlot
 
     public TimeSpan Duration => _duration;
 
-    public DateTime GetConfirmationOpens => From.Subtract(TimeSpan.FromMinutes(30));
-
-    public DateTime GetConfirmationCloses => From.Add(TimeSpan.FromMinutes(15));
-
     public override string? ToString()
     {
         return $"{From:HH:mm}-{To:HH:mm}";
