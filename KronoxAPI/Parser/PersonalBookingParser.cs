@@ -30,14 +30,21 @@ public static class PersonalBookingParser
                 string date = bookingNode.SelectSingleNode("div[1]/a").InnerText.Trim();
                 string combinedTime = bookingNode.SelectSingleNode("div[1]/text()").InnerText.Trim();
                 string locationId = bookingNode.SelectSingleNode("div[1]/b").InnerText.Split(",").Last().Trim();
-                string confirmationTimeString = bookingNode.SelectSingleNode("div[2]/span").InnerText.Replace("Must be confirmed between ", "").Trim();
+
+                string? confirmationTimeString = bookingNode.SelectSingleNode("div[2]/span")?.InnerText.Replace("Must be confirmed between ", "").Trim();
 
                 // Start date conversions
                 DateTime from = DateTime.ParseExact(date + ' ' + combinedTime.Split(" - ")[0], "yy-MM-dd HH:mm", CultureInfo.InvariantCulture);
                 DateTime to = DateTime.ParseExact(date + ' ' + combinedTime.Split(" - ")[1], "yy-MM-dd HH:mm", CultureInfo.InvariantCulture);
 
-                DateTime confirmFrom = DateTime.ParseExact(date + ' ' + confirmationTimeString.Split(" - ")[0], "yy-MM-dd HH:mm", CultureInfo.InvariantCulture);
-                DateTime confirmTo = DateTime.ParseExact(date + ' ' + confirmationTimeString.Split(" - ")[1], "yy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+                DateTime? confirmTo = null;
+                DateTime? confirmFrom = null;
+
+                if (confirmationTimeString != null)
+                {
+                confirmFrom = DateTime.ParseExact(date + ' ' + confirmationTimeString.Split(" - ")[0], "yy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+                confirmTo = DateTime.ParseExact(date + ' ' + confirmationTimeString.Split(" - ")[1], "yy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+                }
 
                 TimeSlot bookingTimeSlot = new(from, to);
 

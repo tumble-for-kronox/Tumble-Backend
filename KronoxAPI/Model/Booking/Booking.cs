@@ -11,10 +11,10 @@ public class Booking
     private readonly string _id;
     private readonly TimeSlot _timeSlot;
     private readonly string _locationId;
-    private readonly DateTime _confirmationOpen;
-    private readonly DateTime _confirmationClosed;
+    private readonly DateTime? _confirmationOpen;
+    private readonly DateTime? _confirmationClosed;
 
-    public Booking(string id, TimeSlot timeSlot, string locationId, DateTime confirmationOpen, DateTime confirmationClosed)
+    public Booking(string id, TimeSlot timeSlot, string locationId, DateTime? confirmationOpen, DateTime? confirmationClosed)
     {
         _id = id;
         _timeSlot = timeSlot;
@@ -29,7 +29,7 @@ public class Booking
 
     public string LocationId => _locationId;
 
-    public DateTime ConfirmationOpen => _confirmationOpen;
+    public DateTime? ConfirmationOpen => _confirmationOpen;
 
-    public DateTime ConfirmationClosed => _confirmationClosed;
+    public DateTime? ConfirmationClosed => _confirmationClosed;
 }

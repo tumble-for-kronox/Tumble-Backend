@@ -147,4 +147,17 @@ public static class BookingController
             throw new ParseException($"Something went wrong while parsing or handling the requset to unbook a resource. Resource details:\n\nschoolUrl: {schoolUrl}\nbookingId: {bookingId}");
         }
     }
+
+    public static async Task ConfirmResourceBooking(string schoolUrl, string sessionToken, string bookingId, string resourceId)
+    {
+        KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+
+        Uri uri = new($"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=konfirmera&flik={resourceId}&bokningsId={bookingId}");
+
+        using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
+        request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        response.EnsureSuccessStatusCode();
+    }
 }

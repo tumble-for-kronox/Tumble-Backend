@@ -2,6 +2,7 @@
 using KronoxAPI.Model.Booking;
 using KronoxAPI.Model.Schools;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using System.Web.Http.Cors;
 using TumbleBackend.Extensions;
 using WebAPIModels.RequestModels;
@@ -22,7 +23,7 @@ public class BookingController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetResources([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken)
+    public ActionResult<List<Resource>> GetResources([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken)
     {
         School? school = schoolId.GetSchool();
 
@@ -46,7 +47,7 @@ public class BookingController : ControllerBase
     }
 
     [HttpGet("userbookings")]
-    public IActionResult GetUserBookings([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken)
+    public ActionResult<List<Booking>> GetUserBookings([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken)
     {
         School? school = schoolId.GetSchool();
 
@@ -70,7 +71,7 @@ public class BookingController : ControllerBase
     }
 
     [HttpGet("{resourceId}")]
-    public IActionResult GetAvailabilities([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken, [FromRoute] string resourceId, [FromQuery] DateTime date)
+    public ActionResult<Resource> GetAvailabilities([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken, [FromRoute] string resourceId, [FromQuery] DateTime date)
     {
         School? school = schoolId.GetSchool();
 
@@ -101,7 +102,7 @@ public class BookingController : ControllerBase
     }
 
     [HttpPut("book")]
-    public async Task<IActionResult> BookResource([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken, [FromBody] BookingRequest bookingRequest)
+    public async Task<ActionResult> BookResource([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken, [FromBody] BookingRequest bookingRequest)
     {
         School? school = schoolId.GetSchool();
 
@@ -137,7 +138,7 @@ public class BookingController : ControllerBase
     }
 
     [HttpPut("unbook")]
-    public async Task<IActionResult> UnbookResource([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken, [FromQuery] string bookingId)
+    public async Task<ActionResult> UnbookResource([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken, [FromQuery] string bookingId)
     {
         School? school = schoolId.GetSchool();
 
@@ -147,6 +148,37 @@ public class BookingController : ControllerBase
         try
         {
             await school.Resources.UnbookResource(sessionToken, bookingId);
+
+            return Ok();
+        }
+        catch (LoginException e)
+        {
+            _logger.LogError(e.Message);
+            return Unauthorized(new Error("Username or password incorrect."));
+        }
+        catch (ParseException e)
+        {
+            _logger.LogError(e.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while attempting to unbook a resource, please try again later."));
+        }
+        catch (BookingCollisionException e)
+        {
+            _logger.LogError(e.Message);
+            return StatusCode(StatusCodes.Status404NotFound, new Error("Couldn't unbook resource because you don't have the bookingId."));
+        }
+    }
+
+    [HttpPut("confirm")]
+    public async  Task<ActionResult> ConfirmResourceBooking([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken, [FromBody] ConfirmBookingRequest data)
+    {
+        School? school = schoolId.GetSchool();
+
+        if (school == null)
+            return BadRequest(new Error("Invalid school value."));
+
+        try
+        {
+            await school.Resources.ConfirmResourceBooking(sessionToken, data.BookingId, data.ResourceId);
 
             return Ok();
         }

@@ -97,4 +97,19 @@ public class SchoolResources
     {
         await BookingController.UnbookResourceLocation(_school.Url, sessionToken, bookingId);
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sessionToken"></param>
+    /// <param name="bookingId"></param>
+    /// <param name="resourceId"></param>
+    /// <returns></returns>
+    /// <exception cref="LoginException"></exception>
+    /// <exception cref="BookingCollisionException"></exception>
+    /// <exception cref="ParseException"></exception>
+    public async Task ConfirmResourceBooking(string sessionToken, string bookingId, string resourceId)
+    {
+        await BookingController.ConfirmResourceBooking(_school.Url, sessionToken, bookingId, resourceId);
+    }
 }
