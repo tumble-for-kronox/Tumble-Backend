@@ -5,7 +5,7 @@ using TumbleBackend.Utilities;
 using WebAPIModels.ResponseModels;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.WebHost.UseIISIntegration();
 // Add services to the container.
 
 var dbglistener = new TextWriterTraceListener(Console.Out);

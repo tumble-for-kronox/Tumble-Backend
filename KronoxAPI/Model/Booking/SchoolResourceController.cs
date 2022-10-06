@@ -42,7 +42,7 @@ public class SchoolResources
             HtmlDocument personalBookingsDoc = new();
             personalBookingsDoc.LoadHtml(personalBookingsForResourceHtml);
 
-            allBookings.AddRange(PersonalBookingParser.ParsePersonalBookings(personalBookingsDoc));
+            allBookings.AddRange(PersonalBookingParser.ParsePersonalBookings(personalBookingsDoc, resource.Id));
         }
 
         return allBookings;

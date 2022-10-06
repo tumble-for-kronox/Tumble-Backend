@@ -14,7 +14,7 @@ namespace KronoxAPI.Parser;
 
 public static class PersonalBookingParser
 {
-    public static List<Booking> ParsePersonalBookings(HtmlDocument personalBookingsHtml)
+    public static List<Booking> ParsePersonalBookings(HtmlDocument personalBookingsHtml, string resourceId)
     {
         try
         {
@@ -26,6 +26,24 @@ public static class PersonalBookingParser
             foreach (HtmlNode bookingNode in personalBookingsNodes)
             {
                 // Get raw data, some will need processing before being built into data object
+                bool showConfirmButton = false;
+                bool showUnbookButton = false;
+
+                IEnumerable<HtmlNode>? buttons = bookingNode.SelectNodes("div[1]/div[1]/a");
+                buttons ??= new List<HtmlNode>();
+
+                foreach (HtmlNode button in buttons)
+                {
+                    if (button.InnerText == "Confirm")
+                    {
+                        showConfirmButton = true;
+                    }
+                    else if (button.InnerText == "Cancel booking")
+                    {
+                        showUnbookButton = true;
+                    }
+                }
+
                 string bookingId = bookingNode.GetAttributeValue("id", "").Trim().Replace("post_", "");
                 string date = bookingNode.SelectSingleNode("div[1]/a").InnerText.Trim();
                 string combinedTime = bookingNode.SelectSingleNode("div[1]/text()").InnerText.Trim();
@@ -42,13 +60,13 @@ public static class PersonalBookingParser
 
                 if (confirmationTimeString != null)
                 {
-                confirmFrom = DateTime.ParseExact(date + ' ' + confirmationTimeString.Split(" - ")[0], "yy-MM-dd HH:mm", CultureInfo.InvariantCulture);
-                confirmTo = DateTime.ParseExact(date + ' ' + confirmationTimeString.Split(" - ")[1], "yy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+                    confirmFrom = DateTime.ParseExact(date + ' ' + confirmationTimeString.Split(" - ")[0], "yy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+                    confirmTo = DateTime.ParseExact(date + ' ' + confirmationTimeString.Split(" - ")[1], "yy-MM-dd HH:mm", CultureInfo.InvariantCulture);
                 }
 
                 TimeSlot bookingTimeSlot = new(from, to);
 
-                bookings.Add(new(bookingId, bookingTimeSlot, locationId, confirmFrom, confirmTo));
+                bookings.Add(new(bookingId, resourceId, bookingTimeSlot, locationId, showConfirmButton, showUnbookButton, confirmFrom, confirmTo));
             }
 
             return bookings;
