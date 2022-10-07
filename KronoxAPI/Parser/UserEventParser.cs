@@ -161,10 +161,10 @@ public class UserEventParser
             rawStartTime = Regex.Match(dataNodes[1].InnerText, @"Start\s*:\s*(.*)").Groups[1].Value;
             rawEndTime = Regex.Match(dataNodes[2].InnerText, @"End\s*:\s*(.*)").Groups[1].Value;
             rawLastSignupDate = Regex.Match(dataNodes[3].InnerText, @"Registration closes\s*:\s*(.*)").Groups[1].Value;
-            type = Regex.Match(dataNodes[4].InnerText, @"Typ\s*:\s*(.*)").Groups[1].Value;
+            type = Regex.Match(dataNodes[4].InnerText, @"Test Type\s*:\s*(.*)").Groups[1].Value;
 
             if (isRegistered)
-                anonymousCode = Regex.Match(dataNodes[5].InnerText, @"Anonym kod\s*:\s*(.*)").Groups[1].Value;
+                anonymousCode = Regex.Match(dataNodes[5].InnerText, @"Anonymous Id\s*:\s*(.*)").Groups[1].Value;
 
         }
         catch (IndexOutOfRangeException ex)
