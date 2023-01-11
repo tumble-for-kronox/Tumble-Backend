@@ -66,7 +66,7 @@ public class BookingController : ControllerBase
         catch (ParseException e)
         {
             _logger.LogError(e.Message);
-            return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while logging in, please try again later."));
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while attempting to parse user bookings, please try again later."));
         }
     }
 
@@ -169,7 +169,7 @@ public class BookingController : ControllerBase
     }
 
     [HttpPut("confirm")]
-    public async  Task<ActionResult> ConfirmResourceBooking([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken, [FromBody] ConfirmBookingRequest data)
+    public async Task<ActionResult> ConfirmResourceBooking([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken, [FromBody] ConfirmBookingRequest data)
     {
         School? school = schoolId.GetSchool();
 

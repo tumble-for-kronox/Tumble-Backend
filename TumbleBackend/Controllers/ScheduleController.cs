@@ -10,9 +10,12 @@ using static TumbleBackend.Library.ScheduleManagement;
 using KronoxAPI.Exceptions;
 using TumbleBackend.Utilities;
 using TumbleBackend.StringConstants;
+using System.Web.Http.Cors;
 
 namespace TumbleBackend.Controllers;
 
+// [EnableCors(origins: "*", headers: "*", methods: "*")]
+[DisableCors]
 [ApiController]
 [Route("schedules")]
 public class ScheduleController : ControllerBase
