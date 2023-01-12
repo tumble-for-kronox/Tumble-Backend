@@ -1,5 +1,6 @@
 using MongoDB.Bson.Serialization;
 using System.Diagnostics;
+using TumbleBackend.ActionFilters;
 using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
 using WebAPIModels.ResponseModels;
@@ -35,6 +36,13 @@ builder.Services.AddCors(options =>
       .AllowAnyMethod()
       .AllowAnyHeader());
 });
+
+builder.Services.AddSingleton((provider) =>
+{
+    return builder.Configuration;
+});
+
+builder.Services.AddScoped<AuthActionFilter>();
 
 var app = builder.Build();
 

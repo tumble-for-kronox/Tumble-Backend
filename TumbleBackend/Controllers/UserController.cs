@@ -11,6 +11,7 @@ using TumbleBackend.Utilities;
 using WebAPIModels.Extensions;
 using TumbleBackend.InternalModels;
 using TumbleBackend.StringConstants;
+using System.Net;
 
 namespace TumbleBackend.Controllers;
 
@@ -24,6 +25,45 @@ public class UserController : ControllerBase
     public UserController(ILogger<UserController> logger)
     {
         _logger = logger;
+    }
+
+    [HttpGet]
+    public IActionResult GetKronoxUser([FromServices] IConfiguration configuration, [FromQuery] SchoolEnum schoolId, [FromHeader(Name = "X-auth-token")] string refreshToken)
+    {
+        School? school = schoolId.GetSchool();
+
+        if (school == null)
+            return BadRequest(new Error("Invalid school value."));
+
+        string? jwtEncKey = configuration[UserSecrets.JwtEncryptionKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtEncryptionKey);
+        string? jwtSigKey = configuration[UserSecrets.JwtSignatureKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtSignatureKey);
+        string? refreshTokenExpiration = configuration[UserSecrets.JwtRefreshTokenExpiration] ?? Environment.GetEnvironmentVariable(EnvVar.JwtRefreshTokenExpiration);
+        if (jwtEncKey == null || refreshTokenExpiration == null || jwtSigKey == null)
+            throw new NullReferenceException("It should not be possible for jwtEncKey OR refreshTokenExpirationTime OR jwtSigKey to be null at this point.");
+
+        RefreshTokenResponseModel? creds = JwtUtil.ValidateAndReadRefreshToken(jwtEncKey, jwtSigKey, refreshToken);
+
+        if (creds == null)
+            return Unauthorized(new Error("Couldn't login user from refreshToken, please log out and back in manually."));
+
+        try
+        {
+            User kronoxUser = school.Login(creds.Username, creds.Password);
+
+            string updatedExpirationDateRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), creds.Username, creds.Password);
+
+            return Ok(kronoxUser.ToWebModel(updatedExpirationDateRefreshToken));
+        }
+        catch (LoginException e)
+        {
+            _logger.LogError(e.Message);
+            return Unauthorized(new Error("Username or password incorrect."));
+        }
+        catch (ParseException e)
+        {
+            _logger.LogError(e.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while logging in, please try again later."));
+        }
     }
 
     [HttpPost("login")]
@@ -46,7 +86,7 @@ public class UserController : ControllerBase
 
             string newRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), body.Username, body.Password);
 
-            return Ok(kronoxUser.toWebModel(newRefreshToken));
+            return Ok(kronoxUser.ToWebModel(newRefreshToken));
         }
         catch (LoginException e)
         {
@@ -85,7 +125,7 @@ public class UserController : ControllerBase
 
             string updatedExpirationDateRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), creds.Username, creds.Password);
 
-            return Ok(kronoxUser.toWebModel(updatedExpirationDateRefreshToken));
+            return Ok(kronoxUser.ToWebModel(updatedExpirationDateRefreshToken));
         }
         catch (LoginException e)
         {
