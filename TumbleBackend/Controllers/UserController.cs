@@ -46,7 +46,7 @@ public class UserController : ControllerBase
 
             string newRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), body.Username, body.Password);
 
-            return Ok(kronoxUser.toWebModel(newRefreshToken));
+            return Ok(kronoxUser.ToWebModel(newRefreshToken));
         }
         catch (LoginException e)
         {
@@ -85,7 +85,7 @@ public class UserController : ControllerBase
 
             string updatedExpirationDateRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), creds.Username, creds.Password);
 
-            return Ok(kronoxUser.toWebModel(updatedExpirationDateRefreshToken));
+            return Ok(kronoxUser.ToWebModel(updatedExpirationDateRefreshToken));
         }
         catch (LoginException e)
         {

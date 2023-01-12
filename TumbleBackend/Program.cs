@@ -1,5 +1,6 @@
 using MongoDB.Bson.Serialization;
 using System.Diagnostics;
+using TumbleBackend.ActionFilters;
 using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
 using WebAPIModels.ResponseModels;
@@ -26,6 +27,22 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+      "CorsPolicy",
+      builder => builder.AllowAnyOrigin()
+      .AllowAnyMethod()
+      .AllowAnyHeader());
+});
+
+builder.Services.AddSingleton((provider) =>
+{
+    return builder.Configuration;
+});
+
+builder.Services.AddScoped<AuthActionFilter>();
 
 var app = builder.Build();
 string? dbConnectionString = app.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.DbConnection] : Environment.GetEnvironmentVariable(EnvVar.DbConnection);

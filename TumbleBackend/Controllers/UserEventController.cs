@@ -7,11 +7,13 @@ using WebAPIModels.Extensions;
 using KronoxAPI.Model.Users;
 using KronoxAPI.Exceptions;
 using System.Web.Http.Cors;
+using TumbleBackend.ActionFilters;
 
 namespace TumbleBackend.Controllers;
 
 [EnableCors(origins: "*", headers: "*", methods: "*")]
 [ApiController]
+[ServiceFilter(typeof(AuthActionFilter))]
 [Route("users/events")]
 public class UserEventController : ControllerBase
 {
@@ -23,9 +25,13 @@ public class UserEventController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAllUserEvents([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken)
+    public IActionResult GetAllUserEvents([FromQuery] SchoolEnum schoolId)
     {
         School? school = schoolId.GetSchool();
+        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+
+        if (!hasSessionToken)
+            return BadRequest(new Error("Requires provided auth token"));
 
         if (school == null)
             return BadRequest(new Error("Invalid school value."));
@@ -57,9 +63,13 @@ public class UserEventController : ControllerBase
     }
 
     [HttpPut("register/all")]
-    public IActionResult RegisterAllAvailableResults([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken)
+    public IActionResult RegisterAllAvailableResults([FromQuery] SchoolEnum schoolId)
     {
         School? school = schoolId.GetSchool();
+        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+
+        if (!hasSessionToken)
+            return BadRequest(new Error("Requires provided auth token"));
 
         if (school == null)
         {
@@ -70,7 +80,7 @@ public class UserEventController : ControllerBase
         {
             Dictionary<string, List<UserEvent>> userEvents = school.GetUserEvents(sessionToken);
             UserEventCollection? webSafeUserEvents = userEvents.ToWebModel();
-            
+
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
 
@@ -107,9 +117,13 @@ public class UserEventController : ControllerBase
     }
 
     [HttpPut("register/{eventId}")]
-    public IActionResult RegisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken)
+    public IActionResult RegisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId)
     {
         School? school = schoolId.GetSchool();
+        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+
+        if (!hasSessionToken)
+            return BadRequest(new Error("Requires provided auth token"));
 
         if (school == null)
             return BadRequest(new Error("Invalid school value."));
@@ -152,9 +166,13 @@ public class UserEventController : ControllerBase
     }
 
     [HttpPut("unregister/{eventId}")]
-    public IActionResult UnregisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken)
+    public IActionResult UnregisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId)
     {
         School? school = schoolId.GetSchool();
+        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+
+        if (!hasSessionToken)
+            return BadRequest(new Error("Requires provided auth token"));
 
         if (school == null)
             return BadRequest(new Error("Invalid school value."));

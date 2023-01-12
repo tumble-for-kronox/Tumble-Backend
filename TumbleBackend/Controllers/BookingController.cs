@@ -4,6 +4,7 @@ using KronoxAPI.Model.Schools;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.Web.Http.Cors;
+using TumbleBackend.ActionFilters;
 using TumbleBackend.Extensions;
 using WebAPIModels.RequestModels;
 using WebAPIModels.ResponseModels;
@@ -12,6 +13,7 @@ namespace TumbleBackend.Controllers;
 
 [EnableCors(origins: "*", headers: "*", methods: "*")]
 [ApiController]
+[ServiceFilter(typeof(AuthActionFilter))]
 [Route("resources")]
 public class BookingController : ControllerBase
 {
@@ -23,9 +25,13 @@ public class BookingController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<Resource>> GetResources([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken)
+    public ActionResult<List<Resource>> GetResources([FromQuery] SchoolEnum schoolId)
     {
         School? school = schoolId.GetSchool();
+        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+
+        if (!hasSessionToken)
+            return BadRequest(new Error("Requires provided auth token"));
 
         if (school == null)
             return BadRequest(new Error("Invalid school value."));
@@ -47,9 +53,13 @@ public class BookingController : ControllerBase
     }
 
     [HttpGet("userbookings")]
-    public ActionResult<List<Booking>> GetUserBookings([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken)
+    public ActionResult<List<Booking>> GetUserBookings([FromQuery] SchoolEnum schoolId)
     {
         School? school = schoolId.GetSchool();
+        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+
+        if (!hasSessionToken)
+            return BadRequest(new Error("Requires provided auth token"));
 
         if (school == null)
             return BadRequest(new Error("Invalid school value."));
@@ -71,9 +81,13 @@ public class BookingController : ControllerBase
     }
 
     [HttpGet("{resourceId}")]
-    public ActionResult<Resource> GetAvailabilities([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken, [FromRoute] string resourceId, [FromQuery] DateTime date)
+    public ActionResult<Resource> GetAvailabilities([FromQuery] SchoolEnum schoolId, [FromRoute] string resourceId, [FromQuery] DateTime date)
     {
         School? school = schoolId.GetSchool();
+        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+
+        if (!hasSessionToken)
+            return BadRequest(new Error("Requires provided auth token"));
 
         if (school == null)
             return BadRequest(new Error("Invalid school value."));
@@ -102,9 +116,13 @@ public class BookingController : ControllerBase
     }
 
     [HttpPut("book")]
-    public async Task<ActionResult> BookResource([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken, [FromBody] BookingRequest bookingRequest)
+    public async Task<ActionResult> BookResource([FromQuery] SchoolEnum schoolId, [FromBody] BookingRequest bookingRequest)
     {
         School? school = schoolId.GetSchool();
+        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+
+        if (!hasSessionToken)
+            return BadRequest(new Error("Requires provided auth token"));
 
         if (school == null)
             return BadRequest(new Error("Invalid school value."));
@@ -138,9 +156,13 @@ public class BookingController : ControllerBase
     }
 
     [HttpPut("unbook")]
-    public async Task<ActionResult> UnbookResource([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken, [FromQuery] string bookingId)
+    public async Task<ActionResult> UnbookResource([FromQuery] SchoolEnum schoolId, [FromQuery] string bookingId)
     {
         School? school = schoolId.GetSchool();
+        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+
+        if (!hasSessionToken)
+            return BadRequest(new Error("Requires provided auth token"));
 
         if (school == null)
             return BadRequest(new Error("Invalid school value."));
@@ -169,9 +191,13 @@ public class BookingController : ControllerBase
     }
 
     [HttpPut("confirm")]
-    public async  Task<ActionResult> ConfirmResourceBooking([FromQuery] SchoolEnum schoolId, [FromQuery] string sessionToken, [FromBody] ConfirmBookingRequest data)
+    public async Task<ActionResult> ConfirmResourceBooking([FromQuery] SchoolEnum schoolId, [FromBody] ConfirmBookingRequest data)
     {
         School? school = schoolId.GetSchool();
+        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+
+        if (!hasSessionToken)
+            return BadRequest(new Error("Requires provided auth token"));
 
         if (school == null)
             return BadRequest(new Error("Invalid school value."));

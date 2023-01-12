@@ -10,10 +10,14 @@ using static TumbleBackend.Library.ScheduleManagement;
 using KronoxAPI.Exceptions;
 using TumbleBackend.Utilities;
 using TumbleBackend.StringConstants;
+using System.Web.Http.Cors;
+using TumbleBackend.ActionFilters;
 
 namespace TumbleBackend.Controllers;
 
+[EnableCors(origins: "*", headers: "*", methods: "*")]
 [ApiController]
+[ServiceFilter(typeof(AuthActionFilter))]
 [Route("schedules")]
 public class ScheduleController : ControllerBase
 {
@@ -33,15 +37,16 @@ public class ScheduleController : ControllerBase
     /// <param name="sessionToken"></param>
     /// <returns></returns>
     [HttpGet("{scheduleId}", Name = "GetSchedule")]
-    public IActionResult Get([FromServices] IConfiguration config, [FromRoute] string scheduleId, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null, [FromQuery] string? sessionToken = null)
+    public IActionResult Get([FromServices] IConfiguration config, [FromRoute] string scheduleId, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null)
     {
         // Extract school instance and make sure the school entry is valid (should've failed in query, but double safety.
         School? school = schoolId.GetSchool();
+        Request.Headers.TryGetValue("sessionToken", out var sessionToken);
 
         if (school == null)
             return BadRequest(new Error("Invalid school value."));
 
-        if (school.LoginRequired && sessionToken == null)
+        if (school.LoginRequired && string.IsNullOrWhiteSpace(sessionToken))
             return BadRequest(new Error($"Login required to access {school.Id} schedules."));
 
         // If given specific start date that parses correctly, simply fetch schedule directly from KronoxAPI and return it.
@@ -92,9 +97,10 @@ public class ScheduleController : ControllerBase
     /// <param name="sessionToken"></param>
     /// <returns>A list of <see cref="Programme"/> objects and an <see cref="int"/> Count. Although the name is "programme" they also map to individuals and schedules correctly.</returns>
     [HttpGet("search", Name = "SearchProgrammes")]
-    public IActionResult Search([FromQuery] string searchQuery, [FromQuery] SchoolEnum? schoolId = null, [FromQuery] string? sessionToken = null)
+    public IActionResult Search([FromQuery] string searchQuery, [FromQuery] SchoolEnum? schoolId = null)
     {
         School? school = schoolId?.GetSchool();
+        Request.Headers.TryGetValue("sessionToken", out var sessionToken);
 
         if (school == null)
             return BadRequest(new Error("Invalid school value."));
