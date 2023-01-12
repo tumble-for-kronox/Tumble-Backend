@@ -45,6 +45,8 @@ builder.Services.AddSingleton((provider) =>
 builder.Services.AddScoped<AuthActionFilter>();
 
 var app = builder.Build();
+
+app.UseCors("CorsPolicy");
 string? dbConnectionString = app.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.DbConnection] : Environment.GetEnvironmentVariable(EnvVar.DbConnection);
 string? awsAccessKey = app.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.AwsAccessKey] : Environment.GetEnvironmentVariable(EnvVar.AwsAccessKey);
 string? awsSecretKey = app.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.AwsSecretKey] : Environment.GetEnvironmentVariable(EnvVar.AwsSecretKey);
