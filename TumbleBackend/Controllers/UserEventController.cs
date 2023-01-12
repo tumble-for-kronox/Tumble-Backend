@@ -6,12 +6,12 @@ using WebAPIModels.ResponseModels;
 using WebAPIModels.Extensions;
 using KronoxAPI.Model.Users;
 using KronoxAPI.Exceptions;
-using System.Web.Http.Cors;
 using TumbleBackend.ActionFilters;
+using Microsoft.AspNetCore.Cors;
 
 namespace TumbleBackend.Controllers;
 
-[EnableCors(origins: "*", headers: "*", methods: "*")]
+[EnableCors("CorsPolicy")]
 [ApiController]
 [ServiceFilter(typeof(AuthActionFilter))]
 [Route("users/events")]

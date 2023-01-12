@@ -59,6 +59,8 @@ if (app.Environment.IsDevelopment())
 DatabaseAPI.Connector.Init(dbConnectionString!);
 EmailUtil.Init(awsAccessKey!, awsSecretKey!);
 
+app.UseCors();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

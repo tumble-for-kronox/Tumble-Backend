@@ -1,9 +1,9 @@
 ﻿using KronoxAPI.Exceptions;
 using KronoxAPI.Model.Booking;
 using KronoxAPI.Model.Schools;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using System.Web.Http.Cors;
 using TumbleBackend.ActionFilters;
 using TumbleBackend.Extensions;
 using WebAPIModels.RequestModels;
@@ -11,7 +11,7 @@ using WebAPIModels.ResponseModels;
 
 namespace TumbleBackend.Controllers;
 
-[EnableCors(origins: "*", headers: "*", methods: "*")]
+[EnableCors("CorsPolicy")]
 [ApiController]
 [ServiceFilter(typeof(AuthActionFilter))]
 [Route("resources")]

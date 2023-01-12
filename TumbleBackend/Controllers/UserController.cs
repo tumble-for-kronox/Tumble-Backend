@@ -1,7 +1,5 @@
 ﻿using KronoxAPI.Model.Schools;
 using Microsoft.AspNetCore.Mvc;
-using System.Web.Http.Cors;
-using System.IdentityModel.Tokens.Jwt;
 using TumbleBackend.Extensions;
 using WebAPIModels.ResponseModels;
 using WebAPIModels.RequestModels;
@@ -11,11 +9,11 @@ using TumbleBackend.Utilities;
 using WebAPIModels.Extensions;
 using TumbleBackend.InternalModels;
 using TumbleBackend.StringConstants;
-using System.Net;
+using Microsoft.AspNetCore.Cors;
 
 namespace TumbleBackend.Controllers;
 
-[EnableCors(origins: "*", headers: "*", methods: "*")]
+[EnableCors("CorsPolicy")]
 [ApiController]
 [Route("users")]
 public class UserController : ControllerBase

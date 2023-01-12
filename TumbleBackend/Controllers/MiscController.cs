@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using TumbleBackend.Utilities;
 using WebAPIModels.RequestModels;
-using System.Web.Http.Cors;
 
 namespace TumbleBackend.Controllers;
 
-[EnableCors(origins: "*", headers: "*", methods: "*")]
+[EnableCors("CorsPolicy")]
 [ApiController]
 [Route("misc")]
 public class MiscController : ControllerBase
