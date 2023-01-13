@@ -76,7 +76,7 @@ public class BookingController : ControllerBase
         catch (ParseException e)
         {
             _logger.LogError(e.Message);
-            return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while logging in, please try again later."));
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while attempting to parse user bookings, please try again later."));
         }
     }
 
