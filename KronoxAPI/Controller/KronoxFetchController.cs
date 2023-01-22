@@ -30,12 +30,12 @@ public static class KronoxFetchController
     /// <param name="sessionToken"></param>
     /// <param name="startDate"></param>
     /// <returns></returns>
-    public static async Task<string> GetSchedule(string scheduleId, string schoolUrl, LangEnum? language, string? sessionToken, DateTime? startDate)
+    public static async Task<string> GetSchedule(string[] scheduleId, string schoolUrl, LangEnum? language, string? sessionToken, DateTime? startDate)
     {
         string parsedDate = startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : "idag";
         LangEnum parsedLang = language == null ? LangEnum.Sv : language;
 
-        string uri = $"https://{schoolUrl}/setup/jsp/SchemaXML.jsp?startDatum={parsedDate}&intervallTyp=m&intervallAntal=6&sprak={parsedLang}&sokMedAND=true&forklaringar=true&resurser={scheduleId}";
+        string uri = $"https://{schoolUrl}/setup/jsp/SchemaXML.jsp?startDatum={parsedDate}&intervallTyp=m&intervallAntal=6&sprak={parsedLang}&sokMedAND=true&forklaringar=true&resurser={string.Join(',', scheduleId)}";
 
         using var request = new HttpRequestMessage(HttpMethod.Get, uri);
         if (sessionToken != null) request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");

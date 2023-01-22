@@ -19,7 +19,7 @@ public static class ScheduleExtensions
     {
         List<DayWebModel> convertedDays = schedule.Days.Select(day => day.ToWebModel(convertedCourses)).ToList();
 
-        return new ScheduleWebModel(schedule.Id, DateTime.Now, convertedDays);
+        return new ScheduleWebModel(schedule.Ids.First(), DateTime.Now, convertedDays);
     }
 
     /// <summary>
@@ -32,6 +32,13 @@ public static class ScheduleExtensions
     {
         List<DayWebModel> convertedDays = schedule.Days.Select(day => day.ToWebModel(convertedCourses)).ToList();
 
-        return new ScheduleWebModel(schedule.Id, cachedAt, convertedDays);
+        return new ScheduleWebModel(schedule.Ids.First(), cachedAt, convertedDays);
+    }
+
+    public static MultiScheduleWebModel ToMultiWebModel(this Schedule schedule, Dictionary<string, CourseWebModel> convertedCourses)
+    {
+        List<DayWebModel> convertedDays = schedule.Days.Select(day => day.ToWebModel(convertedCourses)).ToList();
+
+        return new MultiScheduleWebModel(schedule.Ids, DateTime.Now, convertedDays);
     }
 }

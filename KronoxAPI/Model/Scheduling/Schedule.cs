@@ -11,7 +11,7 @@ namespace KronoxAPI.Model.Scheduling;
 /// </summary>
 public class Schedule
 {
-    private readonly string _id;
+    private readonly string[] _ids;
     private List<Day> _days;
 
     /// <summary>
@@ -20,13 +20,13 @@ public class Schedule
     /// <param name="id"></param>
     /// <param name="days"></param>
     /// <param name="courses"></param>
-    public Schedule(string id, List<Day> days)
+    public Schedule(string[] ids, List<Day> days)
     {
-        _id = id;
+        _ids = ids;
         _days = days;
     }
 
-    public string Id => _id;
+    public string[] Ids => _ids;
 
     public List<Day> Days { get => _days; set => _days = value; }
 }

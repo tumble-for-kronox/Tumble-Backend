@@ -32,7 +32,6 @@ public class ScheduleController : ControllerBase
     /// <param name="scheduleId"></param>
     /// <param name="schoolId"></param>
     /// <param name="startDateISO"></param>
-    /// <param name="sessionToken"></param>
     /// <returns></returns>
     [HttpGet("{scheduleId}", Name = "GetSchedule")]
     public IActionResult Get([FromServices] IConfiguration config, [FromRoute] string scheduleId, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null)
@@ -47,18 +46,18 @@ public class ScheduleController : ControllerBase
         if (school.LoginRequired && string.IsNullOrWhiteSpace(sessionToken))
             return BadRequest(new Error($"Login required to access {school.Id} schedules."));
 
-        // If given specific start date that parses correctly, simply fetch schedule directly from KronoxAPI and return it.
-        if (startDateISO != null && DateTime.TryParse(startDateISO, out DateTime startDate))
-            return Ok(BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken));
-
-        // Reset the given start date as it's either null or an invalid format. Ensures that all cached schedules start at the beginning of the week.
-        startDate = DateTime.Now.FirstDayOfWeek();
-
-        // Attempt to get cached schedule.
-        ScheduleWebModel? cachedSchedule = SchedulesCache.GetSchedule(scheduleId);
-
         try
         {
+            // If given specific start date that parses correctly, simply fetch schedule directly from KronoxAPI and return it.
+            if (startDateISO != null && DateTime.TryParse(startDateISO, out DateTime startDate))
+                return Ok(BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken));
+
+            // Reset the given start date as it's either null or an invalid format. Ensures that all cached schedules start at the beginning of the week.
+            startDate = DateTime.Now.FirstDayOfWeek();
+
+            // Attempt to get cached schedule.
+            ScheduleWebModel? cachedSchedule = SchedulesCache.GetSchedule(scheduleId);
+
             // On cache hit.
             if (cachedSchedule != null)
             {
@@ -77,6 +76,46 @@ public class ScheduleController : ControllerBase
             // On cache miss, fetch, cache, and return schedule from scratch.
             ScheduleWebModel newScheduleFetch = BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken);
             SchedulesCache.SaveSchedule(newScheduleFetch);
+
+            return Ok(newScheduleFetch);
+        }
+        catch (ParseException e)
+        {
+            _logger.LogError(e.Message);
+            return NotFound(new Error("Schedule wasn't found or may have been corrupted."));
+        }
+    }
+
+    /// <summary>
+    /// Endpoint for fetching multiple given schedules as one. Will circumvent all caching.
+    /// </summary>
+    /// <param name="scheduleId"></param>
+    /// <param name="schoolId"></param>
+    /// <param name="startDateISO"></param>
+    /// <returns></returns>
+    [HttpGet("multi")]
+    public IActionResult GetMulti([FromQuery] string[] scheduleIds, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null)
+    {
+        // Extract school instance and make sure the school entry is valid (should've failed in query, but double safety.
+        School? school = schoolId.GetSchool();
+        Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+
+        if (school == null)
+            return BadRequest(new Error("Invalid school value."));
+
+        if (school.LoginRequired && string.IsNullOrWhiteSpace(sessionToken))
+            return BadRequest(new Error($"Login required to access {school.Id} schedules."));
+
+        try
+        {
+            // If given specific start date that parses correctly, simply fetch schedule directly from KronoxAPI and return it.
+            if (startDateISO != null && DateTime.TryParse(startDateISO, out DateTime startDate))
+                return Ok(BuildWebSafeMultiSchedule(scheduleIds, school, startDate, sessionToken));
+
+            // Reset the given start date as it's either null or an invalid format. Ensures that all cached schedules start at the beginning of the week.
+            startDate = DateTime.Now.FirstDayOfWeek();
+
+            MultiScheduleWebModel newScheduleFetch = BuildWebSafeMultiSchedule(scheduleIds, school, startDate, sessionToken);
 
             return Ok(newScheduleFetch);
         }

@@ -88,21 +88,21 @@ public class School
     /// If no value is passed for <paramref name="sessionToken"/> no session token will be used when fetching the schedule. This will only function if the schedule is publicly available.
     /// </para>
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="scheduleIds"></param>
     /// <param name="language"></param>
     /// <param name="sessionToken"></param>
     /// <param name="startDate"></param>
     /// <returns></returns>
     /// <exception cref="ParseException"></exception>
-    public Schedule FetchSchedule(string id, LangEnum? language = null, string? sessionToken = null, DateTime? startDate = null)
+    public Schedule FetchSchedule(string[] scheduleIds, LangEnum? language = null, string? sessionToken = null, DateTime? startDate = null)
     {
-        string scheduleXmlString = KronoxFetchController.GetSchedule(id, Url, language, sessionToken, startDate).Result;
+        string scheduleXmlString = KronoxFetchController.GetSchedule(scheduleIds, Url, language, sessionToken, startDate).Result;
         try
         {
             XDocument scheduleXml = XDocument.Parse(scheduleXmlString);
             List<Day> scheduleDaysOfEvents = ScheduleParser.ParseToDays(scheduleXml);
 
-            return new Schedule(id, scheduleDaysOfEvents);
+            return new Schedule(scheduleIds, scheduleDaysOfEvents);
 
         }
         catch (XmlException e)
