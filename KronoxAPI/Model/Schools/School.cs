@@ -96,17 +96,20 @@ public class School
     /// <exception cref="ParseException"></exception>
     public Schedule FetchSchedule(string[] scheduleIds, LangEnum? language = null, string? sessionToken = null, DateTime? startDate = null)
     {
-        string scheduleXmlString = KronoxFetchController.GetSchedule(scheduleIds, Url, language, sessionToken, startDate).Result;
         try
         {
+            string scheduleXmlString = KronoxFetchController.GetSchedule(scheduleIds, Url, language, sessionToken, startDate).Result;
+
             XDocument scheduleXml = XDocument.Parse(scheduleXmlString);
             List<Day> scheduleDaysOfEvents = ScheduleParser.ParseToDays(scheduleXml);
 
             return new Schedule(scheduleIds, scheduleDaysOfEvents);
 
         }
-        catch (XmlException e)
-        {
+        catch (Exception e) when (
+            e is XmlException ||
+            e is AggregateException
+        ) {
             Console.WriteLine(e.Message);
             throw new ParseException("The requested schedule could not be found or was corrupted.", e);
         }
