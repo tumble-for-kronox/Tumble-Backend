@@ -11,6 +11,7 @@ namespace WebAPIModels.ResponseModels;
 public class EventWebModel
 {
     private readonly string _id;
+    private readonly string _scheduleId;
     private readonly string _title;
     private readonly CourseWebModel _course;
     private readonly List<Teacher> _teachers;
@@ -31,8 +32,10 @@ public class EventWebModel
     public List<Location> Locations => _locations;
 
     public List<Teacher> Teachers => _teachers;
-    
+
     public string Id => _id;
+
+    public string ScheduleId => _scheduleId;
 
     public bool IsSpecial => _isSpecial;
 
@@ -47,9 +50,10 @@ public class EventWebModel
     /// <param name="from"></param>
     /// <param name="to"></param>
     /// <param name="locations"></param>
-    public EventWebModel(string id, string title, CourseWebModel course, List<Teacher> teachers, DateTime from, DateTime to, List<Location> locations, bool isSpecial, DateTime lastModified)
+    public EventWebModel(string id, string scheduleId, string title, CourseWebModel course, List<Teacher> teachers, DateTime from, DateTime to, List<Location> locations, bool isSpecial, DateTime lastModified)
     {
         _id = id;
+        _scheduleId = scheduleId;
         _title = title;
         _course = course;
         _from = from;

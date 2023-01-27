@@ -84,6 +84,7 @@ public static class ScheduleParser
         string title = eventElement.Element("moment") == null ? "" : eventElement.Element("moment")!.Value;
         string eventType = eventElement.Element("aktivitetsTyp") == null ? "" : eventElement.Element("aktivitetsTyp")!.FirstAttribute!.Value;
         string eventId = eventElement.Element("bokningsId")!.Value;
+        string scheduleId = eventElement.Element("resursTrad")!.Descendants("resursNod").First(x => x.Attribute("resursTypId")!.Value == "UTB_PROGRAMINSTANS_KLASSER").Element("resursIdURLEncoded")!.Value;
         string courseId = GetEventCourseId(eventElement);
         List<string> teacherIds = GetEventTeacherIds(eventElement);
         List<string> locationIds = GetEventLocationIds(eventElement);
@@ -104,7 +105,7 @@ public static class ScheduleParser
         // Translate the event's location ids into location objects
         locationIds.ForEach(id => locations.Add(locationsDict.GetValueOrDefault(id, Location.NotAvailable)));
 
-        return new Event(eventId, parsedTitle, coursesDict.GetValueOrDefault(courseId, Course.NotAvailable), teachers, timeStart, timeEnd, locations, eventType == "A", lastModified);
+        return new Event(eventId, scheduleId, parsedTitle, coursesDict.GetValueOrDefault(courseId, Course.NotAvailable), teachers, timeStart, timeEnd, locations, eventType == "A", lastModified);
     }
 
     /// <summary>
