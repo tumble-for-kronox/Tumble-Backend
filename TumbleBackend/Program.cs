@@ -44,6 +44,11 @@ builder.Services.AddSingleton((provider) =>
 
 builder.Services.AddScoped<AuthActionFilter>();
 
+builder.Services.AddSpaStaticFiles(config =>
+{
+    config.RootPath = "wwwroot";
+});
+
 var app = builder.Build();
 
 app.UseCors("CorsPolicy");
@@ -66,6 +71,10 @@ app.UseCors();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseDefaultFiles();
+
+app.UseSpaStaticFiles();
 
 app.MapControllers();
 
