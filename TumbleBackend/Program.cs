@@ -63,7 +63,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-DatabaseAPI.Connector.Init(dbConnectionString!);
+DatabaseAPI.Connector.Init(dbConnectionString!, app.Environment.IsDevelopment());
 EmailUtil.Init(awsAccessKey!, awsSecretKey!);
 
 app.UseCors();

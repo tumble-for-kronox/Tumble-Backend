@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ public static class Connector
     private static MongoCollectionBase<ScheduleWebModel>? _schedules;
     private static MongoCollectionBase<SchoolProgrammeFilter>? _programmeFilters;
 
-    public static void Init(string connectionString)
+    public static void Init(string connectionString, bool isDebug)
     {
         var conventions = new ConventionPack
         {
@@ -28,7 +29,9 @@ public static class Connector
         ConventionRegistry.Register("Custom Conventions", conventions, t => true);
 
         _client = new MongoClient(connectionString);
-        _database = (MongoDatabaseBase)_client.GetDatabase("test_db");
+
+
+        _database = isDebug ? (MongoDatabaseBase)_client.GetDatabase("test_db") : (MongoDatabaseBase)_client.GetDatabase("schedules");
         _schedules = (MongoCollectionBase<ScheduleWebModel>)_database.GetCollection<ScheduleWebModel>("schedules");
         _programmeFilters = (MongoCollectionBase<SchoolProgrammeFilter>)_database.GetCollection<SchoolProgrammeFilter>("programme_filters");
 
