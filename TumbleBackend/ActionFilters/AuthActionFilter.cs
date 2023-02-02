@@ -1,19 +1,13 @@
-﻿using Amazon.Runtime.Internal.Transform;
-using Amazon.SimpleEmailV2.Model;
-using KronoxAPI.Exceptions;
+﻿using KronoxAPI.Exceptions;
 using KronoxAPI.Model.Schools;
 using KronoxAPI.Model.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using System.Net;
-using TumbleBackend.Controllers;
 using TumbleBackend.Extensions;
 using TumbleBackend.InternalModels;
 using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
-using WebAPIModels.Extensions;
 using WebAPIModels.RequestModels;
 using WebAPIModels.ResponseModels;
 

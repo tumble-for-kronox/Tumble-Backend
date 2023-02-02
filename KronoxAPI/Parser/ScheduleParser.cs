@@ -84,10 +84,10 @@ public static class ScheduleParser
         string title = eventElement.Element("moment") == null ? "" : eventElement.Element("moment")!.Value;
         string eventType = eventElement.Element("aktivitetsTyp") == null ? "" : eventElement.Element("aktivitetsTyp")!.FirstAttribute!.Value;
         string eventId = eventElement.Element("bokningsId")!.Value;
-        string scheduleId = eventElement.Element("resursTrad")!.Descendants("resursNod").First(x => x.Attribute("resursTypId")!.Value == "UTB_PROGRAMINSTANS_KLASSER").Element("resursIdURLEncoded")!.Value;
         string courseId = GetEventCourseId(eventElement);
         List<string> teacherIds = GetEventTeacherIds(eventElement);
         List<string> locationIds = GetEventLocationIds(eventElement);
+        List<string> scheduleIds = GetEventScheduleIds(eventElement);
         string timeStartIsoString = eventElement.Element("bokadeDatum")!.Attribute("startDatumTid_iCal")!.Value;
         string timeEndIsoString = eventElement.Element("bokadeDatum")!.Attribute("slutDatumTid_iCal")!.Value;
         string lastModifiedString = eventElement.Element("senastAndradDatum_iCal")!.Value;
@@ -105,11 +105,11 @@ public static class ScheduleParser
         // Translate the event's location ids into location objects
         locationIds.ForEach(id => locations.Add(locationsDict.GetValueOrDefault(id, Location.NotAvailable)));
 
-        return new Event(eventId, scheduleId, parsedTitle, coursesDict.GetValueOrDefault(courseId, Course.NotAvailable), teachers, timeStart, timeEnd, locations, eventType == "A", lastModified);
+        return new Event(eventId, scheduleIds.ToArray(), parsedTitle, coursesDict.GetValueOrDefault(courseId, Course.NotAvailable), teachers, timeStart, timeEnd, locations, eventType == "A", lastModified);
     }
 
     /// <summary>
-    /// Get collection of all courses needed for a give schedule XML.
+    /// Get collection of all courses needed for a given schedule XML.
     /// <para>
     /// Searches XML for a "forklaringsrader" element, with attribute "typ=UTB_KURSINSTANS_GRUPPER", to find each course element.
     /// </para>
@@ -277,5 +277,30 @@ public static class ScheduleParser
              .FirstOrDefault(new XElement("fail"))
              .Element("resursId")!
              .Value;
+    }
+
+    /// <summary>
+    /// Parse event xml element (Kronox's "schemaPost" element) into a list of the schedule ids connected to the event.
+    /// </summary>
+    /// <param name="eventElement"></param>
+    /// <returns><see cref="List{String}"/> with location ids.</returns>
+    private static List<string> GetEventScheduleIds(XElement eventElement)
+    {
+        List<string> scheduleIds = new();
+
+        // Get each teacher element on the Event as an enumberable.
+        IEnumerable<XElement> scheduleIdElements =
+            eventElement.Element("resursTrad")!
+                        .Elements("resursNod")
+                        .Where(el => el.Attribute("resursTypId") != null && el.Attribute("resursTypId")!.Value == "UTB_PROGRAMINSTANS_KLASSER")
+                        .AsEnumerable();
+
+        foreach (XElement scheduleIdElement in scheduleIdElements)
+        {
+            if (scheduleIdElement.Element("resursIdURLEncoded") == null) continue;
+            scheduleIds.Add(scheduleIdElement.Element("resursIdURLEncoded")!.Value);
+        }
+
+        return scheduleIds;
     }
 }

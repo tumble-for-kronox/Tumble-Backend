@@ -14,6 +14,7 @@ namespace TumbleBackend.Controllers;
 [EnableCors("CorsPolicy")]
 [ApiController]
 [ServiceFilter(typeof(AuthActionFilter))]
+[SessionTokenActionFilter]
 [Route("users/events")]
 public class UserEventController : ControllerBase
 {
@@ -59,6 +60,11 @@ public class UserEventController : ControllerBase
         {
             _logger.LogError(e.ToString());
             return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
+        }
+        catch (TaskCanceledException e)
+        {
+            _logger.LogError(e.ToString());
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("Connection to kronox timed out"));
         }
     }
 
@@ -114,6 +120,11 @@ public class UserEventController : ControllerBase
             _logger.LogError(e.ToString());
             return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
         }
+        catch (TaskCanceledException e)
+        {
+            _logger.LogError(e.ToString());
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("Connection to kronox timed out"));
+        }
     }
 
     [HttpPut("register/{eventId}")]
@@ -163,6 +174,11 @@ public class UserEventController : ControllerBase
             _logger.LogError(e.ToString());
             return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
         }
+        catch (TaskCanceledException e)
+        {
+            _logger.LogError(e.ToString());
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("Connection to kronox timed out"));
+        }
     }
 
     [HttpPut("unregister/{eventId}")]
@@ -211,6 +227,11 @@ public class UserEventController : ControllerBase
         {
             _logger.LogError(e.ToString());
             return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
+        }
+        catch (TaskCanceledException e)
+        {
+            _logger.LogError(e.ToString());
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("Connection to kronox timed out"));
         }
     }
 

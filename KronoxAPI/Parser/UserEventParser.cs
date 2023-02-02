@@ -139,7 +139,7 @@ public class UserEventParser
             // The button is a "sign off" button.
             if (button.GetAttributeValue("onclick", "").ToLowerInvariant().Contains("avanmal"))
             {
-                id = Regex.Match(HttpUtility.HtmlDecode(button.GetAttributeValue("onclick", "").ToLowerInvariant()), @"avanmal\('(.*?)'\)").Groups[1].Value;
+                id = Regex.Match(HttpUtility.HtmlDecode(button.GetAttributeValue("onclick", "").ToLowerInvariant()), @"avanmal\(.*?, '(.*?)'\)").Groups[1].Value;
                 continue;
             }
 

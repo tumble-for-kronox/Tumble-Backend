@@ -109,7 +109,8 @@ public class School
         catch (Exception e) when (
             e is XmlException ||
             e is AggregateException
-        ) {
+        )
+        {
             Console.WriteLine(e.Message);
             throw new ParseException("The requested schedule could not be found or was corrupted.", e);
         }
@@ -157,6 +158,7 @@ public class School
     /// <exception cref="ParseException"></exception>
     /// <exception cref="LoginException"></exception>
     /// <exception cref="HttpRequestException"></exception>
+    /// <exception cref="TaskCanceledException"</exception>
     public Dictionary<string, List<UserEvent>> GetUserEvents(string sessionToken)
     {
         if (sessionToken == null)

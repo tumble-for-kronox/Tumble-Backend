@@ -14,6 +14,7 @@ namespace TumbleBackend.Controllers;
 [EnableCors("CorsPolicy")]
 [ApiController]
 [ServiceFilter(typeof(AuthActionFilter))]
+[SessionTokenActionFilter]
 [Route("resources")]
 public class BookingController : ControllerBase
 {
@@ -66,7 +67,8 @@ public class BookingController : ControllerBase
 
         try
         {
-            return Ok(school.Resources.GetUserBookings(sessionToken));
+            List<Booking> bookings = school.Resources.GetUserBookings(sessionToken);
+            return Ok(bookings);
         }
         catch (LoginException e)
         {

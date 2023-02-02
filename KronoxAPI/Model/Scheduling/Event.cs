@@ -12,7 +12,7 @@ namespace KronoxAPI.Model.Scheduling;
 public class Event
 {
     private readonly string _id;
-    private readonly string _scheduleId;
+    private readonly string[] _scheduleIds;
     private readonly string _title;
     private readonly Course _course;
     private readonly List<Teacher> _teachers;
@@ -36,7 +36,7 @@ public class Event
 
     public string Id => _id;
 
-    public string ScheduleId => _scheduleId;
+    public string[] ScheduleIds => _scheduleIds;
 
     public bool IsSpecial => _isSpecial;
 
@@ -55,10 +55,10 @@ public class Event
     /// <param name="locations"></param>
     /// <param name="isSpecial"></param>
     /// <param name="lastModified"></param>
-    public Event(string id, string scheduleId, string title, Course course, List<Teacher> teachers, DateTime timeStart, DateTime timeEnd, List<Location> locations, bool isSpecial, DateTime lastModified)
+    public Event(string id, string[] scheduleIds, string title, Course course, List<Teacher> teachers, DateTime timeStart, DateTime timeEnd, List<Location> locations, bool isSpecial, DateTime lastModified)
     {
         _id = id;
-        _scheduleId = scheduleId;
+        _scheduleIds = scheduleIds;
         _title = title;
         _course = course;
         _timeStart = timeStart;
@@ -71,7 +71,7 @@ public class Event
 
     public override string? ToString()
     {
-        return $"Id: {_id}\nScheduleId: {_scheduleId}\nCourse: {_course}\nTitle: {_title}\nStarts: {_timeStart:yyyy-MM-dd HH:mm}" +
+        return $"Id: {_id}\nScheduleId: {_scheduleIds}\nCourse: {_course}\nTitle: {_title}\nStarts: {_timeStart:yyyy-MM-dd HH:mm}" +
             $"\nEnds: {_timeEnd:yyyy-MM-dd HH:mm}\nTeachers: [{String.Join(", ", _teachers)}]\nLocations: [{String.Join(", ", _locations)}]";
     }
 }

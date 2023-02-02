@@ -12,6 +12,6 @@ public static class KronoxUserExtensions
 {
     public static KronoxUserWebModel ToWebModel(this User user, string refreshToken)
     {
-        return new(user.Name, user.Username, refreshToken);
+        return new(user.Name, user.Username, user.SessionToken, refreshToken);
     }
 }
