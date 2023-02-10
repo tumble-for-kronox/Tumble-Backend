@@ -8,6 +8,7 @@ namespace TumbleBackend.Controllers;
 [EnableCors("CorsPolicy")]
 [ApiController]
 [Route("misc")]
+[Route("api/misc")]
 public class MiscController : ControllerBase
 {
 

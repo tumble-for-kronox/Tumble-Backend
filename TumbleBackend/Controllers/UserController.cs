@@ -16,6 +16,7 @@ namespace TumbleBackend.Controllers;
 [EnableCors("CorsPolicy")]
 [ApiController]
 [Route("users")]
+[Route("api/users")]
 public class UserController : ControllerBase
 {
     private readonly ILogger<UserController> _logger;

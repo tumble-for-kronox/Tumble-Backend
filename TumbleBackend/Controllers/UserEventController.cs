@@ -16,6 +16,7 @@ namespace TumbleBackend.Controllers;
 [ServiceFilter(typeof(AuthActionFilter))]
 [SessionTokenActionFilter]
 [Route("users/events")]
+[Route("api/users/events")]
 public class UserEventController : ControllerBase
 {
     private readonly ILogger<UserEventController> _logger;

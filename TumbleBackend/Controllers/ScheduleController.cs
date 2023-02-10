@@ -17,6 +17,7 @@ namespace TumbleBackend.Controllers;
 [ApiController]
 [ServiceFilter(typeof(AuthActionFilter))]
 [Route("schedules")]
+[Route("api/schedules")]
 public class ScheduleController : ControllerBase
 {
     private readonly ILogger<ScheduleController> _logger;
@@ -33,7 +34,7 @@ public class ScheduleController : ControllerBase
     /// <param name="schoolId"></param>
     /// <param name="startDateISO"></param>
     /// <returns></returns>
-    [HttpGet("{scheduleId}", Name = "GetSchedule")]
+    [HttpGet("{scheduleId}")]
     public IActionResult Get([FromServices] IConfiguration config, [FromRoute] string scheduleId, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null)
     {
         // Extract school instance and make sure the school entry is valid (should've failed in query, but double safety.
@@ -133,7 +134,7 @@ public class ScheduleController : ControllerBase
     /// <param name="schoolId"></param>
     /// <param name="sessionToken"></param>
     /// <returns>A list of <see cref="Programme"/> objects and an <see cref="int"/> Count. Although the name is "programme" they also map to individuals and schedules correctly.</returns>
-    [HttpGet("search", Name = "SearchProgrammes")]
+    [HttpGet("search")]
     public IActionResult Search([FromQuery] string searchQuery, [FromQuery] SchoolEnum? schoolId = null)
     {
         School? school = schoolId?.GetSchool();

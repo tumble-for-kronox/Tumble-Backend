@@ -16,6 +16,7 @@ namespace TumbleBackend.Controllers;
 [ServiceFilter(typeof(AuthActionFilter))]
 [SessionTokenActionFilter]
 [Route("resources")]
+[Route("api/resources")]
 public class BookingController : ControllerBase
 {
     private readonly ILogger<BookingController> _logger;

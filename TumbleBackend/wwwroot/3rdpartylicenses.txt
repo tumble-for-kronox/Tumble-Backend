@@ -142,6 +142,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 mat-icon-button-sizes
 MIT
 
+ngx-color-picker
+MIT
+
 rxjs
 Apache-2.0
                                Apache License
