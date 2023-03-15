@@ -91,7 +91,7 @@ public class UserEventParser
         // Variables needed to construct the AvailableUserEvent in the end.
         bool supportAvailable = false;
         bool mustChooseLocation = false;
-        string id = string.Empty;
+        string? id = null;
         string? participatorId = null;
         string? supportId = null;
         string title;
