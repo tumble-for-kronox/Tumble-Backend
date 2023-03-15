@@ -15,8 +15,14 @@ namespace KronoxAPI.Controller;
 /// </summary>
 public static class KronoxFetchController
 {
-    static readonly HttpClientHandler clientHandler = new();
-    static readonly HttpClient client = new(clientHandler);
+    static readonly HttpClient client;
+
+    static KronoxFetchController()
+    {
+        HttpClientHandler clientHandler = new HttpClientHandler();
+        client = new HttpClient(clientHandler);
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36");
+    }
 
     /// <summary>
     /// Fetch a schedule from Kronox's database, that starts at <paramref name="startDate"/> and goes 6 months forward.
@@ -60,14 +66,12 @@ public static class KronoxFetchController
     public static async Task<string> GetProgrammes(string searchQuery, string schoolUrl, string? sessionToken)
     {
         Uri uri = new($"https://{schoolUrl}/ajax/ajax_sokResurser.jsp?sokord={searchQuery}&startDatum=idag&slutDatum=&intervallTyp=m&intervallAntal=6");
-
         // Perform web request
         using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
         if (sessionToken != null) request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
         HttpResponseMessage response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-
-        return await response.Content.ReadAsStringAsync();
+        string content = await response.Content.ReadAsStringAsync();
+        return content;
     }
 
     /// <summary>
