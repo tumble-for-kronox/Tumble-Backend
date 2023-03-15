@@ -14,8 +14,15 @@ namespace KronoxAPI.Controller;
 
 public static class KronoxPushController
 {
-    static readonly HttpClientHandler clientHandler = new();
-    static readonly HttpClient client = new(clientHandler);
+    static readonly HttpClient client;
+    static readonly HttpClientHandler clientHandler;
+
+    static KronoxPushController()
+    {
+        clientHandler = new HttpClientHandler();
+        client = new HttpClient(clientHandler);
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36");
+    }
 
     /// <summary>
     /// Login a user, using the <paramref name="username"/> and <paramref name="password"/> supplied.
