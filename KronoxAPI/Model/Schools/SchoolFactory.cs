@@ -144,6 +144,6 @@ public class SchoolFactory
     /// <returns></returns>
     public static School Mdh()
     {
-        return new School("mdh", "Mälardalen Högskola", "kronox.mdu.se", true);
+        return new School("mdh", "Mälardalen Högskola", "webbschema.mdh.se", true);
     }
 }
