@@ -3,3 +3,5 @@ TestingConsole/
 ProgrammeFilter/.env
 bin/
 obj/
+
+serviceAccountKey.json

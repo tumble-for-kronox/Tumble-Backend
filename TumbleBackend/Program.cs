@@ -1,6 +1,7 @@
 using MongoDB.Bson.Serialization;
 using System.Diagnostics;
 using TumbleBackend.ActionFilters;
+using TumbleBackend.Library;
 using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
 using WebAPIModels.ResponseModels;
@@ -48,6 +49,8 @@ builder.Services.AddSpaStaticFiles(config =>
 {
     config.RootPath = "wwwroot";
 });
+
+builder.Services.AddSingleton<MobileMessagingClient>();
 
 var app = builder.Build();
 
