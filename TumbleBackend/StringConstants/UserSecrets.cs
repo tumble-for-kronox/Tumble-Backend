@@ -8,4 +8,5 @@ public static class UserSecrets
     public static string DbConnection => "DbConnectionString";
     public static string AwsAccessKey => "Aws:AccessKey";
     public static string AwsSecretKey => "Aws:SecretKey";
+    public static string AdminPass => "Admin:Pass";
 }

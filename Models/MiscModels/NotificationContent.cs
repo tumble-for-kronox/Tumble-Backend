@@ -8,16 +8,9 @@ namespace WebAPIModels.MiscModels;
 
 public class NotificationContent
 {
-    public string Topic { get; private set; }
-    public string Title { get; private set; }
-    public string Body { get; private set; }
-    public DateTime Timestamp { get; private set; }
+    public string Topic { get; set; }
+    public string Title { get; set; }
+    public string Body { get; set; }
+    public readonly DateTime timestamp = DateTime.Now;
 
-    public NotificationContent(string topic, string title, string body)
-    {
-        Topic = topic;
-        Title = title;
-        Body = body;
-        Timestamp = DateTime.Now;
-    }
 }

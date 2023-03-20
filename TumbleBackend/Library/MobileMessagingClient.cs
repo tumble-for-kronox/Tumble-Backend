@@ -10,7 +10,7 @@ public class MobileMessagingClient
 
     public MobileMessagingClient()
     {
-        var app = FirebaseApp.Create(new AppOptions() { Credential = GoogleCredential.FromFile("tumble-ios-11dcc").CreateScoped("https://www.googleapis.com/auth/firebase.messaging") });
+        var app = FirebaseApp.Create(new AppOptions() { Credential = GoogleCredential.FromFile("serviceAccountKey.json").CreateScoped("https://www.googleapis.com/auth/firebase.messaging") });
         messaging = FirebaseMessaging.GetMessaging(app);
 
     }
