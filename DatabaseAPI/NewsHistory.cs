@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using WebAPIModels.MiscModels;
 using WebAPIModels.ResponseModels;
 
@@ -10,7 +11,7 @@ public class NewsHistory
     {
         if (Connector.News == null) throw new Exceptions.DatabaseUninitializedException("The database/collection is not initialized. Run .Init() on the Connector before attempting to access the database.");
 
-        List<NotificationContent> cursor = await Connector.News.Find(Builders<NotificationContent>.Filter.Empty).ToListAsync();
+        List<NotificationContent> cursor = await Connector.News.AsQueryable().OrderByDescending(c => c.Timestamp).Take(2).ToListAsync();
 
         if (cursor.Any())
             return cursor;
