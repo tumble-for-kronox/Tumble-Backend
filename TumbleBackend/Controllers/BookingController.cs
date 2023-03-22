@@ -3,7 +3,6 @@ using KronoxAPI.Model.Booking;
 using KronoxAPI.Model.Schools;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using TumbleBackend.ActionFilters;
 using TumbleBackend.Extensions;
 using WebAPIModels.RequestModels;
@@ -52,6 +51,43 @@ public class BookingController : ControllerBase
             _logger.LogError(e.Message);
             return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while attempting to parse school resources, please try again later."));
         }
+    }
+
+    [HttpGet("all")]
+    public ActionResult<List<Resource>> GetAllResourcesAndAvailabilities([FromQuery] SchoolEnum schoolId, [FromQuery] DateTime date)
+    {
+        School? school = schoolId.GetSchool();
+        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+
+        if (!hasSessionToken)
+            return BadRequest(new Error("Requires provided auth token"));
+
+        if (school == null)
+            return BadRequest(new Error("Invalid school value."));
+
+
+        try
+        {
+            List<Resource> sparseResources = school.Resources.GetResources(sessionToken);
+            List<Resource> fullResources = sparseResources.Select(e => e.FetchData(school.Url, sessionToken, date)).ToList();
+            return Ok(fullResources);
+        }
+        catch (LoginException e)
+        {
+            _logger.LogError(e.Message);
+            return Unauthorized(new Error("Username or password incorrect."));
+        }
+        catch (ParseException e)
+        {
+            _logger.LogError(e.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while attempting to parse school resources, please try again later."));
+        }
+        catch (ResourceInavailableException e)
+        {
+            _logger.LogError(e.Message);
+            return StatusCode(StatusCodes.Status404NotFound, new Error("The resourece you attempted to access is completely inavailable. This may be because you are trying to access it on a weekend."));
+        }
+
     }
 
     [HttpGet("userbookings")]
