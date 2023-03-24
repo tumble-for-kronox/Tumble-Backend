@@ -83,7 +83,7 @@ public static class KronoxFetchController
     /// <exception cref="HttpRequestException"></exception>
     public static async Task<string> GetUserEvents(string schoolUrl, string sessionToken)
     {
-        KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
 
         Uri uri = new($"https://{schoolUrl}/aktivitetsanmalan.jsp");
 

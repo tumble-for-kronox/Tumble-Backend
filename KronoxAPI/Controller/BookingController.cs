@@ -25,7 +25,7 @@ public static class BookingController
 
     public static async Task<string> GetResources(string schoolUrl, string sessionToken)
     {
-        KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
 
         Uri uri = new($"https://{schoolUrl}/resursbokning.jsp");
 
@@ -40,7 +40,7 @@ public static class BookingController
 
     public static async Task<string> GetPersonalBookingsForResource(string schoolUrl, string resourceId, string sessionToken)
     {
-        KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
 
         DateTime date = DateTime.Now;
 
@@ -57,7 +57,7 @@ public static class BookingController
 
     public static async Task<string> GetResourceAvailability(string schoolUrl, DateTime date, string resourceId, string sessionToken)
     {
-        KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
 
         Uri uri = new($"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=hamtaBokningar&datum={date:yy-MM-dd}&flik={resourceId}");
 
@@ -87,7 +87,7 @@ public static class BookingController
     /// <exception cref="ParseException"></exception>
     public static async Task BookResourceLocation(string schoolUrl, DateTime date, string resourceId, string sessionToken, string locationId, string timeSlotId, string resourceType)
     {
-        KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
 
         Uri uri = new($"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=boka&datum={date:yy-MM-dd}&flik={resourceId}&id={locationId}&typ={resourceType}&intervall={timeSlotId}&moment=Booked via Tumble");
 
@@ -130,7 +130,7 @@ public static class BookingController
     /// <exception cref="ParseException"></exception>
     public static async Task UnbookResourceLocation(string schoolUrl, string sessionToken, string bookingId)
     {
-        KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
 
         Uri uri = new($"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=avboka&bokningsId={bookingId}");
 
@@ -157,7 +157,7 @@ public static class BookingController
 
     public static async Task ConfirmResourceBooking(string schoolUrl, string sessionToken, string bookingId, string resourceId)
     {
-        KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
 
         Uri uri = new($"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=konfirmera&flik={resourceId}&bokningsId={bookingId}");
 
