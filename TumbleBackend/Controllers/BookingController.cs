@@ -54,7 +54,7 @@ public class BookingController : ControllerBase
     }
 
     [HttpGet("all")]
-    public ActionResult<List<Resource>> GetAllResourcesAndAvailabilities([FromQuery] SchoolEnum schoolId, [FromQuery] DateTime date)
+    public async Task<ActionResult<List<Resource>>> GetAllResourcesAndAvailabilities([FromQuery] SchoolEnum schoolId, [FromQuery] DateTime date)
     {
         School? school = schoolId.GetSchool();
         bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
@@ -68,9 +68,9 @@ public class BookingController : ControllerBase
 
         try
         {
-            List<Resource> sparseResources = school.Resources.GetResources(sessionToken);
-            List<Resource> fullResources = sparseResources.Select(e => e.FetchData(school.Url, sessionToken, date)).ToList();
-            return Ok(fullResources);
+            List<Resource> sparseResources = await school.Resources.GetResources(sessionToken);
+            IEnumerable<Task<Resource>> fullResourcesTasks = sparseResources.Select(async e => await e.FetchData(school.Url, sessionToken, date));
+            return Ok(await Task.WhenAll(fullResourcesTasks));
         }
         catch (LoginException e)
         {
@@ -120,7 +120,7 @@ public class BookingController : ControllerBase
     }
 
     [HttpGet("{resourceId}")]
-    public ActionResult<Resource> GetAvailabilities([FromQuery] SchoolEnum schoolId, [FromRoute] string resourceId, [FromQuery] DateTime date)
+    public async Task<ActionResult<Resource>> GetAvailabilities([FromQuery] SchoolEnum schoolId, [FromRoute] string resourceId, [FromQuery] DateTime date)
     {
         School? school = schoolId.GetSchool();
         bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
@@ -133,8 +133,8 @@ public class BookingController : ControllerBase
 
         try
         {
-            List<Resource> resources = school.Resources.GetResources(sessionToken);
-            Resource resource = resources.Where(e => e.Id == resourceId).First().FetchData(school.Url, sessionToken, date);
+            List<Resource> resources = await school.Resources.GetResources(sessionToken);
+            Resource resource = await resources.Where(e => e.Id == resourceId).First().FetchData(school.Url, sessionToken, date);
             return Ok(resource);
         }
         catch (LoginException e)

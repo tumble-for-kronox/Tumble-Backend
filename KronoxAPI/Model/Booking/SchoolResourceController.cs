@@ -53,9 +53,9 @@ public class SchoolResources
     /// </summary>
     /// <param name="sessionToken"></param>
     /// <returns></returns>
-    public List<Resource> GetResources(string sessionToken)
+    public async Task<List<Resource>> GetResources(string sessionToken)
     {
-        string resourcesHtml = BookingController.GetResources(_school.Url, sessionToken).Result;
+        string resourcesHtml = await BookingController.GetResources(_school.Url, sessionToken);
         HtmlDocument doc = new();
         doc.LoadHtml(resourcesHtml);
 
