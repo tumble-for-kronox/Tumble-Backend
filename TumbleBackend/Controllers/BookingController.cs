@@ -91,7 +91,7 @@ public class BookingController : ControllerBase
     }
 
     [HttpGet("userbookings")]
-    public ActionResult<List<Booking>> GetUserBookings([FromQuery] SchoolEnum schoolId)
+    public async Task<ActionResult<List<Booking>>> GetUserBookings([FromQuery] SchoolEnum schoolId)
     {
         School? school = schoolId.GetSchool();
         bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
@@ -104,7 +104,7 @@ public class BookingController : ControllerBase
 
         try
         {
-            List<Booking> bookings = school.Resources.GetUserBookings(sessionToken);
+            List<Booking> bookings = await school.Resources.GetUserBookings(sessionToken);
             return Ok(bookings);
         }
         catch (LoginException e)
@@ -155,7 +155,7 @@ public class BookingController : ControllerBase
     }
 
     [HttpPut("book")]
-    public async Task<ActionResult> BookResource([FromQuery] SchoolEnum schoolId, [FromBody] BookingRequest bookingRequest)
+    public async Task<ActionResult<Booking>> BookResource([FromQuery] SchoolEnum schoolId, [FromBody] BookingRequest bookingRequest)
     {
         School? school = schoolId.GetSchool();
         bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
@@ -170,7 +170,16 @@ public class BookingController : ControllerBase
         {
             await school.Resources.BookResource(sessionToken, bookingRequest.ResourceId, bookingRequest.Date, bookingRequest.Slot);
 
-            return Ok();
+            List<Booking> bookings = await school.Resources.GetUserBookings(sessionToken);
+
+            Booking? newBooking = bookings.Find(booking => booking.ResourceId == bookingRequest.ResourceId && booking.LocationId == bookingRequest.Slot.LocationId && booking.TimeSlot.Id.ToString() == bookingRequest.Slot.TimeSlotId);
+
+            if (newBooking == null)
+            {
+                return Accepted()
+            }
+
+            return Ok(newBooking);
         }
         catch (LoginException e)
         {

@@ -26,9 +26,9 @@ public class SchoolResources
     /// </summary>
     /// <param name="sessionToken"></param>
     /// <returns></returns>
-    public List<Booking> GetUserBookings(string sessionToken)
+    public async Task<List<Booking>> GetUserBookings(string sessionToken)
     {
-        string resourcesHtml = BookingController.GetResources(_school.Url, sessionToken).Result;
+        string resourcesHtml = await BookingController.GetResources(_school.Url, sessionToken);
         HtmlDocument doc = new();
         doc.LoadHtml(resourcesHtml);
 
@@ -37,7 +37,7 @@ public class SchoolResources
         List<Booking> allBookings = new();
         foreach (Resource resource in resources)
         {
-            string personalBookingsForResourceHtml = BookingController.GetPersonalBookingsForResource(_school.Url, resource.Id, sessionToken).Result;
+            string personalBookingsForResourceHtml = await BookingController.GetPersonalBookingsForResource(_school.Url, resource.Id, sessionToken);
 
             HtmlDocument personalBookingsDoc = new();
             personalBookingsDoc.LoadHtml(personalBookingsForResourceHtml);
