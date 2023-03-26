@@ -176,7 +176,7 @@ public class BookingController : ControllerBase
 
             if (newBooking == null)
             {
-                return Accepted()
+                return Accepted();
             }
 
             return Ok(newBooking);
