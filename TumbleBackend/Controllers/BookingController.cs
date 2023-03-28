@@ -171,8 +171,13 @@ public class BookingController : ControllerBase
             await school.Resources.BookResource(sessionToken, bookingRequest.ResourceId, bookingRequest.Date, bookingRequest.Slot);
 
             List<Booking> bookings = await school.Resources.GetUserBookings(sessionToken);
+            bookings.Sort((x, y) =>
+            {
+                return int.Parse(x.Id[20..]) > int.Parse(y.Id[20..]) ? 0 : 1;
+            });
 
-            Booking? newBooking = bookings.Find(booking => booking.ResourceId == bookingRequest.ResourceId && booking.LocationId == bookingRequest.Slot.LocationId && booking.TimeSlot.Id.ToString() == bookingRequest.Slot.TimeSlotId);
+
+            Booking? newBooking = bookings.Find(booking => booking.ResourceId == bookingRequest.ResourceId && booking.LocationId == bookingRequest.Slot.LocationId);
 
             if (newBooking == null)
             {
