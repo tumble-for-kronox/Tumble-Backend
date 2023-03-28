@@ -81,7 +81,6 @@ public class AuthActionFilter : ActionFilterAttribute
         catch (ParseException)
         {
             context.Result = new ObjectResult(StatusCodes.Status500InternalServerError);
-            await next();
             return;
         }
 
