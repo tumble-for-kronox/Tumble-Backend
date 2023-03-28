@@ -27,7 +27,7 @@ public class UserEventController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAllUserEvents([FromQuery] SchoolEnum schoolId)
+    public async Task<IActionResult> GetAllUserEvents([FromQuery] SchoolEnum schoolId)
     {
         School? school = schoolId.GetSchool();
         bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
@@ -40,7 +40,7 @@ public class UserEventController : ControllerBase
 
         try
         {
-            Dictionary<string, List<UserEvent>> userEvents = school.GetUserEvents(sessionToken);
+            Dictionary<string, List<UserEvent>> userEvents = await school.GetUserEvents(sessionToken);
             UserEventCollection? webSafeUserEvents = userEvents.ToWebModel();
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
@@ -70,7 +70,7 @@ public class UserEventController : ControllerBase
     }
 
     [HttpPut("register/all")]
-    public IActionResult RegisterAllAvailableResults([FromQuery] SchoolEnum schoolId)
+    public async Task<IActionResult> RegisterAllAvailableResults([FromQuery] SchoolEnum schoolId)
     {
         School? school = schoolId.GetSchool();
         bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
@@ -85,7 +85,7 @@ public class UserEventController : ControllerBase
 
         try
         {
-            Dictionary<string, List<UserEvent>> userEvents = school.GetUserEvents(sessionToken);
+            Dictionary<string, List<UserEvent>> userEvents = await school.GetUserEvents(sessionToken);
             UserEventCollection? webSafeUserEvents = userEvents.ToWebModel();
 
             if (webSafeUserEvents == null)
@@ -98,7 +98,7 @@ public class UserEventController : ControllerBase
             List<AvailableUserEvent> successfulRegistrations = new();
             foreach (AvailableUserEvent availableUserEvent in webSafeUserEvents.UnregisteredEvents)
             {
-                if (!availableUserEvent.Register(school, sessionToken))
+                if (!await availableUserEvent.Register(school, sessionToken))
                     failedRegistrations.Add(availableUserEvent);
                 else
                     successfulRegistrations.Add(availableUserEvent);
@@ -129,7 +129,7 @@ public class UserEventController : ControllerBase
     }
 
     [HttpPut("register/{eventId}")]
-    public IActionResult RegisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId)
+    public async Task<IActionResult> RegisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId)
     {
         School? school = schoolId.GetSchool();
         bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
@@ -142,7 +142,7 @@ public class UserEventController : ControllerBase
 
         try
         {
-            Dictionary<string, List<UserEvent>> userEvents = school.GetUserEvents(sessionToken);
+            Dictionary<string, List<UserEvent>> userEvents = await school.GetUserEvents(sessionToken);
             UserEventCollection? webSafeUserEvents = userEvents.ToWebModel();
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
@@ -151,7 +151,7 @@ public class UserEventController : ControllerBase
             {
                 if (userEvent.Id == eventId)
                 {
-                    if (userEvent.Register(school, sessionToken))
+                    if (await userEvent.Register(school, sessionToken))
                         return Ok();
 
                     return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an error signing up to the event, please try again later."));
@@ -183,7 +183,7 @@ public class UserEventController : ControllerBase
     }
 
     [HttpPut("unregister/{eventId}")]
-    public IActionResult UnregisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId)
+    public async Task<IActionResult> UnregisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId)
     {
         School? school = schoolId.GetSchool();
         bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
@@ -196,7 +196,7 @@ public class UserEventController : ControllerBase
 
         try
         {
-            Dictionary<string, List<UserEvent>> userEvents = school.GetUserEvents(sessionToken);
+            Dictionary<string, List<UserEvent>> userEvents = await school.GetUserEvents(sessionToken);
             UserEventCollection? webSafeUserEvents = userEvents.ToWebModel();
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
@@ -205,7 +205,7 @@ public class UserEventController : ControllerBase
             {
                 if (userEvent.Id == eventId)
                 {
-                    if (userEvent.Unregister(school, sessionToken))
+                    if (await userEvent.Unregister(school, sessionToken))
                         return Ok();
 
                     return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an error signing up to the event, please try again later."));

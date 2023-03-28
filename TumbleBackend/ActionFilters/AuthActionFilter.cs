@@ -24,13 +24,14 @@ public class AuthActionFilter : ActionFilterAttribute
         this.configuration = config;
     }
 
-    public override void OnActionExecuting(ActionExecutingContext context)
+    public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         bool foundSchoolId = context.HttpContext.Request.Query.TryGetValue("schoolId", out schoolIdQuery);
 
         if (!foundSchoolId)
         {
             context.Result = new BadRequestObjectResult(new Error("Requires schoolId query parameter."));
+            await next();
             return;
         }
 
@@ -40,6 +41,7 @@ public class AuthActionFilter : ActionFilterAttribute
 
         if (!hasAuthHeader)
         {
+            await next();
             return;
         }
 
@@ -48,6 +50,7 @@ public class AuthActionFilter : ActionFilterAttribute
         if (school == null)
         {
             context.Result = new BadRequestObjectResult(new Error("Invalid school value."));
+            await next();
             return;
         }
 
@@ -62,26 +65,29 @@ public class AuthActionFilter : ActionFilterAttribute
         if (creds == null)
         {
             context.Result = new UnauthorizedObjectResult(new Error("Couldn't login user from refreshToken, please log out and back in manually."));
+            await next();
             return;
         }
 
         try
         {
-            User kronoxUser = school.Login(creds.Username, creds.Password);
+            User kronoxUser = await school.Login(creds.Username, creds.Password);
 
             //string updatedExpirationDateRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), creds.Username, creds.Password);
 
             context.HttpContext.Request.Headers.Add("sessionToken", kronoxUser.SessionToken);
-            return;
+            await next();
         }
         catch (LoginException e)
         {
             context.Result = new UnauthorizedObjectResult(new Error("Username or password incorrect."));
+            await next();
             return;
         }
         catch (ParseException e)
         {
             context.Result = new ObjectResult(StatusCodes.Status500InternalServerError);
+            await next();
             return;
         }
     }

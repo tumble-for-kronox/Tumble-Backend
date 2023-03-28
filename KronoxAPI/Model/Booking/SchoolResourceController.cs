@@ -53,6 +53,8 @@ public class SchoolResources
     /// </summary>
     /// <param name="sessionToken"></param>
     /// <returns></returns>
+    /// <exception cref="ParseException"></exception>
+    /// <exception cref="LoginException"></exception>
     public async Task<List<Resource>> GetResources(string sessionToken)
     {
         string resourcesHtml = await BookingController.GetResources(_school.Url, sessionToken);

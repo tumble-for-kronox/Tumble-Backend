@@ -19,11 +19,11 @@ public class ScheduleManagement
     /// <param name="sessionToken"></param>
     /// <returns></returns>
     /// <exception cref="ParseException"></exception>
-    public static ScheduleWebModel BuildWebSafeSchedule(string scheduleId, School school, DateTime startDate, string? sessionToken)
+    public static async Task<ScheduleWebModel> BuildWebSafeSchedule(string scheduleId, School school, DateTime startDate, string? sessionToken)
     {
         try
         {
-            Schedule schedule = school.FetchSchedule(new string[] { scheduleId }, null, sessionToken, startDate);
+            Schedule schedule = await school.FetchSchedule(new string[] { scheduleId }, null, sessionToken, startDate);
 
             //Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(TranslatorUtil.SwedishToEnglish(kvp.Value.Name).Result)).ToDictionary(course => course.Id);
             Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(kvp.Value.Name)).ToDictionary(course => course.Id);
@@ -48,11 +48,11 @@ public class ScheduleManagement
     /// <param name="sessionToken"></param>
     /// <returns></returns>
     /// <exception cref="ParseException"></exception>
-    public static MultiScheduleWebModel BuildWebSafeMultiSchedule(string[] scheduleIds, School school, DateTime startDate, string? sessionToken)
+    public static async Task<MultiScheduleWebModel> BuildWebSafeMultiSchedule(string[] scheduleIds, School school, DateTime startDate, string? sessionToken)
     {
         try
         {
-            Schedule schedule = school.FetchSchedule(scheduleIds, null, sessionToken, startDate);
+            Schedule schedule = await school.FetchSchedule(scheduleIds, null, sessionToken, startDate);
 
             //Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(TranslatorUtil.SwedishToEnglish(kvp.Value.Name).Result)).ToDictionary(course => course.Id);
             Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(kvp.Value.Name)).ToDictionary(course => course.Id);

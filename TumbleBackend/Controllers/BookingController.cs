@@ -26,7 +26,7 @@ public class BookingController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<Resource>> GetResources([FromQuery] SchoolEnum schoolId)
+    public async Task<ActionResult<List<Resource>>> GetResources([FromQuery] SchoolEnum schoolId)
     {
         School? school = schoolId.GetSchool();
         bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
@@ -39,7 +39,7 @@ public class BookingController : ControllerBase
 
         try
         {
-            return Ok(school.Resources.GetResources(sessionToken));
+            return Ok(await school.Resources.GetResources(sessionToken));
         }
         catch (LoginException e)
         {

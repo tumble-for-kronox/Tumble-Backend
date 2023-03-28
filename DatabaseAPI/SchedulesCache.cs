@@ -8,11 +8,11 @@ namespace DatabaseAPI;
 /// </summary>
 public static class SchedulesCache
 {
-    public static ScheduleWebModel? GetSchedule(string id)
+    public static async Task<ScheduleWebModel?> GetSchedule(string id)
     {
         if (Connector.Schedules == null) throw new Exceptions.DatabaseUninitializedException("The database/collection is not initialized. Run .Init() on the Connector before attempting to access the database.");
 
-        List<ScheduleWebModel> cursor = Connector.Schedules.Find(Builders<ScheduleWebModel>.Filter.Eq("_id", id)).ToList();
+        List<ScheduleWebModel> cursor = await Connector.Schedules.Find(Builders<ScheduleWebModel>.Filter.Eq("_id", id)).ToListAsync();
 
         if (cursor.Any())
             return cursor.First();
@@ -20,17 +20,17 @@ public static class SchedulesCache
         return null;
     }
 
-    public static void SaveSchedule(ScheduleWebModel schedule)
+    public static async Task SaveSchedule(ScheduleWebModel schedule)
     {
         if (Connector.Schedules == null) throw new Exceptions.DatabaseUninitializedException("The database/collection is not initialized. Run .Init() on the Connector before attempting to access the database.");
 
-        Connector.Schedules.InsertOne(schedule);
+        await Connector.Schedules.InsertOneAsync(schedule);
     }
 
-    public static void UpdateSchedule(string id, ScheduleWebModel schedule)
+    public static async Task UpdateSchedule(string id, ScheduleWebModel schedule)
     {
         if (Connector.Schedules == null) throw new Exceptions.DatabaseUninitializedException("The database/collection is not initialized. Run .Init() on the Connector before attempting to access the database.");
 
-        Connector.Schedules.ReplaceOne(Builders<ScheduleWebModel>.Filter.Eq("_id", id), schedule);
+        await Connector.Schedules.ReplaceOneAsync(Builders<ScheduleWebModel>.Filter.Eq("_id", id), schedule);
     }
 }

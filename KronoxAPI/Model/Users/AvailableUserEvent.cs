@@ -60,11 +60,11 @@ public class AvailableUserEvent : UserEvent
     /// <param name="userSessionToken"></param>
     /// <returns>A <see cref="bool"/> describing if the registering was successful.</returns>
     /// <exception cref="NullReferenceException"></exception>
-    public bool Register(School school, string userSessionToken)
+    public async Task<bool> Register(School school, string userSessionToken)
     {
         if (_id == null || _id == string.Empty) throw new NullReferenceException("_id cannot be null or an empty string when registering.");
 
-        return KronoxPushController.UserEventRegister(school, userSessionToken, Id).Result;
+        return await KronoxPushController.UserEventRegister(school, userSessionToken, Id);
     }
 
     /// <summary>
@@ -74,11 +74,11 @@ public class AvailableUserEvent : UserEvent
     /// <param name="userSessionToken"></param>
     /// <returns>A <see cref="bool"/> describing if the unregistering was successful.</returns>
     /// <exception cref="NullReferenceException"></exception>
-    public bool Unregister(School school, string userSessionToken)
+    public async Task<bool> Unregister(School school, string userSessionToken)
     {
         if (_id == null || _id == string.Empty) throw new NullReferenceException("_id cannot be null or an empty string when unregistering.");
 
-        return KronoxPushController.UserEventUnregister(school, userSessionToken, Id).Result;
+        return await KronoxPushController.UserEventUnregister(school, userSessionToken, Id);
     }
 
     /// <summary>
@@ -88,13 +88,13 @@ public class AvailableUserEvent : UserEvent
     /// <param name="userSessionToken"></param>
     /// <returns>A <see cref="bool"/> describing if the support was successfully added.</returns>
     /// <exception cref="NullReferenceException"></exception>
-    public bool AddSupport(School school, string userSessionToken)
+    public async Task<bool> AddSupport(School school, string userSessionToken)
     {
         if (_supportId == null || _supportId == string.Empty) throw new NullReferenceException("supportId cannot be null or an empty string when adding support.");
 
         if (_participatorId == null || _participatorId == string.Empty) throw new NullReferenceException("participatorId cannot be null or an empty string when adding support.");
 
-        return KronoxPushController.UserEventAddSupport(school, userSessionToken, _participatorId, _supportId).Result;
+        return await KronoxPushController.UserEventAddSupport(school, userSessionToken, _participatorId, _supportId);
     }
 
     /// <summary>
@@ -104,7 +104,7 @@ public class AvailableUserEvent : UserEvent
     /// <param name="userSessionToken"></param>
     /// <returns>A <see cref="bool"/> describing if the support was successfully removed.</returns>
     /// <exception cref="NullReferenceException"></exception>
-    public bool RemoveSupport(School school, string userSessionToken)
+    public async Task<bool> RemoveSupport(School school, string userSessionToken)
     {
         if (_id == null || _id == string.Empty) throw new NullReferenceException("id cannot be null or an empty string when removing support.");
 
@@ -112,6 +112,6 @@ public class AvailableUserEvent : UserEvent
 
         if (_participatorId == null || _participatorId == string.Empty) throw new NullReferenceException("participatorId cannot be null or an empty string when removing support.");
 
-        return KronoxPushController.UserEventRemoveSupport(school, userSessionToken, _id, _participatorId, _supportId).Result;
+        return await KronoxPushController.UserEventRemoveSupport(school, userSessionToken, _id, _participatorId, _supportId);
     }
 }

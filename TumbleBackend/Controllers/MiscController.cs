@@ -14,9 +14,9 @@ public class MiscController : ControllerBase
 {
 
     [HttpPost("submitIssue")]
-    public IActionResult Post([FromBody] IssueSubmission issue)
+    public async Task<IActionResult> SubmitIssue([FromBody] IssueSubmission issue)
     {
-        return new StatusCodeResult(statusCode: (int)EmailUtil.SendNewIssueEmail(issue.title, issue.description).Result);
+        return new StatusCodeResult(statusCode: (int)await EmailUtil.SendNewIssueEmail(issue.title, issue.description));
     }
 
     [HttpGet("news")]

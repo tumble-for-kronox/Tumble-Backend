@@ -35,7 +35,7 @@ public class ScheduleController : ControllerBase
     /// <param name="startDateISO"></param>
     /// <returns></returns>
     [HttpGet("{scheduleId}")]
-    public IActionResult Get([FromServices] IConfiguration config, [FromRoute] string scheduleId, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null)
+    public async Task<IActionResult> GetSingleSchedule([FromServices] IConfiguration config, [FromRoute] string scheduleId, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null)
     {
         // Extract school instance and make sure the school entry is valid (should've failed in query, but double safety.
         School? school = schoolId.GetSchool();
@@ -57,7 +57,7 @@ public class ScheduleController : ControllerBase
             startDate = DateTime.Now.FirstDayOfWeek();
 
             // Attempt to get cached schedule.
-            ScheduleWebModel? cachedSchedule = SchedulesCache.GetSchedule(scheduleId);
+            ScheduleWebModel? cachedSchedule = await SchedulesCache.GetSchedule(scheduleId);
 
             // On cache hit.
             if (cachedSchedule != null)
@@ -66,8 +66,8 @@ public class ScheduleController : ControllerBase
                 if (Math.Abs(cachedSchedule.CachedAt.Subtract(DateTime.Now).TotalSeconds) >= int.Parse(config[AppSettings.ScheduleCacheTTL]))
                 {
                     // Fetch and re-cache schedule if TTL has passed, making sure not to override/change course colors 
-                    ScheduleWebModel scheduleFetchForRecache = BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken);
-                    SchedulesCache.UpdateSchedule(scheduleId, scheduleFetchForRecache);
+                    ScheduleWebModel scheduleFetchForRecache = await BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken);
+                    await SchedulesCache.UpdateSchedule(scheduleId, scheduleFetchForRecache);
                 }
 
                 // Return schedule (at this point up-to-date).
@@ -75,8 +75,8 @@ public class ScheduleController : ControllerBase
             }
 
             // On cache miss, fetch, cache, and return schedule from scratch.
-            ScheduleWebModel newScheduleFetch = BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken);
-            SchedulesCache.SaveSchedule(newScheduleFetch);
+            ScheduleWebModel newScheduleFetch = await BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken);
+            await SchedulesCache.SaveSchedule(newScheduleFetch);
 
             return Ok(newScheduleFetch);
         }
@@ -95,7 +95,7 @@ public class ScheduleController : ControllerBase
     /// <param name="startDateISO"></param>
     /// <returns></returns>
     [HttpGet("multi")]
-    public IActionResult GetMulti([FromQuery] string[] scheduleIds, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null)
+    public async Task<IActionResult> GetMulti([FromQuery] string[] scheduleIds, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null)
     {
         // Extract school instance and make sure the school entry is valid (should've failed in query, but double safety.
         School? school = schoolId.GetSchool();
@@ -111,12 +111,12 @@ public class ScheduleController : ControllerBase
         {
             // If given specific start date that parses correctly, simply fetch schedule directly from KronoxAPI and return it.
             if (startDateISO != null && DateTime.TryParse(startDateISO, out DateTime startDate))
-                return Ok(BuildWebSafeMultiSchedule(scheduleIds, school, startDate, sessionToken));
+                return Ok(await BuildWebSafeMultiSchedule(scheduleIds, school, startDate, sessionToken));
 
             // Reset the given start date as it's either null or an invalid format. Ensures that all cached schedules start at the beginning of the week.
             startDate = DateTime.Now.FirstDayOfWeek();
 
-            MultiScheduleWebModel newScheduleFetch = BuildWebSafeMultiSchedule(scheduleIds, school, startDate, sessionToken);
+            MultiScheduleWebModel newScheduleFetch = await BuildWebSafeMultiSchedule(scheduleIds, school, startDate, sessionToken);
 
             return Ok(newScheduleFetch);
         }
@@ -135,7 +135,7 @@ public class ScheduleController : ControllerBase
     /// <param name="sessionToken"></param>
     /// <returns>A list of <see cref="Programme"/> objects and an <see cref="int"/> Count. Although the name is "programme" they also map to individuals and schedules correctly.</returns>
     [HttpGet("search")]
-    public IActionResult Search([FromQuery] string searchQuery, [FromQuery] SchoolEnum? schoolId = null)
+    public async Task<IActionResult> Search([FromQuery] string searchQuery, [FromQuery] SchoolEnum? schoolId = null)
     {
         School? school = schoolId?.GetSchool();
         Request.Headers.TryGetValue("sessionToken", out var sessionToken);
@@ -144,8 +144,8 @@ public class ScheduleController : ControllerBase
             return BadRequest(new Error("Invalid school value."));
         try
         {
-            List<Programme> searchResult = school.SearchProgrammes(searchQuery, sessionToken);
-            HashSet<string> filter = ProgrammeFilters.GetProgrammeFilter(school);
+            List<Programme> searchResult = await school.SearchProgrammes(searchQuery, sessionToken);
+            HashSet<string> filter = await ProgrammeFilters.GetProgrammeFilter(school);
 
             if (searchResult.Count <= 0)
                 return NoContent();

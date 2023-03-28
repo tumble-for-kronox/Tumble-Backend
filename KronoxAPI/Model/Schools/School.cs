@@ -94,11 +94,11 @@ public class School
     /// <param name="startDate"></param>
     /// <returns></returns>
     /// <exception cref="ParseException"></exception>
-    public Schedule FetchSchedule(string[] scheduleIds, LangEnum? language = null, string? sessionToken = null, DateTime? startDate = null)
+    public async Task<Schedule> FetchSchedule(string[] scheduleIds, LangEnum? language = null, string? sessionToken = null, DateTime? startDate = null)
     {
         try
         {
-            string scheduleXmlString = KronoxFetchController.GetSchedule(scheduleIds, Url, language, sessionToken, startDate).Result;
+            string scheduleXmlString = await KronoxFetchController.GetSchedule(scheduleIds, Url, language, sessionToken, startDate);
 
             XDocument scheduleXml = XDocument.Parse(scheduleXmlString);
             List<Day> scheduleDaysOfEvents = ScheduleParser.ParseToDays(scheduleXml);
@@ -123,9 +123,9 @@ public class School
     /// <param name="sessionToken"></param>
     /// <returns>The <see cref="List{Programme}"/> objects equivalent to the search results found in Kronox's database.</returns>
     /// <exception cref="LoginException"></exception>
-    public List<Programme> SearchProgrammes(string searchQuery, string? sessionToken)
+    public async Task<List<Programme>> SearchProgrammes(string searchQuery, string? sessionToken)
     {
-        string searchResultsHtml = KronoxFetchController.GetProgrammes(searchQuery, Url, sessionToken).Result;
+        string searchResultsHtml = await KronoxFetchController.GetProgrammes(searchQuery, Url, sessionToken);
         return SearchParser.ParseToProgrammes(searchResultsHtml);
     }
 
@@ -140,9 +140,9 @@ public class School
     /// </returns>
     /// <exception cref="LoginException"></exception>
     /// <exception cref="ParseException"></exception>
-    public User Login(string username, string password)
+    public async Task<User> Login(string username, string password)
     {
-        Response.LoginResponse loginResponse = KronoxPushController.Login(username, password, Url).Result;
+        Response.LoginResponse loginResponse = await KronoxPushController.Login(username, password, Url);
         HtmlDocument loginResponseHtmlDocument = new();
         loginResponseHtmlDocument.LoadHtml(loginResponse.htmlResult);
 
@@ -159,12 +159,12 @@ public class School
     /// <exception cref="LoginException"></exception>
     /// <exception cref="HttpRequestException"></exception>
     /// <exception cref="TaskCanceledException"</exception>
-    public Dictionary<string, List<UserEvent>> GetUserEvents(string sessionToken)
+    public async Task<Dictionary<string, List<UserEvent>>> GetUserEvents(string sessionToken)
     {
         if (sessionToken == null)
             throw new NullReferenceException("SessionToken was null when attempting to fetch user info. Make sure the user is logged in and that the sessionToken is not expired.");
 
-        string userEventsHtmlResult = KronoxFetchController.GetUserEvents(this.Url, sessionToken).Result;
+        string userEventsHtmlResult = await KronoxFetchController.GetUserEvents(this.Url, sessionToken);
         HtmlDocument userEventHtmlDoc = new();
         userEventHtmlDoc.LoadHtml(userEventsHtmlResult);
 

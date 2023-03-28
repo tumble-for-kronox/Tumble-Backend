@@ -11,11 +11,11 @@ namespace DatabaseAPI;
 
 public static class ProgrammeFilters
 {
-    public static HashSet<string> GetProgrammeFilter(School school)
+    public static async Task<HashSet<string>> GetProgrammeFilter(School school)
     {
         if (Connector.ProgrammeFilters == null) throw new Exceptions.DatabaseUninitializedException("The database/collection is not initialized. Run .Init() on the Connector before attempting to access the database.");
 
-        List<SchoolProgrammeFilter> cursor = Connector.ProgrammeFilters.Find(Builders<SchoolProgrammeFilter>.Filter.Eq("_id", school.Id)).ToList();
+        List<SchoolProgrammeFilter> cursor = await Connector.ProgrammeFilters.Find(Builders<SchoolProgrammeFilter>.Filter.Eq("_id", school.Id)).ToListAsync();
 
         if (cursor.Any())
             return cursor.First().Filter.ToHashSet();
