@@ -33,9 +33,7 @@ public static class KronoxPushController
     /// <returns><see cref="string"/> containing the login session token.</returns>
     public static async Task<LoginResponse> Login(string username, string password, string schoolUrl)
     {
-        // MDH currently has a sporadic domain name, causing us to resort
-        // to dynamic handling of the string in login requests
-        Uri uri = new($"https://{schoolUrl.Replace("mdh", "mdu")}/login_do.jsp");
+        Uri uri = new($"https://{schoolUrl}/login_do.jsp");
 
         // Perform web request
         using HttpRequestMessage request = new(new HttpMethod("POST"), uri);
