@@ -41,7 +41,7 @@ public static class KronoxFetchController
         string parsedDate = startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : "idag";
         LangEnum parsedLang = language == null ? LangEnum.Sv : language;
 
-        string uri = $"https://{schoolUrl.Replace("mdh", "mdu")}/setup/jsp/SchemaXML.jsp?startDatum={parsedDate}&intervallTyp=m&intervallAntal=6&sprak={parsedLang}&sokMedAND=true&forklaringar=true&resurser={string.Join(',', scheduleId)}";
+        string uri = $"https://{schoolUrl}/setup/jsp/SchemaXML.jsp?startDatum={parsedDate}&intervallTyp=m&intervallAntal=6&sprak={parsedLang}&sokMedAND=true&forklaringar=true&resurser={string.Join(',', scheduleId)}";
 
         using var request = new HttpRequestMessage(HttpMethod.Get, uri);
         if (sessionToken != null) request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");

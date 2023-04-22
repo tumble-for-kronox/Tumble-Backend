@@ -19,7 +19,7 @@ SCHOOL_DICT = {
     # ! "sh": "kronox.sh.se" requires login,
     "hv": "schema.hv.se",
     "hb": "schema.hb.se",
-    # ! "mdh": "schema.mdh.se" requires login,
+    # ! "mdu": "schema.mdu.se" requires login,
 }
 
 SCHOOL_YEAR_REGEX_DICT = {
