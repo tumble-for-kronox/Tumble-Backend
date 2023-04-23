@@ -138,12 +138,12 @@ public class SchoolFactory
     /// schoolId     : "mdh"
     /// schoolName   : "Mälardalen Högskola"
     /// url          : "schema.mdu.se"
-    /// loginRequired: true
+    /// loginRequired: false
     /// </code>
     /// </summary>
     /// <returns></returns>
     public static School Mdh()
     {
-        return new School("mdu", "Mälardalen Högskola", "webbschema.mdu.se", true);
+        return new School("mdu", "Mälardalen Högskola", "webbschema.mdu.se", false);
     }
 }

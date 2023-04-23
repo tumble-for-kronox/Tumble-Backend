@@ -11,15 +11,15 @@ from datetime import datetime
 import certifi
 
 SCHOOL_DICT = {
-    # "hkr": "schema.hkr.se",
-    # "mau": "schema.mau.se",
-    # "oru": "schema.oru.se",
-    # ! "ltu": "schema.ltu.se" requires login,
+    "hkr": "schema.hkr.se",
+    "mau": "schema.mau.se",
+    "oru": "schema.oru.se",
+    "ltu": "schema.ltu.se",
     "hig": "schema.hig.se",
-    # ! "sh": "kronox.sh.se" requires login,
+    "sh": "kronox.sh.se",
     "hv": "schema.hv.se",
     "hb": "schema.hb.se",
-    # ! "mdu": "schema.mdu.se" requires login,
+    "mdu": "schema.mdu.se",
 }
 
 SCHOOL_YEAR_REGEX_DICT = {
