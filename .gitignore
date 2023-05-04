@@ -1,7 +1,9 @@
 .vs/
+.vscode/
 TestingConsole/
 ProgrammeFilter/.env
 bin/
 obj/
+TumbleBackend/Properties/
 
 serviceAccountKey.json

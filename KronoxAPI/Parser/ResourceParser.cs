@@ -29,7 +29,6 @@ public static class ResourceParser
         try
         {
             IEnumerable<HtmlNode> resourceLiList = resourcesHtml.DocumentNode.SelectSingleNode("(//ul[@class='menu'])[2]").SelectNodes("li");
-
             foreach (HtmlNode li in resourceLiList)
             {
                 // /resursbokning.jsp?flik='resourceId' <- we want that resourceId
