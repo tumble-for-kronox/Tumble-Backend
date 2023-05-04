@@ -48,7 +48,7 @@ public class ScheduleManagement
     /// <param name="sessionToken"></param>
     /// <returns></returns>
     /// <exception cref="ParseException"></exception>
-    public static async Task<MultiScheduleWebModel> BuildWebSafeMultiSchedule(string[] scheduleIds, School school, DateTime startDate, string? sessionToken)
+    public static async Task<MultiScheduleWebModel> BuildWebSafeMultiSchedule(string[] scheduleIds, School school, DateTime startDate, string? sessionToken = null)
     {
         try
         {

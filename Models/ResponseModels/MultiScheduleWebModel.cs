@@ -19,6 +19,29 @@ public class MultiScheduleWebModel
 
     public List<DayWebModel> Days { get => _days; set => _days = value; }
 
+    public MultiScheduleWebModel Combine(MultiScheduleWebModel schedule)
+    {
+        List<DayWebModel> newDays = new();
+
+        for (int i = 0; i < _days.Count; i++)
+        {
+            DayWebModel currDay = _days[i];
+            DayWebModel combineDay = schedule.Days[i];
+
+            List<EventWebModel> combinedEventList = currDay.Events.Concat(combineDay.Events).ToList();
+
+            List<EventWebModel> uniqueEventList = combinedEventList.GroupBy(x => x.Id).Select(x => x.First()).ToList();
+
+            newDays.Add(new(currDay.Name, currDay.Date, currDay.IsoString, currDay.WeekNumber, uniqueEventList));
+        }
+
+        return new(Ids, CachedAt, newDays);
+    }
+
+    public List<EventWebModel> GetEvents()
+    {
+        return _days.SelectMany(day => day.Events).ToList();
+    }
 
     public void UpdateCachedAt()
     {
