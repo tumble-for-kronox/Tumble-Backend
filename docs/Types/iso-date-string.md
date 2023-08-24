@@ -1,0 +1,1 @@
+A string that contains an iso8601 formatted date.
