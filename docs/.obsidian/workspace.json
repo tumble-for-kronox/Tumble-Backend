@@ -4,17 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "ac2f22ce81674180",
+        "id": "40f11db3a8ef77b2",
         "type": "tabs",
         "children": [
           {
-            "id": "2848f6185154e62d",
+            "id": "b20029ec294565f7",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Models/Events/MultiRegistrationResult.md",
-                "mode": "source",
+                "file": "Routes/Booking/User Booking Confirmation.md",
+                "mode": "preview",
                 "source": false
               }
             }
@@ -50,7 +50,7 @@
               "type": "search",
               "state": {
                 "query": "",
-                "matchingCase": false,
+                "matchingCase": true,
                 "explainSearch": false,
                 "collapseAll": false,
                 "extraContext": false,
@@ -70,7 +70,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 286.5
   },
   "right": {
     "id": "082baf7f2e1c0f55",
@@ -86,7 +86,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Models/Events/MultiRegistrationResult.md",
+                "file": "Routes/Booking/User Booking Confirmation.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -103,7 +103,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Models/Events/MultiRegistrationResult.md",
+                "file": "Routes/Booking/User Booking Confirmation.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -126,7 +126,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Models/Events/MultiRegistrationResult.md"
+                "file": "Routes/Booking/User Booking Confirmation.md"
               }
             }
           }
@@ -150,43 +150,43 @@
       "obsidian-excalidraw-plugin:Create new drawing": false
     }
   },
-  "active": "2848f6185154e62d",
+  "active": "b20029ec294565f7",
   "lastOpenFiles": [
-    "Models/Events/UpcomingUserEvent.md",
-    "Models/Events/UserEventCollection.md",
-    "Models/Events/AvailableUserEvent.md",
-    "Models/Events/MultiRegistrationResult.md",
+    "Routes/Booking/Unbook Resource.md",
+    "Routes/Booking/User Booking Confirmation.md",
+    "Models/Booking/Booking.md",
+    "Routes/Booking/Book Resource.md",
+    "Routes/Booking/Get Resource Data.md",
+    "Routes/Booking/Get All School Resources.md",
+    "Routes/Booking/Get All User Bookings.md",
+    "Models/Booking/TimeSlot.md",
+    "Models/Booking/Resource.md",
+    "Untitled",
+    "Routes/Feedback/Submit Issue.md",
+    "Overview.md",
     "Types/Primitive/string.md",
-    "Models/Scheduling/Schedule.md",
-    "Models/Scheduling/MultiSchedule.md",
-    "Models/Scheduling/Event.md",
-    "_templates/route.md",
-    "Responses/Error.md",
-    "Models/Users/KronoxUser.md",
-    "Models/Programmes/Programme.md",
-    "Models/Scheduling/Day.md",
-    "Models/Programmes",
-    "Models/Untitled.md",
-    "Types/weekday-string.md",
-    "Types/array.md",
-    "Models/Scheduling/Teacher.md",
-    "Models/Scheduling/Location.md",
+    "Types/Primitive/dict.md",
+    "Types/Primitive/array.md",
+    "Models/Booking/AvailabilitySlot.md",
+    "Types/availability.md",
+    "Types/date-string.md",
+    "Types/duration-string.md",
     "Types/iso-date-string.md",
-    "Types/uuid-string.md",
-    "Models/Scheduling/Course.md",
-    "_templates/model.md",
+    "Types/school-id.md",
+    "Routes/Events/Unregister from User Event.md",
+    "Types/Primitive/boolean.md",
+    "Routes/Events/Register All Available User Events.md",
+    "Models/Events/AvailableUserEvent.md",
+    "Routes/Events/Register for User Event.md",
+    "Routes/Events/Get User Events.md",
+    "css/S - Embed Adjustments.css",
+    "css",
+    "QueryParams",
+    "Headers",
+    "Models/Programmes",
     "Models/Booking",
     "Models/Events",
     "Models/Users",
-    "Models/Scheduling",
-    "Responses",
-    "Types/Primitive/boolean.md",
-    "Types/Primitive/integer.md",
-    "Types/Primitive",
-    "Types/Primitive/null.md",
-    "Types",
-    "_templates/new_line.md",
-    "Routes/Booking",
-    "Routes/Feedback"
+    "Models/Scheduling"
   ]
 }

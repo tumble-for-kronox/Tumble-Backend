@@ -2,5 +2,9 @@
   "accentColor": "",
   "cssTheme": "",
   "theme": "obsidian",
-  "baseFontSize": 16
+  "baseFontSize": 16,
+  "enabledCssSnippets": [
+    "S - Embed Adjustments",
+    "No Icon Callout"
+  ]
 }

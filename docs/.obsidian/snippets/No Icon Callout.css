@@ -1,0 +1,5 @@
+.callout[data-callout="no-icon"] {
+    text-align: center;
+    --callout-color: 43, 43, 43;
+    --callout-icon: none;
+}

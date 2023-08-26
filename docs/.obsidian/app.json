@@ -4,5 +4,6 @@
   "spellcheck": true,
   "strictLineBreaks": false,
   "useTab": false,
-  "promptDelete": false
+  "promptDelete": false,
+  "defaultViewMode": "source"
 }
