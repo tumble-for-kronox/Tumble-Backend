@@ -4,7 +4,6 @@
   "theme": "obsidian",
   "baseFontSize": 16,
   "enabledCssSnippets": [
-    "S - Embed Adjustments",
-    "No Icon Callout"
+    "S - Embed Adjustments"
   ]
 }
