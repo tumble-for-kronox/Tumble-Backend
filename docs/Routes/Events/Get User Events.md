@@ -4,12 +4,12 @@
 ### `rir:Information` Description
 Get all events from a specified user.
 
-<mark style="background: #ADCCFFA6;">GET</mark> `api/user/events`
+<mark style="background: #ADCCFFA6;">GET</mark> `api/users/events`
 ### `rir:ArrowLeftDown` Request
 
 #### Headers
 
-![[School Id Parameter|no-title clean]]
+![[x-auth-token#Required|no-h no-title clean]]
 
 #### Query Parameters
 

@@ -4,35 +4,22 @@
     "type": "split",
     "children": [
       {
-        "id": "9ac0f826ba7f0520",
+        "id": "886d3b27e60ec7dc",
         "type": "tabs",
         "children": [
           {
-            "id": "4e9899054d1d2232",
+            "id": "2ecb95e64826a5ec",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Routes/Schedule/Get Multi Schedule.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "64b482763c47f291",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Routes/Schedule/Get N Events.md",
+                "file": "Routes/Events/Get User Events.md",
                 "mode": "source",
                 "source": false
               }
             }
           }
         ],
-        "currentTab": 1,
         "stacked": true
       }
     ],
@@ -99,7 +86,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Routes/Schedule/Get N Events.md",
+                "file": "Routes/Events/Unregister from User Event.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -116,7 +103,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Routes/Schedule/Get N Events.md",
+                "file": "Routes/Events/Unregister from User Event.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -139,7 +126,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Routes/Schedule/Get N Events.md"
+                "file": "Routes/Events/Unregister from User Event.md"
               }
             }
           }
@@ -163,10 +150,14 @@
       "obsidian-excalidraw-plugin:Create new drawing": false
     }
   },
-  "active": "64b482763c47f291",
+  "active": "123d13a169ac6b53",
   "lastOpenFiles": [
-    "Routes/Schedule/Get Multi Schedule.md",
+    "Routes/Events/Register for User Event.md",
+    "Routes/Events/Register All Available User Events.md",
+    "Routes/Events/Get User Events.md",
+    "Routes/Users/Kronox User Login.md",
     "Routes/Schedule/Get N Events.md",
+    "Routes/Schedule/Get Multi Schedule.md",
     "Routes/Schedule/Get Schedule.md",
     "Types/school-id.md",
     "schoolid.md",
@@ -188,10 +179,6 @@
     "Types/Primitive/dict.md",
     "Types/Primitive/array.md",
     "Models/Booking/AvailabilitySlot.md",
-    "Types/availability.md",
-    "Types/date-string.md",
-    "Types/duration-string.md",
-    "Types/iso-date-string.md",
     "css/S - Embed Adjustments.css",
     "css",
     "QueryParams",

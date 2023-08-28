@@ -5,5 +5,5 @@
   "strictLineBreaks": false,
   "useTab": false,
   "promptDelete": false,
-  "defaultViewMode": "source"
+  "defaultViewMode": "preview"
 }
