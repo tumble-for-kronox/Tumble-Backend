@@ -7,8 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DotNext" Version="4.14.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HttpClient\TumbleHttpClient.csproj" />
   </ItemGroup>
 
 </Project>

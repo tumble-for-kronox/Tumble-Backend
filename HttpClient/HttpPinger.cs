@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 
 namespace TumbleHttpClient;
 
@@ -19,8 +21,17 @@ public class HttpPinger
         this._httpClient = client;
     }
 
-    public string Ping(string[] urls)
+    async public  Result<string, ErrorCode> Ping(string[] urls)
     {
-        
+        Task<HttpResponseMessage>[] requests = urls.Select(url =>  _httpClient.GetAsync(url)).ToArray();
+
+        Task<HttpResponseMessage> completedTask = await Task.WhenAny(requests);
+
+        HttpResponseMessage response = await completedTask;
+
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+
+        }
     }
 }
