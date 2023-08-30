@@ -10,7 +10,7 @@ namespace KronoxAPI.Model.Users;
 
 public class AvailableUserEvent : UserEvent
 {
-    private readonly string _id;
+    private readonly string? _id;
     private readonly string? _participatorId;
     private readonly string? _supportId;
     private readonly string _anonymousCode;
@@ -19,7 +19,7 @@ public class AvailableUserEvent : UserEvent
     private readonly bool _isRegistered;
     private readonly bool _supportAvailable;
     private readonly bool _requiresChoosingLocation;
-    public string Id => _id;
+    public string? Id => _id;
 
     public string? ParticipatorId => _participatorId;
 
@@ -41,7 +41,7 @@ public class AvailableUserEvent : UserEvent
     /// <returns><see cref="AvailableUserEvent"/> wiht all values set as "N/A".</returns>
     public static AvailableUserEvent NotAvailable => new("N/A", "N/A", DateTime.MinValue, DateTime.MinValue, DateTime.MinValue, "N/A", null, null, "N/A", false, false, false);
 
-    public AvailableUserEvent(string title, string type, DateTime lastSignupDate, DateTime eventStart, DateTime eventEnd, string id, string? participatorId, string? supportId, string anonymousCode, bool isRegistered, bool supportAvailable, bool requiresChoosingLocation) : base(title, type, eventStart, eventEnd)
+    public AvailableUserEvent(string title, string type, DateTime lastSignupDate, DateTime eventStart, DateTime eventEnd, string? id, string? participatorId, string? supportId, string anonymousCode, bool isRegistered, bool supportAvailable, bool requiresChoosingLocation) : base(title, type, eventStart, eventEnd)
     {
         _id = id;
         _participatorId = participatorId;
@@ -64,7 +64,7 @@ public class AvailableUserEvent : UserEvent
     {
         if (_id == null || _id == string.Empty) throw new NullReferenceException("_id cannot be null or an empty string when registering.");
 
-        return await KronoxPushController.UserEventRegister(school, userSessionToken, Id);
+        return await KronoxPushController.UserEventRegister(school.Urls, userSessionToken, Id);
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public class AvailableUserEvent : UserEvent
     {
         if (_id == null || _id == string.Empty) throw new NullReferenceException("_id cannot be null or an empty string when unregistering.");
 
-        return await KronoxPushController.UserEventUnregister(school, userSessionToken, Id);
+        return await KronoxPushController.UserEventUnregister(school.Urls, userSessionToken, Id);
     }
 
     /// <summary>
@@ -94,7 +94,7 @@ public class AvailableUserEvent : UserEvent
 
         if (_participatorId == null || _participatorId == string.Empty) throw new NullReferenceException("participatorId cannot be null or an empty string when adding support.");
 
-        return await KronoxPushController.UserEventAddSupport(school, userSessionToken, _participatorId, _supportId);
+        return await KronoxPushController.UserEventAddSupport(school.Urls, userSessionToken, _participatorId, _supportId);
     }
 
     /// <summary>
@@ -112,6 +112,6 @@ public class AvailableUserEvent : UserEvent
 
         if (_participatorId == null || _participatorId == string.Empty) throw new NullReferenceException("participatorId cannot be null or an empty string when removing support.");
 
-        return await KronoxPushController.UserEventRemoveSupport(school, userSessionToken, _id, _participatorId, _supportId);
+        return await KronoxPushController.UserEventRemoveSupport(school.Urls, userSessionToken, _id, _participatorId, _supportId);
     }
 }

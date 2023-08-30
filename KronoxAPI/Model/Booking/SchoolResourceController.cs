@@ -28,7 +28,7 @@ public class SchoolResources
     /// <returns></returns>
     public async Task<List<Booking>> GetUserBookings(string sessionToken)
     {
-        string resourcesHtml = await BookingController.GetResources(_school.Url, sessionToken);
+        string resourcesHtml = await BookingController.GetResources(_school.Urls, sessionToken);
         HtmlDocument doc = new();
         doc.LoadHtml(resourcesHtml);
 
@@ -37,7 +37,7 @@ public class SchoolResources
         List<Booking> allBookings = new();
         foreach (Resource resource in resources)
         {
-            string personalBookingsForResourceHtml = await BookingController.GetPersonalBookingsForResource(_school.Url, resource.Id, sessionToken);
+            string personalBookingsForResourceHtml = await BookingController.GetPersonalBookingsForResource(_school.Urls, resource.Id, sessionToken);
 
             HtmlDocument personalBookingsDoc = new();
             personalBookingsDoc.LoadHtml(personalBookingsForResourceHtml);
@@ -57,7 +57,7 @@ public class SchoolResources
     /// <exception cref="LoginException"></exception>
     public async Task<List<Resource>> GetResources(string sessionToken)
     {
-        string resourcesHtml = await BookingController.GetResources(_school.Url, sessionToken);
+        string resourcesHtml = await BookingController.GetResources(_school.Urls, sessionToken);
         HtmlDocument doc = new();
         doc.LoadHtml(resourcesHtml);
 
@@ -83,7 +83,7 @@ public class SchoolResources
         if (slot.LocationId == null || slot.ResourceType == null || slot.TimeSlotId == null)
             throw new BookingCollisionException($"The resource could not be booked because either locationId, resourceType, or timeSlotId was null. Values:\n\nlocationId: {slot.LocationId}\nresourceType: {slot.ResourceType}\ntimeSlotId: {slot.TimeSlotId}");
 
-        await BookingController.BookResourceLocation(_school.Url, date, resourceId, sessionToken, slot.LocationId!, slot.TimeSlotId!, slot.ResourceType!);
+        await BookingController.BookResourceLocation(_school.Urls, date, resourceId, sessionToken, slot.LocationId!, slot.TimeSlotId!, slot.ResourceType!);
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ public class SchoolResources
     /// <exception cref="ParseException"></exception>
     public async Task UnbookResource(string sessionToken, string bookingId)
     {
-        await BookingController.UnbookResourceLocation(_school.Url, sessionToken, bookingId);
+        await BookingController.UnbookResourceLocation(_school.Urls, sessionToken, bookingId);
     }
 
     /// <summary>
@@ -112,6 +112,6 @@ public class SchoolResources
     /// <exception cref="ParseException"></exception>
     public async Task ConfirmResourceBooking(string sessionToken, string bookingId, string resourceId)
     {
-        await BookingController.ConfirmResourceBooking(_school.Url, sessionToken, bookingId, resourceId);
+        await BookingController.ConfirmResourceBooking(_school.Urls, sessionToken, bookingId, resourceId);
     }
 }

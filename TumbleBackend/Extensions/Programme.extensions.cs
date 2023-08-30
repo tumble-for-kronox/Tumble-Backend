@@ -10,12 +10,12 @@ public static class ProgrammeExtension
 {
     static readonly HttpClient client = new();
 
-    public static async Task<bool> ScheduleAvailable(this Programme programme, School school, string? sessionToken)
+    public static async Task<bool> ScheduleAvailable(this Programme programme, string schoolUrl, string? sessionToken)
     {
 		try
 		{
 
-            string uri = $"https://{school.Url}/setup/jsp/SchemaXML.jsp?startDatum={DateTime.Now.FirstDayOfWeek()}&intervallTyp=m&intervallAntal=6&sprak={LangEnum.Sv}&sokMedAND=true&forklaringar=true&resurser={programme.Id}";
+            string uri = $"https://{schoolUrl}/setup/jsp/SchemaXML.jsp?startDatum={DateTime.Now.FirstDayOfWeek()}&intervallTyp=m&intervallAntal=6&sprak={LangEnum.Sv}&sokMedAND=true&forklaringar=true&resurser={programme.Id}";
 
             using var request = new HttpRequestMessage(HttpMethod.Head, uri);
             if (sessionToken != null) request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");

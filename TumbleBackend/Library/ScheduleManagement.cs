@@ -5,6 +5,7 @@ using TumbleBackend.Extensions;
 using WebAPIModels.Extensions;
 using WebAPIModels.ResponseModels;
 using KronoxAPI.Exceptions;
+using WebAPIModels.RequestModels;
 
 namespace TumbleBackend.Library;
 
@@ -66,5 +67,29 @@ public class ScheduleManagement
             Console.WriteLine(e.Message);
             throw;
         }
+    }
+
+    public static async Task<MultiScheduleWebModel> BuildWebSafeMultiSchoolSchedule(MultiSchoolSchedules[] schoolsAndSchedules, DateTime startDate)
+    {
+        List<MultiScheduleWebModel> schedules = new();
+
+        foreach (var schoolAndSchedules in schoolsAndSchedules)
+        {
+            School? school = schoolAndSchedules.SchoolId.GetSchool() ?? throw new ArgumentException("School value is invalid.");
+
+            try
+            {
+                // If given specific start date that parses correctly, simply fetch schedule directly from KronoxAPI and return it.
+
+                schedules.Add(await BuildWebSafeMultiSchedule(schoolAndSchedules.ScheduleIds, school, startDate));
+            }
+            catch (ParseException e)
+            {
+                Console.WriteLine(e.Message);
+                throw;
+            }
+        }
+
+        return schedules.CombineAll();
     }
 }

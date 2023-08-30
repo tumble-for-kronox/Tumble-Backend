@@ -1,70 +1,75 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
-using KronoxAPI.Exceptions;
-using KronoxAPI.Model.Booking;
-using KronoxAPI.Model.Scheduling;
-using System.Security.AccessControl;
+﻿using KronoxAPI.Exceptions;
+using KronoxAPI.Utilities;
+using System.Net.Http.Headers;
 
 namespace KronoxAPI.Controller;
 
 public static class BookingController
 {
-    static readonly HttpClientHandler clientHandler;
-    static readonly HttpClient client;
+    static readonly MultiRequest client;
 
     static BookingController()
     {
-        clientHandler = new HttpClientHandler();
-        client = new HttpClient(clientHandler);
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36");
+        client = new MultiRequest();
     }
 
-    public static async Task<string> GetResources(string schoolUrl, string sessionToken)
+    public static async Task<string> GetResources(string[] schoolUrls, string sessionToken)
     {
-        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        async Task setSessionEnglish(int index)
+        {
+            await KronoxEnglishSession.SetSessionEnglish(schoolUrls[index], sessionToken);
+        };
 
-        Uri uri = new($"https://{schoolUrl}/resursbokning.jsp");
+        string[] uris = schoolUrls.Select(schoolUrl => $"https://{schoolUrl}/resursbokning.jsp").ToArray();
 
-        // Perform web request
-        using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
-        request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
-        HttpResponseMessage response = await client.SendAsync(request);
+        Dictionary<string, string> requestHeaders = new()
+        {
+            { "Cookie", $"JSESSIONID={sessionToken}" }
+        };
+
+        HttpResponseMessage response = await client.SendAsync(uris, new("GET"), requestHeaders: requestHeaders, setSessionEnglish: setSessionEnglish);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadAsStringAsync();
     }
 
-    public static async Task<string> GetPersonalBookingsForResource(string schoolUrl, string resourceId, string sessionToken)
+    public static async Task<string> GetPersonalBookingsForResource(string[] schoolUrls, string resourceId, string sessionToken)
     {
-        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        async Task setSessionEnglish(int index)
+        {
+            await KronoxEnglishSession.SetSessionEnglish(schoolUrls[index], sessionToken);
+        };
 
         DateTime date = DateTime.Now;
 
-        Uri uri = new($"https://{schoolUrl}/minaresursbokningar.jsp?datum={date:yy-MM-dd}&flik={resourceId}");
+        string[] uris = schoolUrls.Select(schoolUrl => $"https://{schoolUrl}/minaresursbokningar.jsp?datum={date:yy-MM-dd}&flik={resourceId}").ToArray();
 
-        // Perform web request
-        using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
-        request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
-        HttpResponseMessage response = await client.SendAsync(request);
+        Dictionary<string, string> requestHeaders = new()
+        {
+            { "Cookie", $"JSESSIONID={sessionToken}" }
+        };
+
+        HttpResponseMessage response = await client.SendAsync(uris, new("GET"), requestHeaders: requestHeaders, setSessionEnglish: setSessionEnglish);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadAsStringAsync();
     }
 
-    public static async Task<string> GetResourceAvailability(string schoolUrl, DateTime date, string resourceId, string sessionToken)
+    public static async Task<string> GetResourceAvailability(string[] schoolUrls, DateTime date, string resourceId, string sessionToken)
     {
-        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        async Task setSessionEnglish(int index)
+        {
+            await KronoxEnglishSession.SetSessionEnglish(schoolUrls[index], sessionToken);
+        };
 
-        Uri uri = new($"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=hamtaBokningar&datum={date:yy-MM-dd}&flik={resourceId}");
+        string[] uris = schoolUrls.Select(schoolUrl => $"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=hamtaBokningar&datum={date:yy-MM-dd}&flik={resourceId}").ToArray();
 
-        // Perform web request
-        using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
-        request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
-        HttpResponseMessage response = await client.SendAsync(request);
+        Dictionary<string, string> requestHeaders = new()
+        {
+            { "Cookie", $"JSESSIONID={sessionToken}" }
+        };
+
+        HttpResponseMessage response = await client.SendAsync(uris, new("GET"), requestHeaders: requestHeaders, setSessionEnglish: setSessionEnglish);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadAsStringAsync();
@@ -85,15 +90,21 @@ public static class BookingController
     /// <exception cref="BookingCollisionException"></exception>
     /// <exception cref="MaxBookingsException"></exception>
     /// <exception cref="ParseException"></exception>
-    public static async Task BookResourceLocation(string schoolUrl, DateTime date, string resourceId, string sessionToken, string locationId, string timeSlotId, string resourceType)
+    public static async Task BookResourceLocation(string[] schoolUrls, DateTime date, string resourceId, string sessionToken, string locationId, string timeSlotId, string resourceType)
     {
-        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        async Task setSessionEnglish(int index)
+        {
+            await KronoxEnglishSession.SetSessionEnglish(schoolUrls[index], sessionToken);
+        };
 
-        Uri uri = new($"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=boka&datum={date:yy-MM-dd}&flik={resourceId}&id={locationId}&typ={resourceType}&intervall={timeSlotId}&moment=Booked via Tumble");
+        string[] uris = schoolUrls.Select(schoolUrl => $"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=boka&datum={date:yy-MM-dd}&flik={resourceId}&id={locationId}&typ={resourceType}&intervall={timeSlotId}&moment=Booked via Tumble").ToArray();
 
-        using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
-        request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
-        HttpResponseMessage response = await client.SendAsync(request);
+        Dictionary<string, string> requestHeaders = new()
+        {
+            { "Cookie", $"JSESSIONID={sessionToken}" }
+        };
+
+        HttpResponseMessage response = await client.SendAsync(uris, new("GET"), requestHeaders: requestHeaders, setSessionEnglish: setSessionEnglish);
 
         string responseBody = await response.Content.ReadAsStringAsync();
         if (responseBody != "OK")
@@ -114,7 +125,7 @@ public static class BookingController
                 throw new MaxBookingsException("");
             }
 
-            throw new ParseException($"Something went wrong while parsing or handling the requset to book a resource. Resource details:\n\nschoolUrl: {schoolUrl}\ndate: {date:dd-MM-yy}\nresourceId: {resourceId}\nlocationId: {locationId}\nresourceType: {resourceType}\ntimeSlotId: {timeSlotId}");
+            throw new ParseException($"Something went wrong while parsing or handling the requset to book a resource. Resource details:\n\nschoolUrl: {schoolUrls}\ndate: {date:dd-MM-yy}\nresourceId: {resourceId}\nlocationId: {locationId}\nresourceType: {resourceType}\ntimeSlotId: {timeSlotId}");
         }
     }
 
@@ -128,15 +139,21 @@ public static class BookingController
     /// <exception cref="LoginException"></exception>
     /// <exception cref="BookingCollisionException"></exception>
     /// <exception cref="ParseException"></exception>
-    public static async Task UnbookResourceLocation(string schoolUrl, string sessionToken, string bookingId)
+    public static async Task UnbookResourceLocation(string[] schoolUrls, string sessionToken, string bookingId)
     {
-        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        async Task setSessionEnglish(int index)
+        {
+            await KronoxEnglishSession.SetSessionEnglish(schoolUrls[index], sessionToken);
+        };
 
-        Uri uri = new($"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=avboka&bokningsId={bookingId}");
+        string[] uris = schoolUrls.Select(schoolUrl => $"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=avboka&bokningsId={bookingId}").ToArray();
 
-        using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
-        request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
-        HttpResponseMessage response = await client.SendAsync(request);
+        Dictionary<string, string> requestHeaders = new()
+        {
+            { "Cookie", $"JSESSIONID={sessionToken}" }
+        };
+
+        HttpResponseMessage response = await client.SendAsync(uris, new("GET"), requestHeaders: requestHeaders, setSessionEnglish: setSessionEnglish);
 
         string responseBody = await response.Content.ReadAsStringAsync();
         if (responseBody != "OK")
@@ -148,22 +165,28 @@ public static class BookingController
 
             if (responseBody == "Du kan inte radera resursbokningar där du inte är bokare eller deltagare")
             {
-                throw new BookingCollisionException($"Couldn't unbook resource. Resource details:\n\nschoolUrl: {schoolUrl}\nbookingId: {bookingId}");
+                throw new BookingCollisionException($"Couldn't unbook resource. Resource details:\n\nschoolUrl: {schoolUrls}\nbookingId: {bookingId}");
             }
 
-            throw new ParseException($"Something went wrong while parsing or handling the requset to unbook a resource. Resource details:\n\nschoolUrl: {schoolUrl}\nbookingId: {bookingId}");
+            throw new ParseException($"Something went wrong while parsing or handling the requset to unbook a resource. Resource details:\n\nschoolUrl: {schoolUrls}\nbookingId: {bookingId}");
         }
     }
 
-    public static async Task ConfirmResourceBooking(string schoolUrl, string sessionToken, string bookingId, string resourceId)
+    public static async Task ConfirmResourceBooking(string[] schoolUrls, string sessionToken, string bookingId, string resourceId)
     {
-        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        async Task setSessionEnglish(int index)
+        {
+            await KronoxEnglishSession.SetSessionEnglish(schoolUrls[index], sessionToken);
+        };
 
-        Uri uri = new($"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=konfirmera&flik={resourceId}&bokningsId={bookingId}");
+        string[] uris = schoolUrls.Select(schoolUrl => $"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=konfirmera&flik={resourceId}&bokningsId={bookingId}").ToArray();
 
-        using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
-        request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
-        HttpResponseMessage response = await client.SendAsync(request);
+        Dictionary<string, string> requestHeaders = new()
+        {
+            { "Cookie", $"JSESSIONID={sessionToken}" }
+        };
+
+        HttpResponseMessage response = await client.SendAsync(uris, new("GET"), requestHeaders: requestHeaders, setSessionEnglish: setSessionEnglish);
 
         response.EnsureSuccessStatusCode();
     }

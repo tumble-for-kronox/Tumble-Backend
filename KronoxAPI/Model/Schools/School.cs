@@ -32,7 +32,7 @@ public class School
 {
     private readonly string _id;
     private readonly string _name;
-    private readonly string _url;
+    private readonly string[] _urls;
     private readonly bool _loginRequired;
     private readonly SchoolResources _resources;
 
@@ -40,7 +40,7 @@ public class School
 
     public string Name => _name;
 
-    public string Url => _url;
+    public string[] Urls => _urls;
 
     public bool LoginRequired => _loginRequired;
 
@@ -62,12 +62,12 @@ public class School
     /// </summary>
     /// <param name="id"></param>
     /// <param name="name"></param>
-    /// <param name="url"></param>
+    /// <param name="urls"></param>
     /// <param name="loginRequired"></param>
-    public School(string id, string name, string url, bool loginRequired)
+    public School(string id, string name, string[] urls, bool loginRequired)
     {
         this._id = id;
-        this._url = url;
+        this._urls = urls;
         this._loginRequired = loginRequired;
         this._name = name;
         this._resources = new SchoolResources(this);
@@ -98,7 +98,7 @@ public class School
     {
         try
         {
-            string scheduleXmlString = await KronoxFetchController.GetSchedule(scheduleIds, Url, language, sessionToken, startDate);
+            string scheduleXmlString = await KronoxFetchController.GetSchedule(scheduleIds, Urls, language, sessionToken, startDate);
 
             XDocument scheduleXml = XDocument.Parse(scheduleXmlString);
             List<Day> scheduleDaysOfEvents = ScheduleParser.ParseToDays(scheduleXml);
@@ -125,7 +125,7 @@ public class School
     /// <exception cref="LoginException"></exception>
     public async Task<List<Programme>> SearchProgrammes(string searchQuery, string? sessionToken)
     {
-        string searchResultsHtml = await KronoxFetchController.GetProgrammes(searchQuery, Url, sessionToken);
+        string searchResultsHtml = await KronoxFetchController.GetProgrammes(searchQuery, Urls, sessionToken);
         return SearchParser.ParseToProgrammes(searchResultsHtml);
     }
 
@@ -142,7 +142,7 @@ public class School
     /// <exception cref="ParseException"></exception>
     public async Task<User> Login(string username, string password)
     {
-        Response.LoginResponse loginResponse = await KronoxPushController.Login(username, password, Url);
+        Response.LoginResponse loginResponse = await KronoxPushController.Login(username, password, Urls);
         HtmlDocument loginResponseHtmlDocument = new();
         loginResponseHtmlDocument.LoadHtml(loginResponse.htmlResult);
 
@@ -164,7 +164,7 @@ public class School
         if (sessionToken == null)
             throw new NullReferenceException("SessionToken was null when attempting to fetch user info. Make sure the user is logged in and that the sessionToken is not expired.");
 
-        string userEventsHtmlResult = await KronoxFetchController.GetUserEvents(this.Url, sessionToken);
+        string userEventsHtmlResult = await KronoxFetchController.GetUserEvents(this.Urls, sessionToken);
         HtmlDocument userEventHtmlDoc = new();
         userEventHtmlDoc.LoadHtml(userEventsHtmlResult);
 

@@ -57,11 +57,11 @@ public class UserEventController : ControllerBase
             _logger.LogError(e.ToString());
             return Unauthorized(new Error("There was an issue with your login information, please log back in or try again later."));
         }
-        catch (HttpRequestException e)
-        {
-            _logger.LogError(e.ToString());
-            return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
-        }
+        //catch (HttpRequestException e)
+        //{
+        //    _logger.LogError(e.ToString());
+        //    return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
+        //}
         catch (TaskCanceledException e)
         {
             _logger.LogError(e.ToString());

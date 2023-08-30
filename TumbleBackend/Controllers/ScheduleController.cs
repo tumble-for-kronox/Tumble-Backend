@@ -103,76 +103,59 @@ public class ScheduleController : ControllerBase
     [HttpPost("nevents")]
     public async Task<IActionResult> GetEvents([FromBody] MultiSchoolSchedules[] schoolSchedules, [FromQuery] int n_events = 1, [FromQuery] string? startDateISO = null)
     {
-        List<MultiScheduleWebModel> schedules = new();
-
-        foreach (var schoolAndSchedules in schoolSchedules)
-        {
-            School? school = schoolAndSchedules.SchoolId.GetSchool();
-
-            if (school == null)
-                return BadRequest(new Error("Invalid school value."));
-
-            try
-            {
-                // If given specific start date that parses correctly, simply fetch schedule directly from KronoxAPI and return it.
-                if (startDateISO != null && DateTime.TryParse(startDateISO, out DateTime startDate))
-                    schedules.Add(await BuildWebSafeMultiSchedule(schoolAndSchedules.ScheduleIds, school, startDate));
-
-                // Reset the given start date as it's either null or an invalid format. Ensures that all cached schedules start at the beginning of the week.
-                startDate = DateTime.Now;
-
-                schedules.Add(await BuildWebSafeMultiSchedule(schoolAndSchedules.ScheduleIds, school, startDate));
-            }
-            catch (ParseException e)
-            {
-                _logger.LogError(e.Message);
-                return NotFound(new Error("Schedule wasn't found or may have been corrupted."));
-            }
-        }
-
-        MultiScheduleWebModel finalSchedule = schedules.CombineAll();
-
-        return Ok(finalSchedule.GetEvents().Take(n_events));
-    }
-
-    /// <summary>
-    /// Endpoint for fetching multiple given schedules as one. Will circumvent all caching.
-    /// </summary>
-    /// <param name="scheduleId"></param>
-    /// <param name="schoolId"></param>
-    /// <param name="startDateISO"></param>
-    /// <returns></returns>
-    [HttpGet("multi")]
-    [ServiceFilter(typeof(AuthActionFilter))]
-    public async Task<IActionResult> GetMulti([FromQuery] string[] scheduleIds, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null)
-    {
-        // Extract school instance and make sure the school entry is valid (should've failed in query, but double safety.)
-        School? school = schoolId.GetSchool();
-        Request.Headers.TryGetValue("sessionToken", out var sessionToken);
-
-        if (school == null)
-            return BadRequest(new Error("Invalid school value."));
-
-        if (school.LoginRequired && string.IsNullOrWhiteSpace(sessionToken))
-            return BadRequest(new Error($"Login required to access {school.Id} schedules."));
-
+        MultiScheduleWebModel schedule;
         try
         {
-            // If given specific start date that parses correctly, simply fetch schedule directly from KronoxAPI and return it.
-            if (startDateISO != null && DateTime.TryParse(startDateISO, out DateTime startDate))
-                return Ok(await BuildWebSafeMultiSchedule(scheduleIds, school, startDate, sessionToken));
+            if (startDateISO != null && DateTime.TryParse(startDateISO, out var startDate))
+            {
+                schedule = await BuildWebSafeMultiSchoolSchedule(schoolSchedules, startDate);
+            }
+            else
+            {
+                startDate = DateTime.Now;
+                schedule = await BuildWebSafeMultiSchoolSchedule(schoolSchedules, startDate);
+            }
 
-            // Reset the given start date as it's either null or an invalid format. Ensures that all cached schedules start at the beginning of the week.
-            startDate = DateTime.Now.FirstDayOfWeek();
-
-            MultiScheduleWebModel newScheduleFetch = await BuildWebSafeMultiSchedule(scheduleIds, school, startDate, sessionToken);
-
-            return Ok(newScheduleFetch);
+            return Ok(schedule.GetEvents().Take(n_events));
         }
         catch (ParseException e)
         {
             _logger.LogError(e.Message);
             return NotFound(new Error("Schedule wasn't found or may have been corrupted."));
+        }
+        catch (ArgumentException e)
+        {
+            return BadRequest(new Error("Invalid school value."));
+        }
+    }
+
+    /// <summary>
+    /// Endpoint for fetching multiple given schedules as one. Will circumvent all caching.
+    /// </summary>
+    /// <param name="schoolSchedules"></param>
+    /// <param name="startDateISO"></param>
+    /// <returns></returns>
+    [HttpPost("multi")]
+    public async Task<IActionResult> GetMulti([FromBody] MultiSchoolSchedules[] schoolSchedules, [FromQuery] string? startDateISO = null)
+    {
+        try
+        {
+            if (startDateISO != null && DateTime.TryParse(startDateISO, out var startDate))
+            {
+                return Ok(await BuildWebSafeMultiSchoolSchedule(schoolSchedules, startDate));
+            }
+
+            startDate = DateTime.Now;
+            return Ok(await BuildWebSafeMultiSchoolSchedule(schoolSchedules, startDate));
+        }
+        catch (ParseException e)
+        {
+            _logger.LogError(e.Message);
+            return NotFound(new Error("Schedule wasn't found or may have been corrupted."));
+        }
+        catch (ArgumentException e)
+        {
+            return BadRequest(new Error("Invalid school value."));
         }
     }
 

@@ -42,14 +42,14 @@ public class Resource
     /// <param name="date"></param>
     /// <returns></returns>
     /// <exception cref="ResourceInavailableException"></exception>
-    public async Task<Resource> FetchData(string schoolUrl, string sessionToken, DateTime? date = null)
+    public async Task<Resource> FetchData(string[] schoolUrls, string sessionToken, DateTime? date = null)
     {
         date ??= DateTime.Now;
 
         if (date!.Value.DayOfWeek == DayOfWeek.Saturday || date!.Value.DayOfWeek == DayOfWeek.Sunday)
             throw new ResourceInavailableException("The resource you are attempting to access are not available on Saturdays and Sundays");
 
-        string resourceAvailabilityHtml = await BookingController.GetResourceAvailability(schoolUrl, date.Value, Id, sessionToken);
+        string resourceAvailabilityHtml = await BookingController.GetResourceAvailability(schoolUrls, date.Value, Id, sessionToken);
 
         HtmlDocument doc = new();
         doc.LoadHtml(resourceAvailabilityHtml);

@@ -17,14 +17,14 @@ public class SchoolFactory
     /// <code>
     /// schoolId     : "hkr"
     /// schoolName   : "Kristianstad University"
-    /// url          : "schema.hkr.se"
+    /// urls          : ["schema.hkr.se", "kronox.hkr.se"]
     /// loginRequired: false
     /// </code>
     /// </summary>
     /// <returns></returns>
     public static School Hkr()
     {
-        return new School("hkr", "Kristianstad University", "schema.hkr.se", false);
+        return new School("hkr", "Kristianstad University", new string[] { "schema.hkr.se", "kronox.hkr.se" }, false);
     }
 
     /// <summary>
@@ -32,14 +32,14 @@ public class SchoolFactory
     /// <code>
     /// schoolId     : "mau"
     /// schoolName   : "Malmö University"
-    /// url          : "schema.mau.se"
+    /// urls          : ["schema.mau.se"]
     /// loginRequired: false
     /// </code>
     /// </summary>
     /// <returns></returns>
     public static School Mau()
     {
-        return new School("mau", "Malmö University", "schema.mau.se", false);
+        return new School("mau", "Malmö University", new string[] { "schema.mau.se" }, false);
     }
 
     /// <summary>
@@ -47,14 +47,14 @@ public class SchoolFactory
     /// <code>
     /// schoolId     : "oru"
     /// schoolName   : "Örebro University"
-    /// url          : "schema.oru.se"
+    /// urls          : ["schema.oru.se", "kronox.oru.se"]
     /// loginRequired: false
     /// </code>
     /// </summary>
     /// <returns></returns>
     public static School Oru()
     {
-        return new School("oru", "Örebro University", "schema.oru.se", false);
+        return new School("oru", "Örebro University", new string[] { "schema.oru.se", "kronox.oru.se" }, false);
     }
 
     /// <summary>
@@ -62,14 +62,14 @@ public class SchoolFactory
     /// <code>
     /// schoolId     : "ltu"
     /// schoolName   : "Luleå University of Technology"
-    /// url          : "schema.ltu.se"
+    /// urls          : ["schema.ltu.se"]
     /// loginRequired: false
     /// </code>
     /// </summary>
     /// <returns></returns>
     public static School Ltu()
     {
-        return new School("ltu", "Luleå University of Technology", "schema.ltu.se", false);
+        return new School("ltu", "Luleå University of Technology", new string[] { "schema.ltu.se" }, false);
     }
 
     /// <summary>
@@ -77,14 +77,14 @@ public class SchoolFactory
     /// <code>
     /// schoolId     : "hig"
     /// schoolName   : "Högskolan i Gävle"
-    /// url          : "schema.hig.se"
+    /// urls          : ["schema.hig.se", "kronox.hig.se"]
     /// loginRequired: false
     /// </code>
     /// </summary>
     /// <returns></returns>
     public static School Hig()
     {
-        return new School("hig", "Högskolan i Gävle", "schema.hig.se", false);
+        return new School("hig", "Högskolan i Gävle", new string[] { "schema.hig.se", "kronox.hig.se" }, false);
     }
 
     /// <summary>
@@ -92,14 +92,14 @@ public class SchoolFactory
     /// <code>
     /// schoolId     : "sh"
     /// schoolName   : "Södertörns Högskola"
-    /// url          : "kronox.sh.se"
+    /// urls          : ["kronox.sh.se"]
     /// loginRequired: false
     /// </code>
     /// </summary>
     /// <returns></returns>
     public static School Sh()
     {
-        return new School("sh", "Södertörns Högskola", "kronox.sh.se", false);
+        return new School("sh", "Södertörns Högskola", new string[] { "kronox.sh.se" }, false);
     }
 
     /// <summary>
@@ -107,14 +107,14 @@ public class SchoolFactory
     /// <code>
     /// schoolId     : "hv"
     /// schoolName   : "Högskolan Väst"
-    /// url          : "schema.hv.se"
+    /// urls          : ["schema.hv.se", "kronox.hv.se"]
     /// loginRequired: false
     /// </code>
     /// </summary>
     /// <returns></returns>
     public static School Hv()
     {
-        return new School("hv", "Högskolan Väst", "schema.hv.se", false);
+        return new School("hv", "Högskolan Väst", new string[] { "schema.hv.se", "kronox.hv.se" }, false);
     }
 
     /// <summary>
@@ -122,14 +122,14 @@ public class SchoolFactory
     /// <code>
     /// schoolId     : "hb"
     /// schoolName   : "Högskolan i Borås"
-    /// url          : "schema.hb.se"
+    /// urls          : ["schema.hb.se", "kronox.hb.se"]
     /// loginRequired: false
     /// </code>
     /// </summary>
     /// <returns></returns>
     public static School Hb()
     {
-        return new School("hb", "Högskolan i Borås", "schema.hb.se", false);
+        return new School("hb", "Högskolan i Borås", new string[] { "schema.hb.se", "kronox.hb.se" }, false);
     }
 
     /// <summary>
@@ -137,13 +137,13 @@ public class SchoolFactory
     /// <code>
     /// schoolId     : "mdh"
     /// schoolName   : "Mälardalen Högskola"
-    /// url          : "schema.mdu.se"
+    /// urls          : ["schema.mdu.se"]
     /// loginRequired: false
     /// </code>
     /// </summary>
     /// <returns></returns>
     public static School Mdh()
     {
-        return new School("mdu", "Mälardalen Högskola", "webbschema.mdu.se", false);
+        return new School("mdu", "Mälardalen Högskola", new string[] { "webbschema.mdu.se", "kronox.mdu.se" }, false);
     }
 }

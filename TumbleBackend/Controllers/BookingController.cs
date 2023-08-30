@@ -69,7 +69,7 @@ public class BookingController : ControllerBase
         try
         {
             List<Resource> sparseResources = await school.Resources.GetResources(sessionToken);
-            IEnumerable<Task<Resource>> fullResourcesTasks = sparseResources.Select(async e => await e.FetchData(school.Url, sessionToken, date));
+            IEnumerable<Task<Resource>> fullResourcesTasks = sparseResources.Select(async e => await e.FetchData(school.Urls, sessionToken, date));
             return Ok(await Task.WhenAll(fullResourcesTasks));
         }
         catch (LoginException e)
@@ -134,7 +134,7 @@ public class BookingController : ControllerBase
         try
         {
             List<Resource> resources = await school.Resources.GetResources(sessionToken);
-            Resource resource = await resources.Where(e => e.Id == resourceId).First().FetchData(school.Url, sessionToken, date);
+            Resource resource = await resources.Where(e => e.Id == resourceId).First().FetchData(school.Urls, sessionToken, date);
             return Ok(resource);
         }
         catch (LoginException e)
