@@ -15,7 +15,6 @@ namespace TumbleBackend.Controllers;
 
 [EnableCors("CorsPolicy")]
 [ApiController]
-[ServiceFilter(typeof(AuthActionFilter))]
 [Route("schedules")]
 [Route("api/schedules")]
 public class ScheduleController : ControllerBase
@@ -34,10 +33,11 @@ public class ScheduleController : ControllerBase
     /// <param name="schoolId"></param>
     /// <param name="startDateISO"></param>
     /// <returns></returns>
+    [ServiceFilter(typeof(AuthActionFilter))]
     [HttpGet("{scheduleId}")]
     public async Task<IActionResult> GetSingleSchedule([FromServices] IConfiguration config, [FromRoute] string scheduleId, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null)
     {
-        // Extract school instance and make sure the school entry is valid (should've failed in query, but double safety.
+        // Extract school instance and make sure the school entry is valid (should've failed in query, but double safety.)
         School? school = schoolId.GetSchool();
         Request.Headers.TryGetValue("sessionToken", out var sessionToken);
 
@@ -88,6 +88,54 @@ public class ScheduleController : ControllerBase
     }
 
     /// <summary>
+    /// Retrieves events for multiple schools and schedules based on the provided parameters.
+    /// </summary>
+    /// <param name="schoolSchedules">An array of MultiSchoolSchedules objects that includes school IDs and schedule IDs to retrieve events from. This parameter is required.</param>
+    /// <param name="n_events">An integer that specifies the number of events to retrieve. Default value is 1. This parameter is optional.</param>
+    /// <param name="startDateISO">A string that specifies the starting date for the events to retrieve in ISO 8601 format. This parameter is optional.</param>
+    /// <returns>
+    /// Returns an IActionResult object that represents the result of the action.
+    /// It returns an HTTP 400 Bad Request response if an invalid school value is provided.
+    /// It returns an HTTP 404 Not Found response if a schedule wasn't found or may have been corrupted.
+    /// If the retrieval of events is successful, it returns an HTTP 200 OK response with the retrieved events as a JSON array.
+    /// </returns>
+    /// <exception cref="ParseException">Thrown when there is an error while parsing the start date in ISO 8601 format.</exception>
+    [HttpPost("nevents")]
+    public async Task<IActionResult> GetEvents([FromBody] MultiSchoolSchedules[] schoolSchedules, [FromQuery] int n_events = 1, [FromQuery] string? startDateISO = null)
+    {
+        List<MultiScheduleWebModel> schedules = new();
+
+        foreach (var schoolAndSchedules in schoolSchedules)
+        {
+            School? school = schoolAndSchedules.SchoolId.GetSchool();
+
+            if (school == null)
+                return BadRequest(new Error("Invalid school value."));
+
+            try
+            {
+                // If given specific start date that parses correctly, simply fetch schedule directly from KronoxAPI and return it.
+                if (startDateISO != null && DateTime.TryParse(startDateISO, out DateTime startDate))
+                    schedules.Add(await BuildWebSafeMultiSchedule(schoolAndSchedules.ScheduleIds, school, startDate));
+
+                // Reset the given start date as it's either null or an invalid format. Ensures that all cached schedules start at the beginning of the week.
+                startDate = DateTime.Now;
+
+                schedules.Add(await BuildWebSafeMultiSchedule(schoolAndSchedules.ScheduleIds, school, startDate));
+            }
+            catch (ParseException e)
+            {
+                _logger.LogError(e.Message);
+                return NotFound(new Error("Schedule wasn't found or may have been corrupted."));
+            }
+        }
+
+        MultiScheduleWebModel finalSchedule = schedules.CombineAll();
+
+        return Ok(finalSchedule.GetEvents().Take(n_events));
+    }
+
+    /// <summary>
     /// Endpoint for fetching multiple given schedules as one. Will circumvent all caching.
     /// </summary>
     /// <param name="scheduleId"></param>
@@ -95,9 +143,10 @@ public class ScheduleController : ControllerBase
     /// <param name="startDateISO"></param>
     /// <returns></returns>
     [HttpGet("multi")]
+    [ServiceFilter(typeof(AuthActionFilter))]
     public async Task<IActionResult> GetMulti([FromQuery] string[] scheduleIds, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null)
     {
-        // Extract school instance and make sure the school entry is valid (should've failed in query, but double safety.
+        // Extract school instance and make sure the school entry is valid (should've failed in query, but double safety.)
         School? school = schoolId.GetSchool();
         Request.Headers.TryGetValue("sessionToken", out var sessionToken);
 
@@ -135,6 +184,7 @@ public class ScheduleController : ControllerBase
     /// <param name="sessionToken"></param>
     /// <returns>A list of <see cref="Programme"/> objects and an <see cref="int"/> Count. Although the name is "programme" they also map to individuals and schedules correctly.</returns>
     [HttpGet("search")]
+    [ServiceFilter(typeof(AuthActionFilter))]
     public async Task<IActionResult> Search([FromQuery] string searchQuery, [FromQuery] SchoolEnum? schoolId = null)
     {
         School? school = schoolId?.GetSchool();

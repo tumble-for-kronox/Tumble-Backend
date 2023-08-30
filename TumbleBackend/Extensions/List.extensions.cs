@@ -35,4 +35,28 @@ public static class ListExtensions
 
         return programmes.Where((programme, i) => programmeAvailability[i]).ToList();
     }
+
+    public static MultiScheduleWebModel CombineAll(this List<MultiScheduleWebModel> schedules)
+    {
+        if (schedules.Count == 0)
+        {
+            throw new ArgumentException("The list of schedules must contain at least one schedule or more.");
+        }
+
+        if (schedules.Count == 1)
+        {
+            return schedules[0];
+        }
+
+        MultiScheduleWebModel finalSchedule = schedules[0].Combine(schedules[1]);
+
+        List<MultiScheduleWebModel> remainingSchedules = schedules.Skip(2).ToList();
+
+        foreach (var schedule in remainingSchedules)
+        {
+            finalSchedule = finalSchedule.Combine(schedule);
+        }
+
+        return finalSchedule;
+    }
 }

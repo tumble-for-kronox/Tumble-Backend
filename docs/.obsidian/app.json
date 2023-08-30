@@ -1,0 +1,9 @@
+{
+  "alwaysUpdateLinks": true,
+  "readableLineLength": true,
+  "spellcheck": true,
+  "strictLineBreaks": false,
+  "useTab": false,
+  "promptDelete": false,
+  "defaultViewMode": "preview"
+}

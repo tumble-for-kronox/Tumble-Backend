@@ -1,0 +1,1 @@
+Basic integer type

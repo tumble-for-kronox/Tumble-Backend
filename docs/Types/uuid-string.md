@@ -1,0 +1,1 @@
+A string that contains a UUID.

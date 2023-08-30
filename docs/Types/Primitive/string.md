@@ -1,0 +1,1 @@
+Basic string type
