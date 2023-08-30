@@ -67,7 +67,7 @@ public class ScheduleController : ControllerBase
                 {
                     // Fetch and re-cache schedule if TTL has passed, making sure not to override/change course colors 
                     ScheduleWebModel scheduleFetchForRecache = await BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken);
-                    await SchedulesCache.UpdateSchedule(scheduleId, scheduleFetchForRecache);
+                    await SchedulesCache.UpsertSchedule(scheduleFetchForRecache);
                 }
 
                 // Return schedule (at this point up-to-date).
@@ -76,7 +76,7 @@ public class ScheduleController : ControllerBase
 
             // On cache miss, fetch, cache, and return schedule from scratch.
             ScheduleWebModel newScheduleFetch = await BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken);
-            await SchedulesCache.SaveSchedule(newScheduleFetch);
+            await SchedulesCache.UpsertSchedule(newScheduleFetch);
 
             return Ok(newScheduleFetch);
         }
