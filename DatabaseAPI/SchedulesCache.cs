@@ -20,17 +20,19 @@ public static class SchedulesCache
         return null;
     }
 
-    public static async Task SaveSchedule(ScheduleWebModel schedule)
+    /// <summary>
+    ///  This operation will insert a new document if it doesn't exist, or update the existing one if it does
+    /// </summary>
+    /// <param name="schedule"></param>
+    /// <returns></returns>
+    public static async Task UpsertSchedule(ScheduleWebModel schedule)
     {
         if (Connector.Schedules == null) throw new Exceptions.DatabaseUninitializedException("The database/collection is not initialized. Run .Init() on the Connector before attempting to access the database.");
 
-        await Connector.Schedules.InsertOneAsync(schedule);
+        var filter = Builders<ScheduleWebModel>.Filter.Eq("Id", schedule.Id);
+
+        var options = new ReplaceOptions { IsUpsert = true };
+        await Connector.Schedules.ReplaceOneAsync(filter, schedule, options);
     }
 
-    public static async Task UpdateSchedule(string id, ScheduleWebModel schedule)
-    {
-        if (Connector.Schedules == null) throw new Exceptions.DatabaseUninitializedException("The database/collection is not initialized. Run .Init() on the Connector before attempting to access the database.");
-
-        await Connector.Schedules.ReplaceOneAsync(Builders<ScheduleWebModel>.Filter.Eq("_id", id), schedule);
-    }
 }
