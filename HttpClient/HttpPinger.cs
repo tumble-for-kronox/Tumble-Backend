@@ -6,7 +6,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using TumbleHttpClient.Exceptions;
 
 namespace TumbleHttpClient;
 
@@ -21,7 +21,7 @@ public class HttpPinger
         this._httpClient = client;
     }
 
-    async public  Result<string, ErrorCode> Ping(string[] urls)
+    async public Task<string> Ping(string[] urls)
     {
         Task<HttpResponseMessage>[] requests = urls.Select(url =>  _httpClient.GetAsync(url)).ToArray();
 
@@ -31,7 +31,9 @@ public class HttpPinger
 
         if (response.StatusCode != HttpStatusCode.OK)
         {
-
+            throw new NoValidUrlException();
         }
+
+        return response.RequestMessage!.RequestUri!.Host;
     }
 }
