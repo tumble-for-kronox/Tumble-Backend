@@ -29,7 +29,7 @@ public static class SchedulesCache
     {
         if (Connector.Schedules == null) throw new Exceptions.DatabaseUninitializedException("The database/collection is not initialized. Run .Init() on the Connector before attempting to access the database.");
 
-        var filter = Builders<ScheduleWebModel>.Filter.Eq("Id", schedule.Id);
+        var filter = Builders<ScheduleWebModel>.Filter.Eq("_id", schedule.Id);
 
         var options = new ReplaceOptions { IsUpsert = true };
         await Connector.Schedules.ReplaceOneAsync(filter, schedule, options);
