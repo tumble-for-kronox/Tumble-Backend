@@ -6,6 +6,8 @@ using WebAPIModels.Extensions;
 using WebAPIModels.ResponseModels;
 using KronoxAPI.Exceptions;
 using WebAPIModels.RequestModels;
+using TumbleHttpClient;
+using Utilities.Pair;
 
 namespace TumbleBackend.Library;
 
@@ -20,11 +22,11 @@ public class ScheduleManagement
     /// <param name="sessionToken"></param>
     /// <returns></returns>
     /// <exception cref="ParseException"></exception>
-    public static async Task<ScheduleWebModel> BuildWebSafeSchedule(string scheduleId, School school, DateTime startDate, string? sessionToken)
+    public static async Task<ScheduleWebModel> BuildWebSafeSchedule(IKronoxRequestClient client, string scheduleId, School school, DateTime startDate)
     {
         try
         {
-            Schedule schedule = await school.FetchSchedule(new string[] { scheduleId }, null, sessionToken, startDate);
+            Schedule schedule = await school.FetchSchedule(client, new string[] { scheduleId }, null, startDate);
 
             //Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(TranslatorUtil.SwedishToEnglish(kvp.Value.Name).Result)).ToDictionary(course => course.Id);
             Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(kvp.Value.Name)).ToDictionary(course => course.Id);
@@ -49,11 +51,11 @@ public class ScheduleManagement
     /// <param name="sessionToken"></param>
     /// <returns></returns>
     /// <exception cref="ParseException"></exception>
-    public static async Task<MultiScheduleWebModel> BuildWebSafeMultiSchedule(string[] scheduleIds, School school, DateTime startDate, string? sessionToken = null)
+    public static async Task<MultiScheduleWebModel> BuildWebSafeMultiSchedule(IKronoxRequestClient client, string[] scheduleIds, School school, DateTime startDate)
     {
         try
         {
-            Schedule schedule = await school.FetchSchedule(scheduleIds, null, sessionToken, startDate);
+            Schedule schedule = await school.FetchSchedule(client, scheduleIds, null, startDate);
 
             //Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(TranslatorUtil.SwedishToEnglish(kvp.Value.Name).Result)).ToDictionary(course => course.Id);
             Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(kvp.Value.Name)).ToDictionary(course => course.Id);
@@ -69,19 +71,18 @@ public class ScheduleManagement
         }
     }
 
-    public static async Task<MultiScheduleWebModel> BuildWebSafeMultiSchoolSchedule(MultiSchoolSchedules[] schoolsAndSchedules, DateTime startDate)
+    public static async Task<MultiScheduleWebModel> BuildWebSafeMultiSchoolSchedule(IEnumerable<IPair<SchoolEnum, IKronoxRequestClient>> clients, MultiSchoolSchedules[] schoolsAndSchedules, DateTime startDate)
     {
         List<MultiScheduleWebModel> schedules = new();
 
         foreach (var schoolAndSchedules in schoolsAndSchedules)
         {
             School? school = schoolAndSchedules.SchoolId.GetSchool() ?? throw new ArgumentException("School value is invalid.");
+            IKronoxRequestClient client = clients.First(client => client.Key == school.Id).Value;
 
             try
             {
-                // If given specific start date that parses correctly, simply fetch schedule directly from KronoxAPI and return it.
-
-                schedules.Add(await BuildWebSafeMultiSchedule(schoolAndSchedules.ScheduleIds, school, startDate));
+                schedules.Add(await BuildWebSafeMultiSchedule(client, schoolAndSchedules.ScheduleIds, school, startDate));
             }
             catch (ParseException e)
             {

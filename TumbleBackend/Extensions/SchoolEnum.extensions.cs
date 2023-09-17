@@ -1,6 +1,4 @@
 ﻿using KronoxAPI.Model.Schools;
-using TumbleBackend.Utilities;
-using WebAPIModels.RequestModels;
 
 namespace TumbleBackend.Extensions;
 

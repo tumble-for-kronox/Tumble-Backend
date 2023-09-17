@@ -1,7 +1,7 @@
 ﻿using KronoxAPI.Utilities;
 using KronoxAPI.Model.Users;
-using System.Net.Http.Headers;
-using KronoxAPI.Model.Scheduling;
+using TumbleHttpClient;
+using System.Web;
 
 namespace KronoxAPI.Controller;
 
@@ -10,13 +10,6 @@ namespace KronoxAPI.Controller;
 /// </summary>
 public static class KronoxFetchController
 {
-    static readonly MultiRequest client;
-
-    static KronoxFetchController()
-    {
-        client = new MultiRequest();
-    }
-
     /// <summary>
     /// Fetch a schedule from Kronox's database, that starts at <paramref name="startDate"/> and goes 6 months forward.
     /// <para>
@@ -29,19 +22,24 @@ public static class KronoxFetchController
     /// <param name="sessionToken"></param>
     /// <param name="startDate"></param>
     /// <returns></returns>
-    public static async Task<string> GetSchedule(string[] scheduleId, string[] schoolUrls, LangEnum? language, string? sessionToken, DateTime? startDate)
+    public static async Task<string> GetSchedule(IKronoxRequestClient client, string[] scheduleId, LangEnum? language, DateTime? startDate)
     {
         string parsedDate = startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : "idag";
         LangEnum parsedLang = language == null ? LangEnum.Sv : language;
+        string endpoint = "setup/jsp/SchemaXML.jsp";
 
-        string[] uris = schoolUrls.Select(schoolUrl => $"https://{schoolUrl}/setup/jsp/SchemaXML.jsp?startDatum={parsedDate}&intervallTyp=m&intervallAntal=6&sprak={parsedLang}&sokMedAND=true&forklaringar=true&resurser={string.Join(',', scheduleId)}").ToArray();
+        var query = HttpUtility.ParseQueryString("");
+        query["startDatum"] = parsedDate;
+        query["intervallTyp"] = "m";
+        query["intervallAntal"] = "6";
+        query["sprak"] = parsedLang.ToString();
+        query["sokMedAND"] = "true";
+        query["forklaringar"] = "true";
+        query["resurser"] = string.Join(',', scheduleId);
 
-        Dictionary<string, string>? requestHeaders = sessionToken == null ? null : new()
-        {
-            { "Cookie", $"JSESSIONID={sessionToken}" }
-        };
-
-        HttpResponseMessage response = await client.SendAsync(uris, new HttpMethod("POST"), requestHeaders: requestHeaders);
+        string fullPath = $"{endpoint}?{query}";
+        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
+        HttpResponseMessage response = await client.SendAsync(request);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadAsStringAsync();
@@ -58,16 +56,20 @@ public static class KronoxFetchController
     /// <param name="schoolUrl"></param>
     /// <param name="sessionToken"></param>
     /// <returns></returns>
-    public static async Task<string> GetProgrammes(string searchQuery, string[] schoolUrls, string? sessionToken)
+    public static async Task<string> GetProgrammes(IKronoxRequestClient client, string searchQuery)
     {
-        string[] uris = schoolUrls.Select(schoolUrl => $"https://{schoolUrl}/ajax/ajax_sokResurser.jsp?sokord={searchQuery}&startDatum=idag&slutDatum=&intervallTyp=m&intervallAntal=6").ToArray();
+        string endpoint = "ajax/ajax_sokResurser.jsp";
 
-        Dictionary<string, string>? requestHeaders = sessionToken == null ? null : new()
-        {
-            { "Cookie", $"JSESSIONID={sessionToken}" }
-        };
+        var query = HttpUtility.ParseQueryString("");
+        query["sokord"] = searchQuery;
+        query["startDatum"] = "idag";
+        query["slutDatum"] = "";
+        query["intervallTyp"] = "m";
+        query["intervallAntal"] = "6";
 
-        HttpResponseMessage response = await client.SendAsync(uris, new HttpMethod("GET"), requestHeaders: requestHeaders);
+        string fullPath = $"{endpoint}?{query}";
+        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
+        HttpResponseMessage response = await client.SendAsync(request);
         string content = await response.Content.ReadAsStringAsync();
         return content;
     }
@@ -79,21 +81,14 @@ public static class KronoxFetchController
     /// <param name="sessionToken"></param>
     /// <returns><see cref="string"/> HTML page, which carries <see cref="UserEvent"/> data.</returns>
     /// <exception cref="HttpRequestException"></exception>
-    public static async Task<string> GetUserEvents(string[] schoolUrls, string sessionToken)
+    public static async Task<string> GetUserEvents(IKronoxRequestClient client)
     {
-        async Task setSessionEnglish(int index)
-        {
-            await KronoxEnglishSession.SetSessionEnglish(schoolUrls[index], sessionToken);
-        }
+        await KronoxEnglishSession.SetSessionEnglish(client);
 
-        string[] uris = schoolUrls.Select(schoolUrl => $"https://{schoolUrl}/aktivitetsanmalan.jsp").ToArray();
-        // Perform web request
-        Dictionary<string, string> requestHeaders = new()
-        {
-            { "Cookie", $"JSESSIONID={sessionToken}" }
-        };
+        string endpoint = "aktivitetsanmalan.jsp";
 
-        HttpResponseMessage response = await client.SendAsync(uris, new("GET"), requestHeaders: requestHeaders, setSessionEnglish: setSessionEnglish);
+        HttpRequestMessage request = new(new HttpMethod("GET"), endpoint);
+        HttpResponseMessage response = await client.SendAsync(request);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadAsStringAsync();

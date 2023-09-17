@@ -29,6 +29,7 @@
     <ProjectReference Include="..\HttpClient\TumbleHttpClient.csproj" />
     <ProjectReference Include="..\KronoxAPI\KronoxAPI.csproj" />
     <ProjectReference Include="..\Models\WebAPIModels.csproj" />
+    <ProjectReference Include="..\Utilities\Utilities.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Net;
 using TumbleHttpClient.Exceptions;
 
 namespace TumbleHttpClient;
@@ -14,16 +7,22 @@ public class HttpPinger
 {
     private readonly HttpClient _httpClient;
 
-    public HttpPinger(HttpClient client, double timeout = 5)
+    public HttpPinger(HttpClient client)
     {
-        client.Timeout = TimeSpan.FromSeconds(timeout);
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36");
-        this._httpClient = client;
+        _httpClient = client;
     }
 
-    async public Task<string> Ping(string[] urls)
+    /// <summary>
+    /// Method that returns the first url of a list to return a 200 OK response.
+    /// </summary>
+    /// <param name="urls"></param>
+    /// <returns></returns>
+    /// <exception cref="NoValidUrlException"></exception>
+    async public Task<Uri> Ping(string[] urls)
     {
-        Task<HttpResponseMessage>[] requests = urls.Select(url =>  _httpClient.GetAsync(url)).ToArray();
+        HttpRequestMessage[] httpRequestMessages = urls.Select(url => new HttpRequestMessage(HttpMethod.Get, url)).ToArray();
+
+        Task<HttpResponseMessage>[] requests = httpRequestMessages.Select(url =>  _httpClient.SendAsync(url)).ToArray();
 
         Task<HttpResponseMessage> completedTask = await Task.WhenAny(requests);
 
@@ -34,6 +33,6 @@ public class HttpPinger
             throw new NoValidUrlException();
         }
 
-        return response.RequestMessage!.RequestUri!.Host;
+        return response.RequestMessage!.RequestUri!;
     }
 }

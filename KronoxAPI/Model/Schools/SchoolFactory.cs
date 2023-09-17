@@ -24,7 +24,7 @@ public class SchoolFactory
     /// <returns></returns>
     public static School Hkr()
     {
-        return new School("hkr", "Kristianstad University", new string[] { "schema.hkr.se", "kronox.hkr.se" }, false);
+        return new School(SchoolEnum.HKR, "Kristianstad University", new string[] { "https://schema.hkr.se/", "https://kronox.hkr.se/" }, false);
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ public class SchoolFactory
     /// <returns></returns>
     public static School Mau()
     {
-        return new School("mau", "Malmö University", new string[] { "schema.mau.se" }, false);
+        return new School(SchoolEnum.MAU, "Malmö University", new string[] { "https://schema.mau.se/" }, false);
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public class SchoolFactory
     /// <returns></returns>
     public static School Oru()
     {
-        return new School("oru", "Örebro University", new string[] { "schema.oru.se", "kronox.oru.se" }, false);
+        return new School(SchoolEnum.ORU, "Örebro University", new string[] { "https://schema.oru.se/", "https://kronox.oru.se/" }, false);
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public class SchoolFactory
     /// <returns></returns>
     public static School Ltu()
     {
-        return new School("ltu", "Luleå University of Technology", new string[] { "schema.ltu.se" }, false);
+        return new School(SchoolEnum.LTU, "Luleå University of Technology", new string[] { "https://schema.ltu.se/" }, false);
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public class SchoolFactory
     /// <returns></returns>
     public static School Hig()
     {
-        return new School("hig", "Högskolan i Gävle", new string[] { "schema.hig.se", "kronox.hig.se" }, false);
+        return new School(SchoolEnum.HIG, "Högskolan i Gävle", new string[] { "https://schema.hig.se/", "https://kronox.hig.se/" }, false);
     }
 
     /// <summary>
@@ -99,7 +99,7 @@ public class SchoolFactory
     /// <returns></returns>
     public static School Sh()
     {
-        return new School("sh", "Södertörns Högskola", new string[] { "kronox.sh.se" }, false);
+        return new School(SchoolEnum.SH, "Södertörns Högskola", new string[] { "https://kronox.sh.se/" }, false);
     }
 
     /// <summary>
@@ -114,7 +114,7 @@ public class SchoolFactory
     /// <returns></returns>
     public static School Hv()
     {
-        return new School("hv", "Högskolan Väst", new string[] { "schema.hv.se", "kronox.hv.se" }, false);
+        return new School(SchoolEnum.HV, "Högskolan Väst", new string[] { "https://schema.hv.se/", "https://kronox.hv.se/" }, false);
     }
 
     /// <summary>
@@ -129,7 +129,7 @@ public class SchoolFactory
     /// <returns></returns>
     public static School Hb()
     {
-        return new School("hb", "Högskolan i Borås", new string[] { "schema.hb.se", "kronox.hb.se" }, false);
+        return new School(SchoolEnum.HB, "Högskolan i Borås", new string[] { "https://schema.hb.se/", "https://kronox.hb.se/" }, false);
     }
 
     /// <summary>
@@ -144,6 +144,6 @@ public class SchoolFactory
     /// <returns></returns>
     public static School Mdh()
     {
-        return new School("mdu", "Mälardalen Högskola", new string[] { "webbschema.mdu.se", "kronox.mdu.se" }, false);
+        return new School(SchoolEnum.MDH, "Mälardalen Högskola", new string[] { "https://webbschema.mdu.se/", "https://kronox.mdu.se/" }, false);
     }
 }

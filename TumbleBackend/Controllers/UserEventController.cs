@@ -8,6 +8,7 @@ using KronoxAPI.Model.Users;
 using KronoxAPI.Exceptions;
 using TumbleBackend.ActionFilters;
 using Microsoft.AspNetCore.Cors;
+using TumbleHttpClient;
 
 namespace TumbleBackend.Controllers;
 
@@ -29,18 +30,15 @@ public class UserEventController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllUserEvents([FromQuery] SchoolEnum schoolId)
     {
-        School? school = schoolId.GetSchool();
-        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        School school = schoolId.GetSchool()!;
 
-        if (!hasSessionToken)
+        if (!kronoxReqClient.IsAuthenticated)
             return BadRequest(new Error("Requires provided auth token"));
-
-        if (school == null)
-            return BadRequest(new Error("Invalid school value."));
 
         try
         {
-            Dictionary<string, List<UserEvent>> userEvents = await school.GetUserEvents(sessionToken);
+            Dictionary<string, List<UserEvent>> userEvents = await school.GetUserEvents(kronoxReqClient);
             UserEventCollection? webSafeUserEvents = userEvents.ToWebModel();
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
@@ -72,20 +70,15 @@ public class UserEventController : ControllerBase
     [HttpPut("register/all")]
     public async Task<IActionResult> RegisterAllAvailableResults([FromQuery] SchoolEnum schoolId)
     {
-        School? school = schoolId.GetSchool();
-        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        School school = schoolId.GetSchool()!;
 
-        if (!hasSessionToken)
+        if (!kronoxReqClient.IsAuthenticated)
             return BadRequest(new Error("Requires provided auth token"));
-
-        if (school == null)
-        {
-            return BadRequest(new Error("Invalid school value."));
-        }
 
         try
         {
-            Dictionary<string, List<UserEvent>> userEvents = await school.GetUserEvents(sessionToken);
+            Dictionary<string, List<UserEvent>> userEvents = await school.GetUserEvents(kronoxReqClient);
             UserEventCollection? webSafeUserEvents = userEvents.ToWebModel();
 
             if (webSafeUserEvents == null)
@@ -98,7 +91,7 @@ public class UserEventController : ControllerBase
             List<AvailableUserEvent> successfulRegistrations = new();
             foreach (AvailableUserEvent availableUserEvent in webSafeUserEvents.UnregisteredEvents)
             {
-                if (!await availableUserEvent.Register(school, sessionToken))
+                if (!await availableUserEvent.Register(kronoxReqClient))
                     failedRegistrations.Add(availableUserEvent);
                 else
                     successfulRegistrations.Add(availableUserEvent);
@@ -131,18 +124,15 @@ public class UserEventController : ControllerBase
     [HttpPut("register/{eventId}")]
     public async Task<IActionResult> RegisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId)
     {
-        School? school = schoolId.GetSchool();
-        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        School school = schoolId.GetSchool()!;
 
-        if (!hasSessionToken)
+        if (!kronoxReqClient.IsAuthenticated)
             return BadRequest(new Error("Requires provided auth token"));
-
-        if (school == null)
-            return BadRequest(new Error("Invalid school value."));
 
         try
         {
-            Dictionary<string, List<UserEvent>> userEvents = await school.GetUserEvents(sessionToken);
+            Dictionary<string, List<UserEvent>> userEvents = await school.GetUserEvents(kronoxReqClient);
             UserEventCollection? webSafeUserEvents = userEvents.ToWebModel();
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
@@ -151,7 +141,7 @@ public class UserEventController : ControllerBase
             {
                 if (userEvent.Id == eventId)
                 {
-                    if (await userEvent.Register(school, sessionToken))
+                    if (await userEvent.Register(kronoxReqClient))
                         return Ok();
 
                     return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an error signing up to the event, please try again later."));
@@ -185,18 +175,15 @@ public class UserEventController : ControllerBase
     [HttpPut("unregister/{eventId}")]
     public async Task<IActionResult> UnregisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId)
     {
-        School? school = schoolId.GetSchool();
-        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        School school = schoolId.GetSchool()!;
 
-        if (!hasSessionToken)
+        if (!kronoxReqClient.IsAuthenticated)
             return BadRequest(new Error("Requires provided auth token"));
-
-        if (school == null)
-            return BadRequest(new Error("Invalid school value."));
 
         try
         {
-            Dictionary<string, List<UserEvent>> userEvents = await school.GetUserEvents(sessionToken);
+            Dictionary<string, List<UserEvent>> userEvents = await school.GetUserEvents(kronoxReqClient);
             UserEventCollection? webSafeUserEvents = userEvents.ToWebModel();
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
@@ -205,7 +192,7 @@ public class UserEventController : ControllerBase
             {
                 if (userEvent.Id == eventId)
                 {
-                    if (await userEvent.Unregister(school, sessionToken))
+                    if (await userEvent.Unregister(kronoxReqClient))
                         return Ok();
 
                     return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an error signing up to the event, please try again later."));

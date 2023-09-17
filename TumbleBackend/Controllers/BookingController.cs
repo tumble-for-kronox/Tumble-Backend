@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using TumbleBackend.ActionFilters;
 using TumbleBackend.Extensions;
+using TumbleHttpClient;
 using WebAPIModels.RequestModels;
 using WebAPIModels.ResponseModels;
 
@@ -28,18 +29,15 @@ public class BookingController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<Resource>>> GetResources([FromQuery] SchoolEnum schoolId)
     {
-        School? school = schoolId.GetSchool();
-        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        School school = schoolId.GetSchool()!;
 
-        if (!hasSessionToken)
+        if (!kronoxReqClient.IsAuthenticated)
             return BadRequest(new Error("Requires provided auth token"));
-
-        if (school == null)
-            return BadRequest(new Error("Invalid school value."));
 
         try
         {
-            return Ok(await school.Resources.GetResources(sessionToken));
+            return Ok(await school.Resources.GetResources(kronoxReqClient));
         }
         catch (LoginException e)
         {
@@ -56,20 +54,17 @@ public class BookingController : ControllerBase
     [HttpGet("all")]
     public async Task<ActionResult<List<Resource>>> GetAllResourcesAndAvailabilities([FromQuery] SchoolEnum schoolId, [FromQuery] DateTime date)
     {
-        School? school = schoolId.GetSchool();
-        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        School school = schoolId.GetSchool()!;
 
-        if (!hasSessionToken)
+        if (!kronoxReqClient.IsAuthenticated)
             return BadRequest(new Error("Requires provided auth token"));
-
-        if (school == null)
-            return BadRequest(new Error("Invalid school value."));
 
 
         try
         {
-            List<Resource> sparseResources = await school.Resources.GetResources(sessionToken);
-            IEnumerable<Task<Resource>> fullResourcesTasks = sparseResources.Select(async e => await e.FetchData(school.Urls, sessionToken, date));
+            List<Resource> sparseResources = await school.Resources.GetResources(kronoxReqClient);
+            IEnumerable<Task<Resource>> fullResourcesTasks = sparseResources.Select(async e => await e.FetchData(kronoxReqClient, date));
             return Ok(await Task.WhenAll(fullResourcesTasks));
         }
         catch (LoginException e)
@@ -93,18 +88,15 @@ public class BookingController : ControllerBase
     [HttpGet("userbookings")]
     public async Task<ActionResult<List<Booking>>> GetUserBookings([FromQuery] SchoolEnum schoolId)
     {
-        School? school = schoolId.GetSchool();
-        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        School school = schoolId.GetSchool()!;
 
-        if (!hasSessionToken)
+        if (!kronoxReqClient.IsAuthenticated)
             return BadRequest(new Error("Requires provided auth token"));
-
-        if (school == null)
-            return BadRequest(new Error("Invalid school value."));
 
         try
         {
-            List<Booking> bookings = await school.Resources.GetUserBookings(sessionToken);
+            List<Booking> bookings = await school.Resources.GetUserBookings(kronoxReqClient);
             return Ok(bookings);
         }
         catch (LoginException e)
@@ -122,19 +114,16 @@ public class BookingController : ControllerBase
     [HttpGet("{resourceId}")]
     public async Task<ActionResult<Resource>> GetAvailabilities([FromQuery] SchoolEnum schoolId, [FromRoute] string resourceId, [FromQuery] DateTime date)
     {
-        School? school = schoolId.GetSchool();
-        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        School school = schoolId.GetSchool()!;
 
-        if (!hasSessionToken)
+        if (!kronoxReqClient.IsAuthenticated)
             return BadRequest(new Error("Requires provided auth token"));
-
-        if (school == null)
-            return BadRequest(new Error("Invalid school value."));
 
         try
         {
-            List<Resource> resources = await school.Resources.GetResources(sessionToken);
-            Resource resource = await resources.Where(e => e.Id == resourceId).First().FetchData(school.Urls, sessionToken, date);
+            List<Resource> resources = await school.Resources.GetResources(kronoxReqClient);
+            Resource resource = await resources.Where(e => e.Id == resourceId).First().FetchData(kronoxReqClient, date);
             return Ok(resource);
         }
         catch (LoginException e)
@@ -157,20 +146,17 @@ public class BookingController : ControllerBase
     [HttpPut("book")]
     public async Task<ActionResult<Booking>> BookResource([FromQuery] SchoolEnum schoolId, [FromBody] BookingRequest bookingRequest)
     {
-        School? school = schoolId.GetSchool();
-        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        School school = schoolId.GetSchool()!;
 
-        if (!hasSessionToken)
+        if (!kronoxReqClient.IsAuthenticated)
             return BadRequest(new Error("Requires provided auth token"));
-
-        if (school == null)
-            return BadRequest(new Error("Invalid school value."));
 
         try
         {
-            await school.Resources.BookResource(sessionToken, bookingRequest.ResourceId, bookingRequest.Date, bookingRequest.Slot);
+            await school.Resources.BookResource(kronoxReqClient, bookingRequest.ResourceId, bookingRequest.Date, bookingRequest.Slot);
 
-            List<Booking> bookings = await school.Resources.GetUserBookings(sessionToken);
+            List<Booking> bookings = await school.Resources.GetUserBookings(kronoxReqClient);
             bookings.Sort((x, y) =>
             {
                 return int.Parse(x.Id[20..]) > int.Parse(y.Id[20..]) ? 0 : 1;
@@ -211,18 +197,15 @@ public class BookingController : ControllerBase
     [HttpPut("unbook")]
     public async Task<ActionResult> UnbookResource([FromQuery] SchoolEnum schoolId, [FromQuery] string bookingId)
     {
-        School? school = schoolId.GetSchool();
-        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        School school = schoolId.GetSchool()!;
 
-        if (!hasSessionToken)
+        if (!kronoxReqClient.IsAuthenticated)
             return BadRequest(new Error("Requires provided auth token"));
-
-        if (school == null)
-            return BadRequest(new Error("Invalid school value."));
 
         try
         {
-            await school.Resources.UnbookResource(sessionToken, bookingId);
+            await school.Resources.UnbookResource(kronoxReqClient, bookingId);
 
             return Ok();
         }
@@ -246,18 +229,15 @@ public class BookingController : ControllerBase
     [HttpPut("confirm")]
     public async Task<ActionResult> ConfirmResourceBooking([FromQuery] SchoolEnum schoolId, [FromBody] ConfirmBookingRequest data)
     {
-        School? school = schoolId.GetSchool();
-        bool hasSessionToken = Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        School school = schoolId.GetSchool()!;
 
-        if (!hasSessionToken)
+        if (!kronoxReqClient.IsAuthenticated)
             return BadRequest(new Error("Requires provided auth token"));
-
-        if (school == null)
-            return BadRequest(new Error("Invalid school value."));
 
         try
         {
-            await school.Resources.ConfirmResourceBooking(sessionToken, data.BookingId, data.ResourceId);
+            await school.Resources.ConfirmResourceBooking(kronoxReqClient, data.BookingId, data.ResourceId);
 
             return Ok();
         }

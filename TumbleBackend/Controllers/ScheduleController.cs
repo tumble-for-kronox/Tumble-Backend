@@ -10,6 +10,9 @@ using KronoxAPI.Exceptions;
 using TumbleBackend.StringConstants;
 using TumbleBackend.ActionFilters;
 using Microsoft.AspNetCore.Cors;
+using TumbleHttpClient;
+using KronoxAPI.Extensions;
+using Utilities.Pair;
 
 namespace TumbleBackend.Controllers;
 
@@ -37,21 +40,18 @@ public class ScheduleController : ControllerBase
     [HttpGet("{scheduleId}")]
     public async Task<IActionResult> GetSingleSchedule([FromServices] IConfiguration config, [FromRoute] string scheduleId, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null)
     {
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
         // Extract school instance and make sure the school entry is valid (should've failed in query, but double safety.)
-        School? school = schoolId.GetSchool();
-        Request.Headers.TryGetValue("sessionToken", out var sessionToken);
+        School school = schoolId.GetSchool()!;
 
-        if (school == null)
-            return BadRequest(new Error("Invalid school value."));
-
-        if (school.LoginRequired && string.IsNullOrWhiteSpace(sessionToken))
-            return BadRequest(new Error($"Login required to access {school.Id} schedules."));
+        if (school.LoginRequired && !kronoxReqClient.IsAuthenticated)
+            return BadRequest(new Error($"Login required to access {school.Id.ToStringId()} schedules."));
 
         try
         {
             // If given specific start date that parses correctly, simply fetch schedule directly from KronoxAPI and return it.
             if (startDateISO != null && DateTime.TryParse(startDateISO, out DateTime startDate))
-                return Ok(BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken));
+                return Ok(BuildWebSafeSchedule(kronoxReqClient, scheduleId, school, startDate));
 
             // Reset the given start date as it's either null or an invalid format. Ensures that all cached schedules start at the beginning of the week.
             startDate = DateTime.Now.FirstDayOfWeek();
@@ -66,7 +66,7 @@ public class ScheduleController : ControllerBase
                 if (Math.Abs(cachedSchedule.CachedAt.Subtract(DateTime.Now).TotalSeconds) >= int.Parse(config[AppSettings.ScheduleCacheTTL]))
                 {
                     // Fetch and re-cache schedule if TTL has passed, making sure not to override/change course colors 
-                    ScheduleWebModel scheduleFetchForRecache = await BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken);
+                    ScheduleWebModel scheduleFetchForRecache = await BuildWebSafeSchedule(kronoxReqClient, scheduleId, school, startDate);
                     _ = SchedulesCache.UpdateSchedule(scheduleId, scheduleFetchForRecache);
                 }
 
@@ -75,7 +75,7 @@ public class ScheduleController : ControllerBase
             }
 
             // On cache miss, fetch, cache, and return schedule from scratch.
-            ScheduleWebModel newScheduleFetch = await BuildWebSafeSchedule(scheduleId, school, startDate, sessionToken);
+            ScheduleWebModel newScheduleFetch = await BuildWebSafeSchedule(kronoxReqClient, scheduleId, school, startDate);
             _ =SchedulesCache.SaveSchedule(newScheduleFetch);
 
             return Ok(newScheduleFetch);
@@ -103,17 +103,18 @@ public class ScheduleController : ControllerBase
     [HttpPost("nevents")]
     public async Task<IActionResult> GetEvents([FromBody] MultiSchoolSchedules[] schoolSchedules, [FromQuery] int n_events = 1, [FromQuery] string? startDateISO = null)
     {
-        MultiScheduleWebModel schedule;
+        IEnumerable<IPair<SchoolEnum, IKronoxRequestClient>> kronoxReqClients = (HttpContext.Items["kronoxReqClientArray"] as IEnumerable<Pair<SchoolEnum, KronoxRequestClient>>)!.CastPairs<SchoolEnum, IKronoxRequestClient>();
         try
         {
+            MultiScheduleWebModel schedule;
             if (startDateISO != null && DateTime.TryParse(startDateISO, out var startDate))
             {
-                schedule = await BuildWebSafeMultiSchoolSchedule(schoolSchedules, startDate);
+                schedule = await BuildWebSafeMultiSchoolSchedule(kronoxReqClients, schoolSchedules, startDate);
             }
             else
             {
                 startDate = DateTime.Now;
-                schedule = await BuildWebSafeMultiSchoolSchedule(schoolSchedules, startDate);
+                schedule = await BuildWebSafeMultiSchoolSchedule(kronoxReqClients, schoolSchedules, startDate);
             }
 
             return Ok(schedule.GetEvents().Take(n_events));
@@ -138,15 +139,16 @@ public class ScheduleController : ControllerBase
     [HttpPost("multi")]
     public async Task<IActionResult> GetMulti([FromBody] MultiSchoolSchedules[] schoolSchedules, [FromQuery] string? startDateISO = null)
     {
+        IEnumerable<IPair<SchoolEnum, IKronoxRequestClient>> kronoxReqClients = (HttpContext.Items["kronoxReqClientArray"] as IEnumerable<Pair<SchoolEnum, KronoxRequestClient>>)!.CastPairs<SchoolEnum, IKronoxRequestClient>();
         try
         {
             if (startDateISO != null && DateTime.TryParse(startDateISO, out var startDate))
             {
-                return Ok(await BuildWebSafeMultiSchoolSchedule(schoolSchedules, startDate));
+                return Ok(await BuildWebSafeMultiSchoolSchedule(kronoxReqClients, schoolSchedules, startDate));
             }
 
             startDate = DateTime.Now;
-            return Ok(await BuildWebSafeMultiSchoolSchedule(schoolSchedules, startDate));
+            return Ok(await BuildWebSafeMultiSchoolSchedule(kronoxReqClients, schoolSchedules, startDate));
         }
         catch (ParseException e)
         {
@@ -170,14 +172,14 @@ public class ScheduleController : ControllerBase
     [ServiceFilter(typeof(AuthActionFilter))]
     public async Task<IActionResult> Search([FromQuery] string searchQuery, [FromQuery] SchoolEnum? schoolId = null)
     {
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
         School? school = schoolId?.GetSchool();
-        Request.Headers.TryGetValue("sessionToken", out var sessionToken);
 
         if (school == null)
             return BadRequest(new Error("Invalid school value."));
         try
         {
-            List<Programme> searchResult = await school.SearchProgrammes(searchQuery, sessionToken);
+            List<Programme> searchResult = await school.SearchProgrammes(kronoxReqClient, searchQuery);
             HashSet<string> filter = await ProgrammeFilters.GetProgrammeFilter(school);
 
             if (searchResult.Count <= 0)

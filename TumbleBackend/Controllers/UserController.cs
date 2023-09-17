@@ -10,6 +10,7 @@ using WebAPIModels.Extensions;
 using TumbleBackend.InternalModels;
 using TumbleBackend.StringConstants;
 using Microsoft.AspNetCore.Cors;
+using TumbleHttpClient;
 
 namespace TumbleBackend.Controllers;
 
@@ -29,10 +30,8 @@ public class UserController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetKronoxUser([FromServices] IConfiguration configuration, [FromQuery] SchoolEnum schoolId, [FromHeader(Name = "X-auth-token")] string refreshToken)
     {
-        School? school = schoolId.GetSchool();
-
-        if (school == null)
-            return BadRequest(new Error("Invalid school value."));
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        School school = schoolId.GetSchool()!;
 
         string? jwtEncKey = configuration[UserSecrets.JwtEncryptionKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtEncryptionKey);
         string? jwtSigKey = configuration[UserSecrets.JwtSignatureKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtSignatureKey);
@@ -47,7 +46,7 @@ public class UserController : ControllerBase
 
         try
         {
-            User kronoxUser = await school.Login(creds.Username, creds.Password);
+            User kronoxUser = await school.Login(kronoxReqClient, creds.Username, creds.Password);
 
             string updatedExpirationDateRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), creds.Username, creds.Password);
 
@@ -68,14 +67,12 @@ public class UserController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> LoginKronoxUser([FromServices] IConfiguration configuration, [FromQuery] SchoolEnum schoolId, [FromBody] LoginRequest body)
     {
-        School? school = schoolId.GetSchool();
-
-        if (school == null)
-            return BadRequest(new Error("Invalid school value."));
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        School school = schoolId.GetSchool()!;
 
         try
         {
-            User kronoxUser = await school.Login(body.Username, body.Password);
+            User kronoxUser = await school.Login(kronoxReqClient, body.Username, body.Password);
 
             string? jwtEncKey = configuration[UserSecrets.JwtEncryptionKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtEncryptionKey);
             string? jwtSigKey = configuration[UserSecrets.JwtSignatureKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtSignatureKey);
@@ -102,10 +99,8 @@ public class UserController : ControllerBase
     [HttpGet("refresh")]
     public async Task<IActionResult> RefreshKronoxUser([FromServices] IConfiguration configuration, [FromQuery] SchoolEnum schoolId, [FromHeader] string authorization)
     {
-        School? school = schoolId.GetSchool();
-
-        if (school == null)
-            return BadRequest(new Error("Invalid school value."));
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        School school = schoolId.GetSchool()!;
 
         string? jwtEncKey = configuration[UserSecrets.JwtEncryptionKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtEncryptionKey);
         string? jwtSigKey = configuration[UserSecrets.JwtSignatureKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtSignatureKey);
@@ -120,7 +115,7 @@ public class UserController : ControllerBase
 
         try
         {
-            User kronoxUser = await school.Login(creds.Username, creds.Password);
+            User kronoxUser = await school.Login(kronoxReqClient, creds.Username, creds.Password);
 
             string updatedExpirationDateRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), creds.Username, creds.Password);
 

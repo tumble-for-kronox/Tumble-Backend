@@ -1,15 +1,17 @@
 using MongoDB.Bson.Serialization;
 using System.Diagnostics;
+using System.Net;
 using TumbleBackend.ActionFilters;
 using TumbleBackend.Library;
+using TumbleBackend.OperationFilters;
 using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
 using TumbleHttpClient;
 using WebAPIModels.ResponseModels;
 
 var builder = WebApplication.CreateBuilder(args);
+KronoxUrlFilter kronoxUrlFilter = new KronoxUrlFilter();
 builder.WebHost.UseIISIntegration();
-// Add services to the container.
 
 var dbglistener = new TextWriterTraceListener(Console.Out);
 Trace.Listeners.Add(dbglistener);
@@ -24,13 +26,17 @@ BsonClassMap.RegisterClassMap<EventWebModel>(cm =>
         .SetIsRequired(true);
 });
 
-
+// Add services to the container.
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddHttpClient<RequestClient>();
-builder.Services.AddHttpClient<HttpPinger>();
+builder.Services.AddSwaggerGen(config => {
+    config.OperationFilter<AuthHeaderFilter>();
+});
+builder.Services.AddHttpClient("KronoxClient", client =>
+{
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36");
+});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
@@ -40,19 +46,21 @@ builder.Services.AddCors(options =>
       .AllowAnyHeader());
 });
 
-builder.Services.AddSingleton((provider) =>
-{
-    return builder.Configuration;
-});
-
+builder.Services.AddSingleton(builder.Configuration);
+builder.Services.AddSingleton<MobileMessagingClient>();
 builder.Services.AddScoped<AuthActionFilter>();
+builder.Services.AddScoped<KronoxUrlFilter>();
+builder.Services.AddScoped<KronoxRequestClient>();
 
 builder.Services.AddSpaStaticFiles(config =>
 {
     config.RootPath = "wwwroot";
 });
 
-builder.Services.AddSingleton<MobileMessagingClient>();
+builder.Services.AddMvc(opts =>
+{
+    opts.Filters.Add(new KronoxUrlFilter());
+});
 
 var app = builder.Build();
 
