@@ -33,7 +33,7 @@ public static class KronoxFetchController
         query["intervallTyp"] = "m";
         query["intervallAntal"] = "6";
         query["sprak"] = parsedLang.ToString();
-        query["sokMedAND"] = "true";
+        query["sokMedAND"] = "false";
         query["forklaringar"] = "true";
         query["resurser"] = string.Join(',', scheduleId);
 
