@@ -50,7 +50,7 @@ builder.Services.AddSingleton(builder.Configuration);
 builder.Services.AddSingleton<MobileMessagingClient>();
 builder.Services.AddScoped<AuthActionFilter>();
 builder.Services.AddScoped<KronoxUrlFilter>();
-builder.Services.AddScoped<KronoxRequestClient>();
+builder.Services.AddTransient<KronoxRequestClient>();
 
 builder.Services.AddSpaStaticFiles(config =>
 {

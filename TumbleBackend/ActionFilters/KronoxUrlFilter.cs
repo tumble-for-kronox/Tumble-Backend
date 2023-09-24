@@ -47,6 +47,15 @@ namespace TumbleBackend.ActionFilters
             try
             {
                 Pair<SchoolEnum, Uri>[] workingUrls = await Task.WhenAll(schools.Select(async school => new Pair<SchoolEnum, Uri>(school!.Id, await pinger.Ping(school.Urls))));
+                //Pair<SchoolEnum, KronoxRequestClient>[] requestClients = {};
+                //foreach (var keyValue in workingUrls)
+                //{
+                //    KronoxRequestClient client = context.HttpContext.RequestServices.GetService<KronoxRequestClient>()!;
+                //    client.SetBaseAddress(keyValue.Value);
+
+                //    requestClients = requestClients.Append(new Pair<SchoolEnum, KronoxRequestClient>(keyValue.Key, client)).ToArray();
+                //}
+
                 Pair<SchoolEnum, KronoxRequestClient>[] requestClients = workingUrls.Select(keyValue =>
                 {
                     KronoxRequestClient client = context.HttpContext.RequestServices.GetService<KronoxRequestClient>()!;
@@ -56,13 +65,9 @@ namespace TumbleBackend.ActionFilters
                 }).ToArray();
 
                 if (requestClients.Length == 1)
-                {
                     context.HttpContext.Items.Add("kronoxReqClient", requestClients[0].Value);
-                    context.HttpContext.Items.Add("kronoxReqClientArray", requestClients.AsEnumerable());
-                } else
-                {
-                    context.HttpContext.Items.Add("kronoxReqClientArray", requestClients.AsEnumerable());
-                }
+
+                context.HttpContext.Items.Add("kronoxReqClientArray", requestClients.AsEnumerable());
             } catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException)
             {
                 context.Result = new ObjectResult(StatusCodes.Status500InternalServerError);
