@@ -68,7 +68,7 @@ public class ScheduleController : ControllerBase
                 {
                     // Fetch and re-cache schedule if TTL has passed, making sure not to override/change course colors 
                     ScheduleWebModel scheduleFetchForRecache = await BuildWebSafeSchedule(kronoxReqClient, scheduleId, school, startDate);
-                    _ = SchedulesCache.UpdateSchedule(scheduleId, scheduleFetchForRecache);
+                    await SchedulesCache.UpsertSchedule(scheduleFetchForRecache);
                 }
 
                 // Return schedule (at this point up-to-date).
@@ -77,7 +77,7 @@ public class ScheduleController : ControllerBase
 
             // On cache miss, fetch, cache, and return schedule from scratch.
             ScheduleWebModel newScheduleFetch = await BuildWebSafeSchedule(kronoxReqClient, scheduleId, school, startDate);
-            _ =SchedulesCache.SaveSchedule(newScheduleFetch);
+            await SchedulesCache.UpsertSchedule(newScheduleFetch);
 
             return Ok(newScheduleFetch);
         }
@@ -85,6 +85,11 @@ public class ScheduleController : ControllerBase
         {
             _logger.LogError(e.Message);
             return NotFound(new Error("Schedule wasn't found or may have been corrupted."));
+        }
+        catch (TaskCanceledException e)
+        {
+            _logger.LogError($"Task canceled: {e.Message}");
+            return StatusCode(408, new Error("The request timed out."));
         }
     }
 
@@ -105,20 +110,19 @@ public class ScheduleController : ControllerBase
     public async Task<IActionResult> GetEvents([FromBody] MultiSchoolSchedules[] schoolSchedules, [FromQuery] int n_events = 1, [FromQuery] string? startDateISO = null)
     {
         IEnumerable<IPair<SchoolEnum, IKronoxRequestClient>> kronoxReqClients = (HttpContext.Items["kronoxReqClientArray"] as IEnumerable<Pair<SchoolEnum, KronoxRequestClient>>)!.CastPairs<SchoolEnum, IKronoxRequestClient>();
+        MultiScheduleWebModel finalSchedule;
+
         try
         {
-            MultiScheduleWebModel schedule;
             if (startDateISO != null && DateTime.TryParse(startDateISO, out var startDate))
             {
-                schedule = await BuildWebSafeMultiSchoolSchedule(kronoxReqClients, schoolSchedules, startDate);
-            }
-            else
-            {
-                startDate = DateTime.Now;
-                schedule = await BuildWebSafeMultiSchoolSchedule(kronoxReqClients, schoolSchedules, startDate);
+                finalSchedule = await BuildWebSafeMultiSchoolSchedule(kronoxReqClients, schoolSchedules, startDate);
+                return Ok(finalSchedule.GetEvents().Take(n_events));
             }
 
-            return Ok(schedule.GetEvents().Take(n_events));
+            startDate = DateTime.Now;
+            finalSchedule = await BuildWebSafeMultiSchoolSchedule(kronoxReqClients, schoolSchedules, startDate);
+            return Ok(finalSchedule.GetEvents().Take(n_events));
         }
         catch (ParseException e)
         {
@@ -128,6 +132,11 @@ public class ScheduleController : ControllerBase
         catch (ArgumentException e)
         {
             return BadRequest(new Error("Invalid school value."));
+        }
+        catch (TaskCanceledException e)
+        {
+            _logger.LogError($"Task canceled: {e.Message}");
+            return StatusCode(408, new Error("The request timed out."));
         }
     }
 
@@ -159,6 +168,11 @@ public class ScheduleController : ControllerBase
         catch (ArgumentException e)
         {
             return BadRequest(new Error("Invalid school value."));
+        }
+        catch (TaskCanceledException e)
+        {
+            _logger.LogError($"Task canceled: {e.Message}");
+            return StatusCode(408, new Error("The request timed out."));
         }
     }
 
@@ -195,5 +209,11 @@ public class ScheduleController : ControllerBase
             _logger.LogError(e.Message);
             return Unauthorized(new Error("Invalid credentials, please login again."));
         }
+        catch (TaskCanceledException e)
+        {
+            _logger.LogError($"Task canceled: {e.Message}");
+            return StatusCode(408, new Error("The request timed out."));
+        }
     }
+
 }

@@ -25,8 +25,7 @@ public static class KronoxFetchController
     public static async Task<string> GetSchedule(IKronoxRequestClient client, string[] scheduleId, LangEnum? language, DateTime? startDate)
     {
         string parsedDate = startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : "idag";
-        LangEnum parsedLang = language == null ? LangEnum.Sv : language;
-        string endpoint = "setup/jsp/SchemaXML.jsp";
+        LangEnum parsedLang = language ?? LangEnum.Sv;
 
         var query = HttpUtility.ParseQueryString("");
         query["startDatum"] = parsedDate;
