@@ -13,6 +13,7 @@ using KronoxAPI.Exceptions;
 using HtmlAgilityPack;
 using System.Xml;
 using KronoxAPI.Model.Booking;
+using TumbleHttpClient;
 
 namespace KronoxAPI.Model.Schools;
 
@@ -30,17 +31,17 @@ namespace KronoxAPI.Model.Schools;
 /// </summary>
 public class School
 {
-    private readonly string _id;
+    private readonly SchoolEnum _id;
     private readonly string _name;
-    private readonly string _url;
+    private readonly string[] _urls;
     private readonly bool _loginRequired;
     private readonly SchoolResources _resources;
 
-    public string Id => _id;
+    public SchoolEnum Id => _id;
 
     public string Name => _name;
 
-    public string Url => _url;
+    public string[] Urls => _urls;
 
     public bool LoginRequired => _loginRequired;
 
@@ -62,15 +63,15 @@ public class School
     /// </summary>
     /// <param name="id"></param>
     /// <param name="name"></param>
-    /// <param name="url"></param>
+    /// <param name="urls"></param>
     /// <param name="loginRequired"></param>
-    public School(string id, string name, string url, bool loginRequired)
+    public School(SchoolEnum id, string name, string[] urls, bool loginRequired)
     {
         this._id = id;
-        this._url = url;
+        this._urls = urls;
         this._loginRequired = loginRequired;
         this._name = name;
-        this._resources = new SchoolResources(this);
+        this._resources = new SchoolResources();
     }
 
     /// <summary>
@@ -84,21 +85,18 @@ public class School
     /// <para>
     /// If no value is passed for <paramref name="startDate"/> it will default to the current day.
     /// </para>
-    /// <para>
-    /// If no value is passed for <paramref name="sessionToken"/> no session token will be used when fetching the schedule. This will only function if the schedule is publicly available.
-    /// </para>
     /// </summary>
     /// <param name="scheduleIds"></param>
     /// <param name="language"></param>
-    /// <param name="sessionToken"></param>
+    /// <param name="client"></param>
     /// <param name="startDate"></param>
     /// <returns></returns>
     /// <exception cref="ParseException"></exception>
-    public async Task<Schedule> FetchSchedule(string[] scheduleIds, LangEnum? language = null, string? sessionToken = null, DateTime? startDate = null)
+    public async Task<Schedule> FetchSchedule(IKronoxRequestClient client, string[] scheduleIds, LangEnum? language = null, DateTime? startDate = null)
     {
         try
         {
-            string scheduleXmlString = await KronoxFetchController.GetSchedule(scheduleIds, Url, language, sessionToken, startDate);
+            string scheduleXmlString = await KronoxFetchController.GetSchedule(client, scheduleIds, language, startDate);
 
             XDocument scheduleXml = XDocument.Parse(scheduleXmlString);
             List<Day> scheduleDaysOfEvents = ScheduleParser.ParseToDays(scheduleXml);
@@ -123,9 +121,9 @@ public class School
     /// <param name="sessionToken"></param>
     /// <returns>The <see cref="List{Programme}"/> objects equivalent to the search results found in Kronox's database.</returns>
     /// <exception cref="LoginException"></exception>
-    public async Task<List<Programme>> SearchProgrammes(string searchQuery, string? sessionToken)
+    public async Task<List<Programme>> SearchProgrammes(IKronoxRequestClient client, string searchQuery)
     {
-        string searchResultsHtml = await KronoxFetchController.GetProgrammes(searchQuery, Url, sessionToken);
+        string searchResultsHtml = await KronoxFetchController.GetProgrammes(client, searchQuery);
         return SearchParser.ParseToProgrammes(searchResultsHtml);
     }
 
@@ -140,9 +138,9 @@ public class School
     /// </returns>
     /// <exception cref="LoginException"></exception>
     /// <exception cref="ParseException"></exception>
-    public async Task<User> Login(string username, string password)
+    public async Task<User> Login(IKronoxRequestClient client, string username, string password)
     {
-        Response.LoginResponse loginResponse = await KronoxPushController.Login(username, password, Url);
+        Response.LoginResponse loginResponse = await KronoxPushController.Login(client, username, password);
         HtmlDocument loginResponseHtmlDocument = new();
         loginResponseHtmlDocument.LoadHtml(loginResponse.htmlResult);
 
@@ -159,12 +157,9 @@ public class School
     /// <exception cref="LoginException"></exception>
     /// <exception cref="HttpRequestException"></exception>
     /// <exception cref="TaskCanceledException"</exception>
-    public async Task<Dictionary<string, List<UserEvent>>> GetUserEvents(string sessionToken)
+    public async Task<Dictionary<string, List<UserEvent>>> GetUserEvents(IKronoxRequestClient client)
     {
-        if (sessionToken == null)
-            throw new NullReferenceException("SessionToken was null when attempting to fetch user info. Make sure the user is logged in and that the sessionToken is not expired.");
-
-        string userEventsHtmlResult = await KronoxFetchController.GetUserEvents(this.Url, sessionToken);
+        string userEventsHtmlResult = await KronoxFetchController.GetUserEvents(client);
         HtmlDocument userEventHtmlDoc = new();
         userEventHtmlDoc.LoadHtml(userEventsHtmlResult);
 

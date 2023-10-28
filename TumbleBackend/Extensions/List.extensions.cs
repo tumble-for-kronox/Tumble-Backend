@@ -31,7 +31,7 @@ public static class ListExtensions
 
     public static List<Programme> FilterWorkingProgrammeLinks(this List<Programme> programmes, School school, string? sessionToken)
     {
-        bool[] programmeAvailability = Task.WhenAll(programmes.Select(programme => programme.ScheduleAvailable(school, sessionToken))).Result;
+        bool[] programmeAvailability = Task.WhenAll(programmes.Select(programme => programme.ScheduleAvailable(school.Urls[0], sessionToken))).Result;
 
         return programmes.Where((programme, i) => programmeAvailability[i]).ToList();
     }

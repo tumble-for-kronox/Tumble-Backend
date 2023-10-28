@@ -1,69 +1,66 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
-using KronoxAPI.Exceptions;
-using KronoxAPI.Model.Booking;
-using KronoxAPI.Model.Scheduling;
-using System.Security.AccessControl;
+﻿using KronoxAPI.Exceptions;
+using KronoxAPI.Utilities;
+using System.Web;
+using TumbleHttpClient;
 
 namespace KronoxAPI.Controller;
 
 public static class BookingController
 {
-    static readonly HttpClientHandler clientHandler;
-    static readonly HttpClient client;
+    static readonly MultiRequest client;
 
     static BookingController()
     {
-        clientHandler = new HttpClientHandler();
-        client = new HttpClient(clientHandler);
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36");
+        client = new MultiRequest();
     }
 
-    public static async Task<string> GetResources(string schoolUrl, string sessionToken)
+    public static async Task<string> GetResources(IKronoxRequestClient client)
     {
-        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        await KronoxEnglishSession.SetSessionEnglish(client);
 
-        Uri uri = new($"https://{schoolUrl}/resursbokning.jsp");
+        string endpoint = "resursbokning.jsp";
 
-        // Perform web request
-        using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
-        request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
+        HttpRequestMessage request = new(new HttpMethod("GET"), endpoint);
         HttpResponseMessage response = await client.SendAsync(request);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadAsStringAsync();
     }
 
-    public static async Task<string> GetPersonalBookingsForResource(string schoolUrl, string resourceId, string sessionToken)
+    public static async Task<string> GetPersonalBookingsForResource(IKronoxRequestClient client, string resourceId)
     {
-        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        await KronoxEnglishSession.SetSessionEnglish(client);
 
         DateTime date = DateTime.Now;
+        string endpoint = "minaresursbokningar.jsp";
 
-        Uri uri = new($"https://{schoolUrl}/minaresursbokningar.jsp?datum={date:yy-MM-dd}&flik={resourceId}");
+        var query = HttpUtility.ParseQueryString("");
+        query["datum"] = $"{date:yy-MM-dd}";
+        query["flik"] = resourceId;
 
-        // Perform web request
-        using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
-        request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
+        string fullPath = $"{endpoint}?{query}";
+
+        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
         HttpResponseMessage response = await client.SendAsync(request);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadAsStringAsync();
     }
 
-    public static async Task<string> GetResourceAvailability(string schoolUrl, DateTime date, string resourceId, string sessionToken)
+    public static async Task<string> GetResourceAvailability(IKronoxRequestClient client, DateTime date, string resourceId)
     {
-        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        await KronoxEnglishSession.SetSessionEnglish(client);
 
-        Uri uri = new($"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=hamtaBokningar&datum={date:yy-MM-dd}&flik={resourceId}");
+        string endpoint = "ajax/ajax_resursbokning.jsp";
 
-        // Perform web request
-        using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
-        request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
+        var query = HttpUtility.ParseQueryString("");
+        query["op"] = "hamtaBokningar";
+        query["datum"] = $"{date:yy-MM-dd}";
+        query["flik"] = resourceId;
+
+        string fullPath = $"{endpoint}?{query}";
+
+        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
         HttpResponseMessage response = await client.SendAsync(request);
         response.EnsureSuccessStatusCode();
 
@@ -85,21 +82,31 @@ public static class BookingController
     /// <exception cref="BookingCollisionException"></exception>
     /// <exception cref="MaxBookingsException"></exception>
     /// <exception cref="ParseException"></exception>
-    public static async Task BookResourceLocation(string schoolUrl, DateTime date, string resourceId, string sessionToken, string locationId, string timeSlotId, string resourceType)
+    public static async Task BookResourceLocation(IKronoxRequestClient client, DateTime date, string resourceId, string locationId, string timeSlotId, string resourceType)
     {
-        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        await KronoxEnglishSession.SetSessionEnglish(client);
 
-        Uri uri = new($"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=boka&datum={date:yy-MM-dd}&flik={resourceId}&id={locationId}&typ={resourceType}&intervall={timeSlotId}&moment=Booked via Tumble");
+        string endpoint = "ajax/ajax_resursbokning.jsp";
 
-        using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
-        request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
+        var query = HttpUtility.ParseQueryString("");
+        query["op"] = "boka";
+        query["datum"] = $"{date:yy-MM-dd}";
+        query["flik"] = resourceId;
+        query["id"] = locationId;
+        query["typ"] = resourceType;
+        query["intervall"] = timeSlotId;
+        query["moment"] = "Booked via Tumble";
+
+        string fullPath = $"{endpoint}?{query}";
+
+        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
         HttpResponseMessage response = await client.SendAsync(request);
 
         string responseBody = await response.Content.ReadAsStringAsync();
         if (responseBody != "OK")
         {
             Console.WriteLine(responseBody);
-            if (responseBody == "Din användare har inte rättigheter att skapa resursbokningar.")
+            if (responseBody == "Your user do not have permissions to book resources.")
             {
                 throw new LoginException("Kronox failed to authorize the user credentials.");
             }
@@ -114,7 +121,7 @@ public static class BookingController
                 throw new MaxBookingsException("");
             }
 
-            throw new ParseException($"Something went wrong while parsing or handling the requset to book a resource. Resource details:\n\nschoolUrl: {schoolUrl}\ndate: {date:dd-MM-yy}\nresourceId: {resourceId}\nlocationId: {locationId}\nresourceType: {resourceType}\ntimeSlotId: {timeSlotId}");
+            throw new ParseException($"Something went wrong while parsing or handling the requset to book a resource. Resource details:\n\nschoolUrl: {client.BaseUrl}\ndate: {date:dd-MM-yy}\nresourceId: {resourceId}\nlocationId: {locationId}\nresourceType: {resourceType}\ntimeSlotId: {timeSlotId}");
         }
     }
 
@@ -128,14 +135,19 @@ public static class BookingController
     /// <exception cref="LoginException"></exception>
     /// <exception cref="BookingCollisionException"></exception>
     /// <exception cref="ParseException"></exception>
-    public static async Task UnbookResourceLocation(string schoolUrl, string sessionToken, string bookingId)
+    public static async Task UnbookResourceLocation(IKronoxRequestClient client, string bookingId)
     {
-        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        await KronoxEnglishSession.SetSessionEnglish(client);
 
-        Uri uri = new($"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=avboka&bokningsId={bookingId}");
+        string endpoint = "ajax/ajax_resursbokning.jsp";
 
-        using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
-        request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
+        var query = HttpUtility.ParseQueryString("");
+        query["op"] = "avboka";
+        query["bokningsId"] = bookingId;
+
+        string fullPath = $"{endpoint}?{query}";
+
+        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
         HttpResponseMessage response = await client.SendAsync(request);
 
         string responseBody = await response.Content.ReadAsStringAsync();
@@ -148,21 +160,27 @@ public static class BookingController
 
             if (responseBody == "Du kan inte radera resursbokningar där du inte är bokare eller deltagare")
             {
-                throw new BookingCollisionException($"Couldn't unbook resource. Resource details:\n\nschoolUrl: {schoolUrl}\nbookingId: {bookingId}");
+                throw new BookingCollisionException($"Couldn't unbook resource. Resource details:\n\nschoolUrl: {client.BaseUrl}\nbookingId: {bookingId}");
             }
 
-            throw new ParseException($"Something went wrong while parsing or handling the requset to unbook a resource. Resource details:\n\nschoolUrl: {schoolUrl}\nbookingId: {bookingId}");
+            throw new ParseException($"Something went wrong while parsing or handling the requset to unbook a resource. Resource details:\n\nschoolUrl: {client.BaseUrl}\nbookingId: {bookingId}");
         }
     }
 
-    public static async Task ConfirmResourceBooking(string schoolUrl, string sessionToken, string bookingId, string resourceId)
+    public static async Task ConfirmResourceBooking(IKronoxRequestClient client, string bookingId, string resourceId)
     {
-        await KronoxEnglishSession.SetSessionEnglish(schoolUrl, sessionToken);
+        await KronoxEnglishSession.SetSessionEnglish(client);
 
-        Uri uri = new($"https://{schoolUrl}/ajax/ajax_resursbokning.jsp?op=konfirmera&flik={resourceId}&bokningsId={bookingId}");
+        string endpoint = "ajax/ajax_resursbokning.jsp";
 
-        using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
-        request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
+        var query = HttpUtility.ParseQueryString("");
+        query["op"] = "konfirmera";
+        query["flik"] = resourceId;
+        query["bokningsId"] = bookingId;
+
+        string fullPath = $"{endpoint}?{query}";
+
+        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
         HttpResponseMessage response = await client.SendAsync(request);
 
         response.EnsureSuccessStatusCode();

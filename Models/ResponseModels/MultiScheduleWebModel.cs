@@ -35,7 +35,7 @@ public class MultiScheduleWebModel
             newDays.Add(new(currDay.Name, currDay.Date, currDay.IsoString, currDay.WeekNumber, uniqueEventList));
         }
 
-        return new(Ids, CachedAt, newDays);
+        return new(Ids.Concat(schedule.Ids).ToArray(), CachedAt, newDays);
     }
 
     public List<EventWebModel> GetEvents()

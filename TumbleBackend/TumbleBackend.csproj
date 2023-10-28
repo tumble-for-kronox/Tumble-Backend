@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.SimpleEmailV2" Version="3.7.1.123" />
+    <PackageReference Include="DotNext" Version="4.14.0" />
     <PackageReference Include="FirebaseAdmin" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Cors" Version="5.2.9" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
@@ -25,8 +26,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DatabaseAPI\DatabaseAPI.csproj" />
+    <ProjectReference Include="..\HttpClient\TumbleHttpClient.csproj" />
     <ProjectReference Include="..\KronoxAPI\KronoxAPI.csproj" />
     <ProjectReference Include="..\Models\WebAPIModels.csproj" />
+    <ProjectReference Include="..\Utilities\Utilities.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TumbleHttpClient;
 
 namespace KronoxAPI.Model.Booking;
 
@@ -42,14 +43,14 @@ public class Resource
     /// <param name="date"></param>
     /// <returns></returns>
     /// <exception cref="ResourceInavailableException"></exception>
-    public async Task<Resource> FetchData(string schoolUrl, string sessionToken, DateTime? date = null)
+    public async Task<Resource> FetchData(IKronoxRequestClient client, DateTime? date = null)
     {
         date ??= DateTime.Now;
 
         if (date!.Value.DayOfWeek == DayOfWeek.Saturday || date!.Value.DayOfWeek == DayOfWeek.Sunday)
             throw new ResourceInavailableException("The resource you are attempting to access are not available on Saturdays and Sundays");
 
-        string resourceAvailabilityHtml = await BookingController.GetResourceAvailability(schoolUrl, date.Value, Id, sessionToken);
+        string resourceAvailabilityHtml = await BookingController.GetResourceAvailability(client, date.Value, Id);
 
         HtmlDocument doc = new();
         doc.LoadHtml(resourceAvailabilityHtml);

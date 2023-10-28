@@ -1,29 +1,14 @@
 ﻿using KronoxAPI.Model.Response;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Web;
-using System.Net.Http.Headers;
-using System.Collections.Specialized;
-using System.Text;
-using System.Threading.Tasks;
-using KronoxAPI.Model.Schools;
+using TumbleHttpClient;
+using KronoxAPI.Extensions;
+using KronoxAPI.Exceptions;
 
 namespace KronoxAPI.Controller;
 
 public static class KronoxPushController
 {
-    static readonly HttpClient client;
-    static readonly HttpClientHandler clientHandler;
-
-    static KronoxPushController()
-    {
-        clientHandler = new HttpClientHandler();
-        client = new HttpClient(clientHandler);
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36");
-    }
-
     /// <summary>
     /// Login a user, using the <paramref name="username"/> and <paramref name="password"/> supplied.
     /// </summary>
@@ -31,28 +16,21 @@ public static class KronoxPushController
     /// <param name="password"></param>
     /// <param name="schoolUrl"></param>
     /// <returns><see cref="string"/> containing the login session token.</returns>
-    public static async Task<LoginResponse> Login(string username, string password, string schoolUrl)
+    public static async Task<LoginResponse> Login(IKronoxRequestClient client, string username, string password)
     {
-        Uri uri = new($"https://{schoolUrl}/login_do.jsp");
+        string endpoint = "login_do.jsp";
+        HttpRequestMessage req = new(new("POST"), endpoint)
+        {
+            Content = new StringContent($"username={WebUtility.UrlEncode(username)}&password={WebUtility.UrlEncode(password)}")
+        };
+        req.Content.Headers.ContentType = new("application/x-www-form-urlencoded");
 
-        // Perform web request
-        using HttpRequestMessage request = new(new HttpMethod("POST"), uri);
-        request.Content = new StringContent($"username={WebUtility.UrlEncode(username)}&password={WebUtility.UrlEncode(password)}");
-        request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
-        HttpResponseMessage response = await client.SendAsync(request);
+        HttpResponseMessage response = await client.SendAsync(req);
 
         // Handle response, making sure it's good and preparing to strip session cookie
         response.EnsureSuccessStatusCode();
-        string sessionToken = string.Empty;
 
-        // Fetch cookies as iterable from CookieContainer
-        IEnumerable<Cookie> responseCookies = clientHandler.CookieContainer.GetCookies(uri).Cast<Cookie>();
-        foreach (Cookie cookie in responseCookies)
-        {
-            if (cookie.Name == "JSESSIONID") sessionToken = cookie.Value;
-            // Make sure all the current cookies are expired, so there's no bleed between http requests on the same client
-            cookie.Expired = true;
-        }
+        string? sessionToken = (client.CookieContainer.GetCookie(client.BaseUrl!, "JSESSIONID")?.Value) ?? throw new LoginException($"No session token was found after logging in, failed to log in {username}.");
 
         // Return the relevant cookie value (login session token)
         return new LoginResponse(sessionToken, await response.Content.ReadAsStringAsync());
@@ -64,18 +42,18 @@ public static class KronoxPushController
     /// <param name="school"></param>
     /// <param name="userEventId"></param>
 
-    public static async Task<bool> UserEventRegister(School school, string sessionToken, string userEventId)
+    public static async Task<bool> UserEventRegister(IKronoxRequestClient client, string userEventId)
     {
-        Uri uri = new($"https://{school.Url}/ajax/ajax_aktivitetsanmalan.jsp");
+        string endpoint = "ajax/ajax_aktivitetsanmalan.jsp";
 
-        // Add query parameters needed for the request.
-        NameValueCollection query = HttpUtility.ParseQueryString(string.Empty);
+        var query = HttpUtility.ParseQueryString("");
         query["op"] = "anmal";
         query["aktivitetsTillfallesId"] = userEventId;
         query["ort"] = "";
 
-        // Perform web request
-        HttpRequestMessage request = BuildGetRequestWithQueryParams(uri, query.ToString(), sessionToken);
+        string fullPath = $"{endpoint}?{query}";
+
+        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
         HttpResponseMessage response = await client.SendAsync(request);
 
         if (response.StatusCode != HttpStatusCode.OK) return false;
@@ -90,17 +68,17 @@ public static class KronoxPushController
     /// <param name="sessionToken"></param>
     /// <param name="userEventId"></param>
     /// <returns>A bool showing whether the information was correctly pushed to the backend.</returns>
-    public static async Task<bool> UserEventUnregister(School school, string sessionToken, string userEventId)
+    public static async Task<bool> UserEventUnregister(IKronoxRequestClient client, string userEventId)
     {
-        Uri uri = new($"https://{school.Url}/ajax/ajax_aktivitetsanmalan.jsp");
+        string endpoint = "ajax/ajax_aktivitetsanmalan.jsp";
 
-        // Add query parameters needed for the request.
-        NameValueCollection query = HttpUtility.ParseQueryString(string.Empty);
+        var query = HttpUtility.ParseQueryString("");
         query["op"] = "avanmal";
         query["deltagarMojlighetsId"] = userEventId;
 
-        // Perform web request
-        HttpRequestMessage request = BuildGetRequestWithQueryParams(uri, query.ToString(), sessionToken);
+        string fullPath = $"{endpoint}?{query}";
+
+        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
         HttpResponseMessage response = await client.SendAsync(request);
 
         if (response.StatusCode != HttpStatusCode.OK) return false;
@@ -116,18 +94,18 @@ public static class KronoxPushController
     /// <param name="participatorId"></param>
     /// <param name="supportId"></param>
     /// <returns>A bool showing whether the information was correctly pushed to the backend.</returns>
-    public static async Task<bool> UserEventAddSupport(School school, string sessionToken, string participatorId, string supportId)
+    public static async Task<bool> UserEventAddSupport(KronoxRequestClient client, string participatorId, string supportId)
     {
-        Uri uri = new($"https://{school.Url}/ajax/ajax_aktivitetsanmalan.jsp");
+        string endpoint = "ajax/ajax_aktivitetsanmalan.jsp";
 
-        // Add query parameters needed for the request.
-        NameValueCollection query = HttpUtility.ParseQueryString(string.Empty);
+        var query = HttpUtility.ParseQueryString("");
         query["op"] = "laggTillStod";
         query["stodId"] = supportId;
         query["deltagarId"] = participatorId;
 
-        // Perform web request
-        HttpRequestMessage request = BuildGetRequestWithQueryParams(uri, query.ToString(), sessionToken);
+        string fullPath = $"{endpoint}?{query}";
+
+        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
         HttpResponseMessage response = await client.SendAsync(request);
 
         if (response.StatusCode != HttpStatusCode.OK) return false;
@@ -144,37 +122,23 @@ public static class KronoxPushController
     /// <param name="participatorId"></param>
     /// <param name="supportId"></param>
     /// <returns>A bool showing whether the information was correctly pushed to the backend.</returns>
-    public static async Task<bool> UserEventRemoveSupport(School school, string sessionToken, string userEventId, string participatorId, string supportId)
+    public static async Task<bool> UserEventRemoveSupport(KronoxRequestClient client, string userEventId, string participatorId, string supportId)
     {
-        Uri uri = new($"https://{school.Url}/ajax/ajax_aktivitetsanmalan.jsp");
+        string endpoint = "ajax/ajax_aktivitetsanmalan.jsp";
 
-        // Add query parameters needed for the request.
-        NameValueCollection query = HttpUtility.ParseQueryString(string.Empty);
+        var query = HttpUtility.ParseQueryString("");
         query["op"] = "tabortStod";
         query["aktivitetsTillfallesId"] = userEventId;
         query["stodId"] = supportId;
         query["deltagarId"] = participatorId;
 
-        // Perform web request
-        HttpRequestMessage request = BuildGetRequestWithQueryParams(uri, query.ToString(), sessionToken);
+        string fullPath = $"{endpoint}?{query}";
+
+        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
         HttpResponseMessage response = await client.SendAsync(request);
 
         if (response.StatusCode != HttpStatusCode.OK) return false;
 
         return true;
-    }
-
-    /// <summary>
-    /// Helper method for combining URI with query params and building a HTTP GET request with them. Also adds the sessionToken cookie header.
-    /// </summary>
-    /// <param name="uri"></param>
-    /// <param name="queryParams"></param>
-    /// <param name="sessionToken"></param>
-    /// <returns></returns>
-    private static HttpRequestMessage BuildGetRequestWithQueryParams(Uri uri, string queryParams, string sessionToken)
-    {
-        HttpRequestMessage request = new(new HttpMethod("GET"), uri + "?" + queryParams);
-        request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
-        return request;
     }
 }

@@ -8,6 +8,7 @@ using TumbleBackend.Extensions;
 using TumbleBackend.InternalModels;
 using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
+using TumbleHttpClient;
 using WebAPIModels.RequestModels;
 using WebAPIModels.ResponseModels;
 
@@ -26,6 +27,14 @@ public class AuthActionFilter : ActionFilterAttribute
 
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        bool hasAuthHeader = context.HttpContext.Request.Headers.TryGetValue("X-auth-token", out refreshToken);
+
+        if (!hasAuthHeader)
+        {
+            await next();
+            return;
+        }
+
         bool foundSchoolId = context.HttpContext.Request.Query.TryGetValue("schoolId", out schoolIdQuery);
 
         if (!foundSchoolId)
@@ -35,14 +44,6 @@ public class AuthActionFilter : ActionFilterAttribute
         }
 
         SchoolEnum schoolId = (SchoolEnum)int.Parse(schoolIdQuery);
-
-        bool hasAuthHeader = context.HttpContext.Request.Headers.TryGetValue("X-auth-token", out refreshToken);
-
-        if (!hasAuthHeader)
-        {
-            await next();
-            return;
-        }
 
         School? school = schoolId.GetSchool();
 
@@ -68,10 +69,14 @@ public class AuthActionFilter : ActionFilterAttribute
 
         try
         {
-            User kronoxUser = await school.Login(creds.Username, creds.Password);
+            KronoxRequestClient requestClient = (KronoxRequestClient)context.HttpContext.Items["kronoxReqClient"]!;
+
+            User kronoxUser = await school.Login(requestClient, creds.Username, creds.Password);
 
             //string updatedExpirationDateRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), creds.Username, creds.Password);
-            context.HttpContext.Request.Headers.Add("sessionToken", kronoxUser.SessionToken);
+
+            requestClient.SetSessionToken(kronoxUser.SessionToken);
+            context.HttpContext.Items["kronoxReqClient"] = requestClient;
         }
         catch (LoginException e)
         {

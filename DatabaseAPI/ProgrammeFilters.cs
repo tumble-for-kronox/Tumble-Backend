@@ -1,4 +1,5 @@
-﻿using KronoxAPI.Model.Schools;
+﻿using KronoxAPI.Extensions;
+using KronoxAPI.Model.Schools;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ public static class ProgrammeFilters
     {
         if (Connector.ProgrammeFilters == null) throw new Exceptions.DatabaseUninitializedException("The database/collection is not initialized. Run .Init() on the Connector before attempting to access the database.");
 
-        List<SchoolProgrammeFilter> cursor = await Connector.ProgrammeFilters.Find(Builders<SchoolProgrammeFilter>.Filter.Eq("_id", school.Id)).ToListAsync();
+        List<SchoolProgrammeFilter> cursor = await Connector.ProgrammeFilters.Find(Builders<SchoolProgrammeFilter>.Filter.Eq("_id", school.Id.ToStringId())).ToListAsync();
 
         if (cursor.Any())
             return cursor.First().Filter.ToHashSet();
