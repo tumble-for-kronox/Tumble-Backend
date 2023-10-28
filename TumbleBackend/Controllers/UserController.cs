@@ -9,6 +9,7 @@ using TumbleBackend.Utilities;
 using WebAPIModels.Extensions;
 using TumbleBackend.InternalModels;
 using TumbleBackend.StringConstants;
+using TumbleBackend.ActionFilters;
 using Microsoft.AspNetCore.Cors;
 using TumbleHttpClient;
 
@@ -16,6 +17,7 @@ namespace TumbleBackend.Controllers;
 
 [EnableCors("CorsPolicy")]
 [ApiController]
+[KronoxUrlFilter]
 [Route("users")]
 [Route("api/users")]
 public class UserController : ControllerBase

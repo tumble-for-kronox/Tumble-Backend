@@ -13,6 +13,7 @@ namespace TumbleBackend.Controllers;
 
 [EnableCors("CorsPolicy")]
 [ApiController]
+[KronoxUrlFilter]
 [ServiceFilter(typeof(AuthActionFilter))]
 [SessionTokenActionFilter]
 [Route("resources")]

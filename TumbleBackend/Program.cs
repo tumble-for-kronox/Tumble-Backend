@@ -57,10 +57,10 @@ builder.Services.AddSpaStaticFiles(config =>
     config.RootPath = "wwwroot";
 });
 
-builder.Services.AddMvc(opts =>
-{
-    opts.Filters.Add(new KronoxUrlFilter());
-});
+//builder.Services.AddMvc(opts =>
+//{
+//    opts.Filters.Add(new KronoxUrlFilter());
+//});
 
 var app = builder.Build();
 

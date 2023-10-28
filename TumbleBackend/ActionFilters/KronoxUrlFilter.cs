@@ -12,6 +12,8 @@ namespace TumbleBackend.ActionFilters
 {
     public class KronoxUrlFilter : ActionFilterAttribute
     {
+        readonly string multiSchedulePath = "/api/schedules/multi";
+
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var request = context.HttpContext.Request;
@@ -20,14 +22,14 @@ namespace TumbleBackend.ActionFilters
 
             bool foundSchoolId = request.Query.TryGetValue("schoolId", out var schoolIdQuery);
 
-            if (!foundSchoolId && request.Path != "/api/schedules/multi")
+            if (!foundSchoolId && request.Path != multiSchedulePath)
             {
                 context.Result = new BadRequestObjectResult(new Error("Requires schoolId query parameter."));
                 return;
             }
 
             List<SchoolEnum> schoolIds = new();
-            if (request.Path == "/api/schedules/multi")
+            if (request.Path == multiSchedulePath)
             {
                 MultiSchoolSchedules[] multiSchoolSchedules = (context.ActionArguments["schoolSchedules"] as MultiSchoolSchedules[])!;
                 schoolIds = multiSchoolSchedules.Select(multiSchoolSchedule => multiSchoolSchedule.SchoolId).ToList();
@@ -47,14 +49,6 @@ namespace TumbleBackend.ActionFilters
             try
             {
                 Pair<SchoolEnum, Uri>[] workingUrls = await Task.WhenAll(schools.Select(async school => new Pair<SchoolEnum, Uri>(school!.Id, await pinger.Ping(school.Urls))));
-                //Pair<SchoolEnum, KronoxRequestClient>[] requestClients = {};
-                //foreach (var keyValue in workingUrls)
-                //{
-                //    KronoxRequestClient client = context.HttpContext.RequestServices.GetService<KronoxRequestClient>()!;
-                //    client.SetBaseAddress(keyValue.Value);
-
-                //    requestClients = requestClients.Append(new Pair<SchoolEnum, KronoxRequestClient>(keyValue.Key, client)).ToArray();
-                //}
 
                 Pair<SchoolEnum, KronoxRequestClient>[] requestClients = workingUrls.Select(keyValue =>
                 {
