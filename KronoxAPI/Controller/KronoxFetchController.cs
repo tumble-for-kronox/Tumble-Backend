@@ -26,6 +26,7 @@ public static class KronoxFetchController
     {
         string parsedDate = startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : "idag";
         LangEnum parsedLang = language ?? LangEnum.Sv;
+        string endpoint = "setup/jsp/SchemaXML.jsp";
 
         var query = HttpUtility.ParseQueryString("");
         query["startDatum"] = parsedDate;
