@@ -19,7 +19,7 @@ public static class KronoxFetchController
 
     static KronoxFetchController()
     {
-        HttpClientHandler clientHandler = new HttpClientHandler();
+        HttpClientHandler clientHandler = new();
         client = new HttpClient(clientHandler);
         client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36");
     }
@@ -39,7 +39,7 @@ public static class KronoxFetchController
     public static async Task<string> GetSchedule(string[] scheduleId, string schoolUrl, LangEnum? language, string? sessionToken, DateTime? startDate)
     {
         string parsedDate = startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : "idag";
-        LangEnum parsedLang = language == null ? LangEnum.Sv : language;
+        LangEnum parsedLang = language ?? LangEnum.Sv;
 
         string uri = $"https://{schoolUrl}/setup/jsp/SchemaXML.jsp?startDatum={parsedDate}&intervallTyp=m&intervallAntal=6&sprak={parsedLang}&sokMedAND=true&forklaringar=true&resurser={string.Join(',', scheduleId)}";
 
@@ -66,9 +66,10 @@ public static class KronoxFetchController
     public static async Task<string> GetProgrammes(string searchQuery, string schoolUrl, string? sessionToken)
     {
         Uri uri = new($"https://{schoolUrl}/ajax/ajax_sokResurser.jsp?sokord={searchQuery}&startDatum=idag&slutDatum=&intervallTyp=m&intervallAntal=6");
-        // Perform web request
+
         using var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
         if (sessionToken != null) request.Headers.Add("Cookie", $"JSESSIONID={sessionToken}");
+
         HttpResponseMessage response = await client.SendAsync(request);
         string content = await response.Content.ReadAsStringAsync();
         return content;
