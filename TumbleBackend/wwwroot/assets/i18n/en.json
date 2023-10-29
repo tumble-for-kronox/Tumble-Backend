@@ -9,7 +9,7 @@
         "search-bar": {
             "placeholder": "Search for schedules",
             "no-school-search-help-title": "Looks like you haven't chosen a school yet!",
-            "no-school-search-help-body": "Choose your college to the left of the search bar",
+            "no-school-search-help-body": "Choose your college to the right",
             "search-help": "Search using a programme, teacher, or course code. You can even search by classroom!",
             "results": "{{count}} results"
         }
@@ -18,6 +18,10 @@
         "bookmarks": {
             "title": "Bookmarks",
             "no-bookmarks": "You have no bookmarked schedules"
+        },
+        "temp": {
+            "title": "Open Schedules",
+            "reset-btn": "Close all"
         }
     },
     "login": {
@@ -31,7 +35,10 @@
         "password-placeholder": "Password"
     },
     "schedule": {
-        "reset-btn": "Reset schedule"
+        "task-bar": {
+            "schedules-count": "{count, plural, =1 {# • Schedule} other {# • Schedules}}",
+            "reset-search": "Reset search"
+        }
     },
     "errors": {
         "timeout": "Connecting to the server timed out",
