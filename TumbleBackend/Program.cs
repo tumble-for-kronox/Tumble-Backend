@@ -15,12 +15,12 @@ Trace.Listeners.Add(dbglistener);
 
 BsonClassMap.RegisterClassMap<EventWebModel>(cm =>
 {
-    cm.AutoMap();
-    cm.UnmapProperty(c => c.Id);
-    cm.MapMember(c => c.Id)
-        .SetElementName("id")
-        .SetOrder(0)
-        .SetIsRequired(true);
+	cm.AutoMap();
+	cm.UnmapProperty(c => c.Id);
+	cm.MapMember(c => c.Id)
+		.SetElementName("id")
+		.SetOrder(0)
+		.SetIsRequired(true);
 });
 
 
@@ -31,23 +31,23 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(
-      "CorsPolicy",
-      builder => builder.AllowAnyOrigin()
-      .AllowAnyMethod()
-      .AllowAnyHeader());
+	options.AddPolicy(
+	  "CorsPolicy",
+	  builder => builder.AllowAnyOrigin()
+	  .AllowAnyMethod()
+	  .AllowAnyHeader());
 });
 
 builder.Services.AddSingleton((provider) =>
 {
-    return builder.Configuration;
+	return builder.Configuration;
 });
 
 builder.Services.AddScoped<AuthActionFilter>();
 
 builder.Services.AddSpaStaticFiles(config =>
 {
-    config.RootPath = "wwwroot";
+	config.RootPath = "wwwroot";
 });
 
 builder.Services.AddSingleton<MobileMessagingClient>();
@@ -62,12 +62,13 @@ string? awsSecretKey = app.Environment.IsDevelopment() ? builder.Configuration[U
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+	app.UseSwagger();
+	app.UseSwaggerUI();
 }
 
 DatabaseAPI.Connector.Init(dbConnectionString!, app.Environment.IsDevelopment());
 EmailUtil.Init(awsAccessKey!, awsSecretKey!);
+CalendarManager.SetupCalendarSystem();
 
 app.UseCors();
 
