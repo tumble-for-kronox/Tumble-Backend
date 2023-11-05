@@ -69,14 +69,14 @@ public class AuthActionFilter : ActionFilterAttribute
 
         try
         {
-            KronoxRequestClient requestClient = (KronoxRequestClient)context.HttpContext.Items["kronoxReqClient"]!;
+            KronoxRequestClient requestClient = (KronoxRequestClient)context.HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
 
             User kronoxUser = await school.Login(requestClient, creds.Username, creds.Password);
 
             //string updatedExpirationDateRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), creds.Username, creds.Password);
 
             requestClient.SetSessionToken(kronoxUser.SessionToken);
-            context.HttpContext.Items["kronoxReqClient"] = requestClient;
+            context.HttpContext.Items[KronoxReqClientKeys.SingleClient] = requestClient;
         }
         catch (LoginException e)
         {

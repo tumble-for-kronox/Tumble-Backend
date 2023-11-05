@@ -41,7 +41,7 @@ public class ScheduleController : ControllerBase
     [HttpGet("{scheduleId}")]
     public async Task<IActionResult> GetSingleSchedule([FromServices] IConfiguration config, [FromRoute] string scheduleId, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         // Extract school instance and make sure the school entry is valid (should've failed in query, but double safety.)
         School school = schoolId.GetSchool()!;
 
@@ -109,7 +109,7 @@ public class ScheduleController : ControllerBase
     [HttpPost("nevents")]
     public async Task<IActionResult> GetEvents([FromBody] MultiSchoolSchedules[] schoolSchedules, [FromQuery] int n_events = 1, [FromQuery] string? startDateISO = null)
     {
-        IEnumerable<IPair<SchoolEnum, IKronoxRequestClient>> kronoxReqClients = (HttpContext.Items["kronoxReqClientArray"] as IEnumerable<Pair<SchoolEnum, KronoxRequestClient>>)!.CastPairs<SchoolEnum, IKronoxRequestClient>();
+        IEnumerable<IPair<SchoolEnum, IKronoxRequestClient>> kronoxReqClients = (HttpContext.Items[KronoxReqClientKeys.MultiClient] as IEnumerable<Pair<SchoolEnum, KronoxRequestClient>>)!.CastPairs<SchoolEnum, IKronoxRequestClient>();
         MultiScheduleWebModel finalSchedule;
 
         try
@@ -149,7 +149,7 @@ public class ScheduleController : ControllerBase
     [HttpPost("multi")]
     public async Task<IActionResult> GetMulti([FromBody] MultiSchoolSchedules[] schoolSchedules, [FromQuery] string? startDateISO = null)
     {
-        IEnumerable<IPair<SchoolEnum, IKronoxRequestClient>> kronoxReqClients = (HttpContext.Items["kronoxReqClientArray"] as IEnumerable<Pair<SchoolEnum, KronoxRequestClient>>)!.CastPairs<SchoolEnum, IKronoxRequestClient>();
+        IEnumerable<IPair<SchoolEnum, IKronoxRequestClient>> kronoxReqClients = (HttpContext.Items[KronoxReqClientKeys.MultiClient] as IEnumerable<Pair<SchoolEnum, KronoxRequestClient>>)!.CastPairs<SchoolEnum, IKronoxRequestClient>();
         try
         {
             if (startDateISO != null && DateTime.TryParse(startDateISO, out var startDate))
@@ -187,7 +187,7 @@ public class ScheduleController : ControllerBase
     [ServiceFilter(typeof(AuthActionFilter))]
     public async Task<IActionResult> Search([FromQuery] string searchQuery, [FromQuery] SchoolEnum? schoolId = null)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School? school = schoolId?.GetSchool();
 
         if (school == null)

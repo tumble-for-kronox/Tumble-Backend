@@ -1,6 +1,7 @@
 ﻿using KronoxAPI.Model.Schools;
 using KronoxAPI.Model.Users;
 using Microsoft.AspNetCore.Mvc.Filters;
+using TumbleBackend.StringConstants;
 using TumbleHttpClient;
 
 namespace TumbleBackend.ActionFilters;
@@ -16,9 +17,9 @@ public class SessionTokenActionFilter : ActionFilterAttribute
             return;
         }
 
-        KronoxRequestClient requestClient = (KronoxRequestClient)context.ActionArguments["kronoxReqClient"]!;
+        KronoxRequestClient requestClient = (KronoxRequestClient)context.HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         requestClient.SetSessionToken(sessionToken);
-        context.ActionArguments["kronoxReqClient"] = requestClient;
+        context.ActionArguments[KronoxReqClientKeys.SingleClient] = requestClient;
 
         base.OnActionExecuting(context);
     }

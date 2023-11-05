@@ -7,6 +7,7 @@ using TumbleHttpClient;
 using WebAPIModels.RequestModels;
 using WebAPIModels.ResponseModels;
 using Utilities.Pair;
+using TumbleBackend.StringConstants;
 
 namespace TumbleBackend.ActionFilters
 {
@@ -59,9 +60,9 @@ namespace TumbleBackend.ActionFilters
                 }).ToArray();
 
                 if (requestClients.Length == 1)
-                    context.HttpContext.Items.Add("kronoxReqClient", requestClients[0].Value);
+                    context.HttpContext.Items.Add(KronoxReqClientKeys.SingleClient, requestClients[0].Value);
 
-                context.HttpContext.Items.Add("kronoxReqClientArray", requestClients.AsEnumerable());
+                context.HttpContext.Items.Add(KronoxReqClientKeys.MultiClient, requestClients.AsEnumerable());
             } catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException)
             {
                 context.Result = new ObjectResult(StatusCodes.Status500InternalServerError);

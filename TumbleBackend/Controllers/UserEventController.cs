@@ -9,6 +9,7 @@ using KronoxAPI.Exceptions;
 using TumbleBackend.ActionFilters;
 using Microsoft.AspNetCore.Cors;
 using TumbleHttpClient;
+using TumbleBackend.StringConstants;
 
 namespace TumbleBackend.Controllers;
 
@@ -31,7 +32,7 @@ public class UserEventController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllUserEvents([FromQuery] SchoolEnum schoolId)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
 
         if (!kronoxReqClient.IsAuthenticated)
@@ -71,7 +72,7 @@ public class UserEventController : ControllerBase
     [HttpPut("register/all")]
     public async Task<IActionResult> RegisterAllAvailableResults([FromQuery] SchoolEnum schoolId)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
 
         if (!kronoxReqClient.IsAuthenticated)
@@ -125,7 +126,7 @@ public class UserEventController : ControllerBase
     [HttpPut("register/{eventId}")]
     public async Task<IActionResult> RegisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
 
         if (!kronoxReqClient.IsAuthenticated)
@@ -176,7 +177,7 @@ public class UserEventController : ControllerBase
     [HttpPut("unregister/{eventId}")]
     public async Task<IActionResult> UnregisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
 
         if (!kronoxReqClient.IsAuthenticated)

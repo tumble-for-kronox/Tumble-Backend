@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using TumbleBackend.ActionFilters;
 using TumbleBackend.Extensions;
+using TumbleBackend.StringConstants;
 using TumbleHttpClient;
 using WebAPIModels.RequestModels;
 using WebAPIModels.ResponseModels;
@@ -30,7 +31,7 @@ public class BookingController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<Resource>>> GetResources([FromQuery] SchoolEnum schoolId)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
 
         if (!kronoxReqClient.IsAuthenticated)
@@ -55,7 +56,7 @@ public class BookingController : ControllerBase
     [HttpGet("all")]
     public async Task<ActionResult<List<Resource>>> GetAllResourcesAndAvailabilities([FromQuery] SchoolEnum schoolId, [FromQuery] DateTime date)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
 
         if (!kronoxReqClient.IsAuthenticated)
@@ -89,7 +90,7 @@ public class BookingController : ControllerBase
     [HttpGet("userbookings")]
     public async Task<ActionResult<List<Booking>>> GetUserBookings([FromQuery] SchoolEnum schoolId)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
 
         if (!kronoxReqClient.IsAuthenticated)
@@ -115,7 +116,7 @@ public class BookingController : ControllerBase
     [HttpGet("{resourceId}")]
     public async Task<ActionResult<Resource>> GetAvailabilities([FromQuery] SchoolEnum schoolId, [FromRoute] string resourceId, [FromQuery] DateTime date)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
 
         if (!kronoxReqClient.IsAuthenticated)
@@ -147,7 +148,7 @@ public class BookingController : ControllerBase
     [HttpPut("book")]
     public async Task<ActionResult<Booking>> BookResource([FromQuery] SchoolEnum schoolId, [FromBody] BookingRequest bookingRequest)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
 
         if (!kronoxReqClient.IsAuthenticated)
@@ -198,7 +199,7 @@ public class BookingController : ControllerBase
     [HttpPut("unbook")]
     public async Task<ActionResult> UnbookResource([FromQuery] SchoolEnum schoolId, [FromQuery] string bookingId)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
 
         if (!kronoxReqClient.IsAuthenticated)
@@ -230,7 +231,7 @@ public class BookingController : ControllerBase
     [HttpPut("confirm")]
     public async Task<ActionResult> ConfirmResourceBooking([FromQuery] SchoolEnum schoolId, [FromBody] ConfirmBookingRequest data)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
 
         if (!kronoxReqClient.IsAuthenticated)

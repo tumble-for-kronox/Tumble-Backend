@@ -32,7 +32,7 @@ public class UserController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetKronoxUser([FromServices] IConfiguration configuration, [FromQuery] SchoolEnum schoolId, [FromHeader(Name = "X-auth-token")] string refreshToken)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
 
         string? jwtEncKey = configuration[UserSecrets.JwtEncryptionKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtEncryptionKey);
@@ -69,7 +69,7 @@ public class UserController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> LoginKronoxUser([FromServices] IConfiguration configuration, [FromQuery] SchoolEnum schoolId, [FromBody] LoginRequest body)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
 
         try
@@ -101,7 +101,7 @@ public class UserController : ControllerBase
     [HttpGet("refresh")]
     public async Task<IActionResult> RefreshKronoxUser([FromServices] IConfiguration configuration, [FromQuery] SchoolEnum schoolId, [FromHeader] string authorization)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items["kronoxReqClient"]!;
+        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
 
         string? jwtEncKey = configuration[UserSecrets.JwtEncryptionKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtEncryptionKey);
