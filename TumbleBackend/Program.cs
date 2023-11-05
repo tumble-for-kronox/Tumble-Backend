@@ -2,6 +2,7 @@ using MongoDB.Bson.Serialization;
 using System.Diagnostics;
 using System.Net;
 using TumbleBackend.ActionFilters;
+using TumbleBackend.ExceptionMiddleware;
 using TumbleBackend.Library;
 using TumbleBackend.OperationFilters;
 using TumbleBackend.StringConstants;
@@ -57,11 +58,6 @@ builder.Services.AddSpaStaticFiles(config =>
     config.RootPath = "wwwroot";
 });
 
-//builder.Services.AddMvc(opts =>
-//{
-//    opts.Filters.Add(new KronoxUrlFilter());
-//});
-
 var app = builder.Build();
 
 app.Use(async (context, next) =>
@@ -101,5 +97,7 @@ app.UseDefaultFiles();
 app.UseSpaStaticFiles();
 
 app.MapControllers();
+
+app.UseMiddleware<TimeoutExceptionMiddleware>();
 
 app.Run();

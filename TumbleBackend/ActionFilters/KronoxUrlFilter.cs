@@ -8,6 +8,8 @@ using WebAPIModels.RequestModels;
 using WebAPIModels.ResponseModels;
 using Utilities.Pair;
 using TumbleBackend.StringConstants;
+using TumbleHttpClient.Exceptions;
+using System.Net;
 
 namespace TumbleBackend.ActionFilters
 {
@@ -49,7 +51,7 @@ namespace TumbleBackend.ActionFilters
 
             try
             {
-                Pair<SchoolEnum, Uri>[] workingUrls = await Task.WhenAll(schools.Select(async school => new Pair<SchoolEnum, Uri>(school!.Id, await pinger.Ping(school.Urls))));
+                Pair<SchoolEnum, Uri>[] workingUrls = await Task.WhenAll(schools.Select(async school => new Pair<SchoolEnum, Uri>(school!.Id, await pinger.PingAsync(school.Urls))));
 
                 Pair<SchoolEnum, KronoxRequestClient>[] requestClients = workingUrls.Select(keyValue =>
                 {
@@ -63,9 +65,12 @@ namespace TumbleBackend.ActionFilters
                     context.HttpContext.Items.Add(KronoxReqClientKeys.SingleClient, requestClients[0].Value);
 
                 context.HttpContext.Items.Add(KronoxReqClientKeys.MultiClient, requestClients.AsEnumerable());
-            } catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException)
+            } catch (NoValidUrlException ex)
             {
-                context.Result = new ObjectResult(StatusCodes.Status500InternalServerError);
+                context.Result = new ObjectResult(new Error("No Kronox connections are available right now."))
+                {
+                    StatusCode = (int)HttpStatusCode.GatewayTimeout
+                }
                 return;
             }
 
