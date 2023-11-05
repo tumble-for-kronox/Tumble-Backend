@@ -156,10 +156,15 @@ public class School
     /// <exception cref="ParseException"></exception>
     /// <exception cref="LoginException"></exception>
     /// <exception cref="HttpRequestException"></exception>
-    /// <exception cref="TaskCanceledException"</exception>
-    public async Task<Dictionary<string, List<UserEvent>>> GetUserEvents(IKronoxRequestClient client)
+    public async Task<Dictionary<string, List<UserEvent>>?> GetUserEvents(IKronoxRequestClient client)
     {
-        string userEventsHtmlResult = await KronoxFetchController.GetUserEvents(client);
+        string? userEventsHtmlResult = await KronoxFetchController.GetUserEvents(client);
+            
+        if (userEventsHtmlResult == null)
+        {
+            return null;
+        }
+
         HtmlDocument userEventHtmlDoc = new();
         userEventHtmlDoc.LoadHtml(userEventsHtmlResult);
 

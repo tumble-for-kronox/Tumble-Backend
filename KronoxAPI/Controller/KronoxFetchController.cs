@@ -81,7 +81,7 @@ public static class KronoxFetchController
     /// <param name="sessionToken"></param>
     /// <returns><see cref="string"/> HTML page, which carries <see cref="UserEvent"/> data.</returns>
     /// <exception cref="HttpRequestException"></exception>
-    public static async Task<string> GetUserEvents(IKronoxRequestClient client)
+    public static async Task<string?> GetUserEvents(IKronoxRequestClient client)
     {
         await KronoxEnglishSession.SetSessionEnglish(client);
 
@@ -89,7 +89,11 @@ public static class KronoxFetchController
 
         HttpRequestMessage request = new(new HttpMethod("GET"), endpoint);
         HttpResponseMessage response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
 
         return await response.Content.ReadAsStringAsync();
     }

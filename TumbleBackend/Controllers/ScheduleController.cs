@@ -86,11 +86,6 @@ public class ScheduleController : ControllerBase
             _logger.LogError(e.Message);
             return NotFound(new Error("Schedule wasn't found or may have been corrupted."));
         }
-        catch (TaskCanceledException e)
-        {
-            _logger.LogError($"Task canceled: {e.Message}");
-            return StatusCode(408, new Error("The request timed out."));
-        }
     }
 
     /// <summary>
@@ -133,11 +128,6 @@ public class ScheduleController : ControllerBase
         {
             return BadRequest(new Error("Invalid school value."));
         }
-        catch (TaskCanceledException e)
-        {
-            _logger.LogError($"Task canceled: {e.Message}");
-            return StatusCode(408, new Error("The request timed out."));
-        }
     }
 
     /// <summary>
@@ -168,11 +158,6 @@ public class ScheduleController : ControllerBase
         catch (ArgumentException e)
         {
             return BadRequest(new Error("Invalid school value."));
-        }
-        catch (TaskCanceledException e)
-        {
-            _logger.LogError($"Task canceled: {e.Message}");
-            return StatusCode(408, new Error("The request timed out."));
         }
     }
 
@@ -208,11 +193,6 @@ public class ScheduleController : ControllerBase
         {
             _logger.LogError(e.Message);
             return Unauthorized(new Error("Invalid credentials, please login again."));
-        }
-        catch (TaskCanceledException e)
-        {
-            _logger.LogError($"Task canceled: {e.Message}");
-            return StatusCode(408, new Error("The request timed out."));
         }
     }
 
