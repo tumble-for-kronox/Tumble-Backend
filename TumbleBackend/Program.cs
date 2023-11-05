@@ -99,5 +99,6 @@ app.UseSpaStaticFiles();
 app.MapControllers();
 
 app.UseMiddleware<TimeoutExceptionMiddleware>();
+app.UseMiddleware<GeneralExceptionMiddleware>();
 
 app.Run();
