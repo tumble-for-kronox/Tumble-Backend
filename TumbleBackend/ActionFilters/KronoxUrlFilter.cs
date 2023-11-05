@@ -70,7 +70,7 @@ namespace TumbleBackend.ActionFilters
                 context.Result = new ObjectResult(new Error("No Kronox connections are available right now."))
                 {
                     StatusCode = (int)HttpStatusCode.GatewayTimeout
-                }
+                };
                 return;
             }
 
