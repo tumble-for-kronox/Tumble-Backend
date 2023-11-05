@@ -48,7 +48,10 @@ public class UserController : ControllerBase
 
         try
         {
-            User kronoxUser = await school.Login(kronoxReqClient, creds.Username, creds.Password);
+            User? kronoxUser = await school.Login(kronoxReqClient, creds.Username, creds.Password);
+
+            if (kronoxUser == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an unknown error while fetching user data from Kronox."));
 
             string updatedExpirationDateRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), creds.Username, creds.Password);
 
@@ -74,7 +77,10 @@ public class UserController : ControllerBase
 
         try
         {
-            User kronoxUser = await school.Login(kronoxReqClient, body.Username, body.Password);
+            User? kronoxUser = await school.Login(kronoxReqClient, body.Username, body.Password);
+
+            if (kronoxUser == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an unknown error while fetching user data from Kronox."));
 
             string? jwtEncKey = configuration[UserSecrets.JwtEncryptionKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtEncryptionKey);
             string? jwtSigKey = configuration[UserSecrets.JwtSignatureKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtSignatureKey);
@@ -117,7 +123,10 @@ public class UserController : ControllerBase
 
         try
         {
-            User kronoxUser = await school.Login(kronoxReqClient, creds.Username, creds.Password);
+            User? kronoxUser = await school.Login(kronoxReqClient, creds.Username, creds.Password);
+
+            if (kronoxUser == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an unknown error while fetching user data from Kronox."));
 
             string updatedExpirationDateRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), creds.Username, creds.Password);
 

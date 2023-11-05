@@ -138,9 +138,15 @@ public class School
     /// </returns>
     /// <exception cref="LoginException"></exception>
     /// <exception cref="ParseException"></exception>
-    public async Task<User> Login(IKronoxRequestClient client, string username, string password)
+    public async Task<User?> Login(IKronoxRequestClient client, string username, string password)
     {
-        Response.LoginResponse loginResponse = await KronoxPushController.Login(client, username, password);
+        Response.LoginResponse? loginResponse = await KronoxPushController.Login(client, username, password);
+
+        if (loginResponse == null)
+        {
+            return null;
+        }
+
         HtmlDocument loginResponseHtmlDocument = new();
         loginResponseHtmlDocument.LoadHtml(loginResponse.htmlResult);
 

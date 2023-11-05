@@ -4,6 +4,7 @@ using KronoxAPI.Model.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Primitives;
+using System.Net;
 using TumbleBackend.Extensions;
 using TumbleBackend.InternalModels;
 using TumbleBackend.StringConstants;
@@ -71,9 +72,16 @@ public class AuthActionFilter : ActionFilterAttribute
         {
             KronoxRequestClient requestClient = (KronoxRequestClient)context.HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
 
-            User kronoxUser = await school.Login(requestClient, creds.Username, creds.Password);
+            User? kronoxUser = await school.Login(requestClient, creds.Username, creds.Password);
 
-            //string updatedExpirationDateRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), creds.Username, creds.Password);
+            if (kronoxUser == null)
+            {
+                context.Result = new ObjectResult(new Error("There was an unknown error while fetching user data from Kronox."))
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+                return;
+            }
 
             requestClient.SetSessionToken(kronoxUser.SessionToken);
             context.HttpContext.Items[KronoxReqClientKeys.SingleClient] = requestClient;

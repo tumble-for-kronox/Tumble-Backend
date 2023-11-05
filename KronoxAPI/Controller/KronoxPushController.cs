@@ -16,7 +16,7 @@ public static class KronoxPushController
     /// <param name="password"></param>
     /// <param name="schoolUrl"></param>
     /// <returns><see cref="string"/> containing the login session token.</returns>
-    public static async Task<LoginResponse> Login(IKronoxRequestClient client, string username, string password)
+    public static async Task<LoginResponse?> Login(IKronoxRequestClient client, string username, string password)
     {
         string endpoint = "login_do.jsp";
         HttpRequestMessage req = new(new("POST"), endpoint)
@@ -27,8 +27,10 @@ public static class KronoxPushController
 
         HttpResponseMessage response = await client.SendAsync(req);
 
-        // Handle response, making sure it's good and preparing to strip session cookie
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
 
         string? sessionToken = (client.CookieContainer.GetCookie(client.BaseUrl!, "JSESSIONID")?.Value) ?? throw new LoginException($"No session token was found after logging in, failed to log in {username}.");
 
