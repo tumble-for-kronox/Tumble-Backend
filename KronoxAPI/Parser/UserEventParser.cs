@@ -73,7 +73,7 @@ public class UserEventParser
         catch (NullReferenceException e)
         {
             if (userEventsHtml.SessionExpired())
-                throw new LoginException("Kronox rejected the login attempt due to bad credentials or something else on their end.", e);
+                throw new LoginException($"Kronox rejected the login attempt due to bad credentials or something else on their end. Below is the HTML that caused the issue:\n\n{userEventsHtml.Text}", e);
 
             throw new ParseException("An error occurred while attempting to parse registered, unregistered, and upcoming events.", e);
         }

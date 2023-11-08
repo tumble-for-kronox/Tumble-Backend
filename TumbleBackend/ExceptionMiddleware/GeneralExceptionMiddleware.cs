@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using Newtonsoft.Json;
+using System.Net;
 using WebAPIModels.ResponseModels;
 
 namespace TumbleBackend.ExceptionMiddleware;
@@ -6,13 +7,15 @@ namespace TumbleBackend.ExceptionMiddleware;
 public class GeneralExceptionMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<GeneralExceptionMiddleware> _logger;
 
-    public GeneralExceptionMiddleware(RequestDelegate next)
+    public GeneralExceptionMiddleware(RequestDelegate next, ILogger<GeneralExceptionMiddleware> logger)
     {
         _next = next;
+        _logger = logger;
     }
 
-    public async Task Invoke(HttpContext context)
+    public async Task InvokeAsync(HttpContext context)
     {
         try
         {
@@ -20,9 +23,19 @@ public class GeneralExceptionMiddleware
         }
         catch (Exception ex)
         {
-            // Handle the TimeoutException here, e.g., log the exception or return a custom response.
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            await context.Response.WriteAsJsonAsync(new Error("An unknown error occurred."));
+            _logger.LogError(ex, "An unhandled exception has occurred.");
+            await HandleExceptionAsync(context, ex);
         }
     }
+
+    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+        // Here you can add more detailed error info if needed
+        var result = JsonConvert.SerializeObject(new Error("An unknown error occured while processing your request."));
+        return context.Response.WriteAsync(result);
+    }
+
 }

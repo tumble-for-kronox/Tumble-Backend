@@ -11,7 +11,7 @@ public static class HtmlDocumentExtensions
 {
     public static bool SessionExpired(this HtmlDocument doc)
     {
-        return doc.DocumentNode.SelectSingleNode("//*[@id=\"inaktiv\"]") != null;
+        return doc.DocumentNode.SelectSingleNode("//form[@id=\"loginform\"]") != null;
     }
 
 }

@@ -17,8 +17,6 @@ namespace TumbleBackend.Controllers;
 [ApiController]
 [KronoxUrlFilter]
 [ServiceFilter(typeof(AuthActionFilter))]
-[SessionTokenActionFilter]
-[Route("users/events")]
 [Route("api/users/events")]
 public class UserEventController : ControllerBase
 {

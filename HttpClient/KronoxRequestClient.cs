@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 
 namespace TumbleHttpClient;
 
@@ -31,7 +32,14 @@ public class KronoxRequestClient : IKronoxRequestClient
 
     public void SetSessionToken(string sessionToken)
     {
-        _httpClient.DefaultRequestHeaders.Add("JSESSIONID", sessionToken);
+        _cookieContainer.Add(new Cookie()
+        {
+            Name = "JSESSIONID",
+            Value = sessionToken,
+            Domain = BaseUrl!.Host,
+            Path = "/",
+            Secure = true
+        });
         _sessionToken = sessionToken;
     }
 

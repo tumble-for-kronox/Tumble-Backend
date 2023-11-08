@@ -19,7 +19,6 @@ namespace TumbleBackend.Controllers;
 [EnableCors("CorsPolicy")]
 [ApiController]
 [KronoxUrlFilter]
-[Route("schedules")]
 [Route("api/schedules")]
 public class ScheduleController : ControllerBase
 {

@@ -18,7 +18,6 @@ namespace TumbleBackend.Controllers;
 [EnableCors("CorsPolicy")]
 [ApiController]
 [KronoxUrlFilter]
-[Route("users")]
 [Route("api/users")]
 public class UserController : ControllerBase
 {
@@ -91,46 +90,6 @@ public class UserController : ControllerBase
             string newRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), body.Username, body.Password);
 
             return Ok(kronoxUser.ToWebModel(newRefreshToken));
-        }
-        catch (LoginException e)
-        {
-            _logger.LogError(e.Message);
-            return Unauthorized(new Error("Username or password incorrect."));
-        }
-        catch (ParseException e)
-        {
-            _logger.LogError(e.Message);
-            return StatusCode(StatusCodes.Status500InternalServerError, new Error("An error occurred while logging in, please try again later."));
-        }
-    }
-
-    [HttpGet("refresh")]
-    public async Task<IActionResult> RefreshKronoxUser([FromServices] IConfiguration configuration, [FromQuery] SchoolEnum schoolId, [FromHeader] string authorization)
-    {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
-        School school = schoolId.GetSchool()!;
-
-        string? jwtEncKey = configuration[UserSecrets.JwtEncryptionKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtEncryptionKey);
-        string? jwtSigKey = configuration[UserSecrets.JwtSignatureKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtSignatureKey);
-        string? refreshTokenExpiration = configuration[UserSecrets.JwtRefreshTokenExpiration] ?? Environment.GetEnvironmentVariable(EnvVar.JwtRefreshTokenExpiration);
-        if (jwtEncKey == null || refreshTokenExpiration == null || jwtSigKey == null)
-            throw new NullReferenceException("It should not be possible for jwtEncKey OR refreshTokenExpirationTime OR jwtSigKey to be null at this point.");
-
-        RefreshTokenResponseModel? creds = JwtUtil.ValidateAndReadRefreshToken(jwtEncKey, jwtSigKey, authorization);
-
-        if (creds == null)
-            return Unauthorized(new Error("Couldn't login user from refreshToken, please log out and back in manually."));
-
-        try
-        {
-            User? kronoxUser = await school.Login(kronoxReqClient, creds.Username, creds.Password);
-
-            if (kronoxUser == null)
-                return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an unknown error while fetching user data from Kronox."));
-
-            string updatedExpirationDateRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), creds.Username, creds.Password);
-
-            return Ok(kronoxUser.ToWebModel(updatedExpirationDateRefreshToken));
         }
         catch (LoginException e)
         {

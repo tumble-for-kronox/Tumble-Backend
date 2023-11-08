@@ -16,8 +16,6 @@ namespace TumbleBackend.Controllers;
 [ApiController]
 [KronoxUrlFilter]
 [ServiceFilter(typeof(AuthActionFilter))]
-[SessionTokenActionFilter]
-[Route("resources")]
 [Route("api/resources")]
 public class BookingController : ControllerBase
 {
