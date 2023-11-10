@@ -1,6 +1,5 @@
 using MongoDB.Bson.Serialization;
 using System.Diagnostics;
-using System.Net;
 using TumbleBackend.ActionFilters;
 using TumbleBackend.ExceptionMiddleware;
 using TumbleBackend.Library;
@@ -11,7 +10,6 @@ using TumbleHttpClient;
 using WebAPIModels.ResponseModels;
 
 var builder = WebApplication.CreateBuilder(args);
-KronoxUrlFilter kronoxUrlFilter = new KronoxUrlFilter();
 builder.WebHost.UseIISIntegration();
 
 var dbglistener = new TextWriterTraceListener(Console.Out);
@@ -42,7 +40,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(
       "CorsPolicy",
-      builder => builder.AllowAnyOrigin()
+      policy => policy.AllowAnyOrigin()
       .AllowAnyMethod()
       .AllowAnyHeader());
 });

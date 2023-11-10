@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Net;
+﻿using System.Net;
 
 namespace TumbleHttpClient;
 
@@ -12,12 +11,15 @@ public class KronoxRequestClient : IKronoxRequestClient
 
     public KronoxRequestClient(double timeout = 5)
     {
-        _cookieContainer = new();
-        HttpClientHandler handler = new()
+        _cookieContainer = new CookieContainer();
+        var clientHandler = new HttpClientHandler { CookieContainer = _cookieContainer };
+
+        var rateLimitingHandler = new RateLimitingHandler(maxRequests: 200, timeSpan: TimeSpan.FromMinutes(60))
         {
-            CookieContainer = _cookieContainer
+            InnerHandler = clientHandler
         };
-        _httpClient = new(handler)
+
+        _httpClient = new HttpClient(rateLimitingHandler)
         {
             Timeout = TimeSpan.FromSeconds(timeout)
         };
