@@ -7,5 +7,6 @@ bin/
 obj/
 TumbleBackend/Properties/
 TumbleBackend/TumbleBackend.csproj.user
+.DS_Store
 
 serviceAccountKey.json
