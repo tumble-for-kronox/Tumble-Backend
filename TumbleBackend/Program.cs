@@ -1,4 +1,8 @@
+using DatabaseAPI;
+using DatabaseAPI.Interfaces;
+using Microsoft.Extensions.Configuration;
 using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Conventions;
 using System.Diagnostics;
 using System.Net;
 using TumbleBackend.ActionFilters;
@@ -11,9 +15,14 @@ using TumbleHttpClient;
 using WebAPIModels.ResponseModels;
 
 var builder = WebApplication.CreateBuilder(args);
-KronoxUrlFilter kronoxUrlFilter = new KronoxUrlFilter();
 builder.WebHost.UseIISIntegration();
 
+
+string? dbConnectionString = builder.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.DbConnection] : Environment.GetEnvironmentVariable(EnvVar.DbConnection);
+string? dbName = builder.Environment.IsDevelopment() ? builder.Configuration[AppSettings.DevDatabase] : builder.Configuration[AppSettings.ProdDatabase];
+MongoDBSettings dbSettings = new(dbConnectionString!, dbName);
+string? awsAccessKey = builder.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.AwsAccessKey] : Environment.GetEnvironmentVariable(EnvVar.AwsAccessKey);
+string? awsSecretKey = builder.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.AwsSecretKey] : Environment.GetEnvironmentVariable(EnvVar.AwsSecretKey);
 var dbglistener = new TextWriterTraceListener(Console.Out);
 Trace.Listeners.Add(dbglistener);
 
@@ -26,6 +35,12 @@ BsonClassMap.RegisterClassMap<EventWebModel>(cm =>
         .SetOrder(0)
         .SetIsRequired(true);
 });
+
+ConventionPack conventions = new()
+        {
+            new CamelCaseElementNameConvention()
+        };
+ConventionRegistry.Register("Custom Conventions", conventions, t => true);
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -49,6 +64,12 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSingleton(builder.Configuration);
 builder.Services.AddSingleton<MobileMessagingClient>();
+builder.Services.AddSingleton<IDbSettings>(dbSettings);
+builder.Services.AddSingleton<IDbSchedulesService>(sp => new MongoSchedulesService(sp.GetService<IDbSettings>()!));
+builder.Services.AddSingleton<IDbProgrammeFiltersService>(sp => new MongoProgrammeFiltersService(sp.GetService<IDbSettings>()!));
+builder.Services.AddSingleton<IDbNewsService>(sp => new MongoNewsService(sp.GetService<IDbSettings>()!));
+builder.Services.AddSingleton<IDbKronoxCacheService>(sp => new MongoKronoxCacheService(sp.GetService<IDbSettings>()!));
+
 builder.Services.AddScoped<AuthActionFilter>();
 builder.Services.AddScoped<KronoxUrlFilter>();
 builder.Services.AddTransient<KronoxRequestClient>();
@@ -70,11 +91,7 @@ app.Use(async (context, next) =>
         await next();
     }
 });
-
 app.UseCors("CorsPolicy");
-string? dbConnectionString = app.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.DbConnection] : Environment.GetEnvironmentVariable(EnvVar.DbConnection);
-string? awsAccessKey = app.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.AwsAccessKey] : Environment.GetEnvironmentVariable(EnvVar.AwsAccessKey);
-string? awsSecretKey = app.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.AwsSecretKey] : Environment.GetEnvironmentVariable(EnvVar.AwsSecretKey);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -83,7 +100,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-DatabaseAPI.Connector.Init(dbConnectionString!, app.Environment.IsDevelopment());
 EmailUtil.Init(awsAccessKey!, awsSecretKey!);
 
 app.UseCors();

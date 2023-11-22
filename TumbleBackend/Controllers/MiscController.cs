@@ -1,4 +1,5 @@
 ﻿using DatabaseAPI;
+using DatabaseAPI.Interfaces;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using TumbleBackend.Utilities;
@@ -19,8 +20,8 @@ public class MiscController : ControllerBase
     }
 
     [HttpGet("news")]
-    public async Task<IActionResult> GetNewsHistory()
+    public async Task<IActionResult> GetNewsHistory([FromServices] IDbNewsService newsService)
     {
-        return Ok(await NewsHistory.GetNewsHistory());
+        return Ok(await newsService.GetNewsHistoryAsync());
     }
 }

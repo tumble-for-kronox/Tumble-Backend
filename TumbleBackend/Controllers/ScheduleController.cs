@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Cors;
 using TumbleHttpClient;
 using KronoxAPI.Extensions;
 using Utilities.Pair;
+using DatabaseAPI.Interfaces;
 
 namespace TumbleBackend.Controllers;
 
@@ -38,7 +39,7 @@ public class ScheduleController : ControllerBase
     /// <returns></returns>
     [ServiceFilter(typeof(AuthActionFilter))]
     [HttpGet("{scheduleId}")]
-    public async Task<IActionResult> GetSingleSchedule([FromServices] IConfiguration config, [FromRoute] string scheduleId, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null)
+    public async Task<IActionResult> GetSingleSchedule([FromServices] IConfiguration config, [FromServices] IDbSchedulesService schedulesService, [FromRoute] string scheduleId, [FromQuery] SchoolEnum schoolId, [FromQuery] string? startDateISO = null)
     {
         IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         // Extract school instance and make sure the school entry is valid (should've failed in query, but double safety.)
@@ -57,7 +58,7 @@ public class ScheduleController : ControllerBase
             startDate = DateTime.Now.FirstDayOfWeek();
 
             // Attempt to get cached schedule.
-            ScheduleWebModel? cachedSchedule = await SchedulesCache.GetSchedule(scheduleId);
+            ScheduleWebModel? cachedSchedule = await schedulesService.GetScheduleAsync(scheduleId);
 
             // On cache hit.
             if (cachedSchedule != null)
@@ -67,7 +68,7 @@ public class ScheduleController : ControllerBase
                 {
                     // Fetch and re-cache schedule if TTL has passed, making sure not to override/change course colors 
                     ScheduleWebModel scheduleFetchForRecache = await BuildWebSafeSchedule(kronoxReqClient, scheduleId, school, startDate);
-                    await SchedulesCache.UpsertSchedule(scheduleFetchForRecache);
+                    await schedulesService.UpsertScheduleAsync(scheduleFetchForRecache);
                 }
 
                 // Return schedule (at this point up-to-date).
@@ -76,7 +77,7 @@ public class ScheduleController : ControllerBase
 
             // On cache miss, fetch, cache, and return schedule from scratch.
             ScheduleWebModel newScheduleFetch = await BuildWebSafeSchedule(kronoxReqClient, scheduleId, school, startDate);
-            await SchedulesCache.UpsertSchedule(newScheduleFetch);
+            await schedulesService.UpsertScheduleAsync(newScheduleFetch);
 
             return Ok(newScheduleFetch);
         }
@@ -169,7 +170,7 @@ public class ScheduleController : ControllerBase
     /// <returns>A list of <see cref="Programme"/> objects and an <see cref="int"/> Count. Although the name is "programme" they also map to individuals and schedules correctly.</returns>
     [HttpGet("search")]
     [ServiceFilter(typeof(AuthActionFilter))]
-    public async Task<IActionResult> Search([FromQuery] string searchQuery, [FromQuery] SchoolEnum? schoolId = null)
+    public async Task<IActionResult> Search([FromServices] IDbProgrammeFiltersService programmeFiltersService, [FromQuery] string searchQuery, [FromQuery] SchoolEnum? schoolId = null)
     {
         IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School? school = schoolId?.GetSchool();
@@ -179,7 +180,7 @@ public class ScheduleController : ControllerBase
         try
         {
             List<Programme> searchResult = await school.SearchProgrammes(kronoxReqClient, searchQuery);
-            HashSet<string> filter = await ProgrammeFilters.GetProgrammeFilter(school);
+            HashSet<string> filter = await programmeFiltersService.GetProgrammeFiltersAsync(school);
 
             if (searchResult.Count <= 0)
                 return NoContent();

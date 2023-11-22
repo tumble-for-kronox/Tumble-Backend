@@ -10,6 +10,7 @@ using System.Web.Http.Results;
 using WebAPIModels.ResponseModels;
 using DatabaseAPI;
 using TumbleBackend.StringConstants;
+using DatabaseAPI.Interfaces;
 
 namespace TumbleBackend.Controllers;
 
@@ -19,7 +20,7 @@ namespace TumbleBackend.Controllers;
 public class AdminController : Controller
 {
     [HttpPut("notification")]
-    public async Task<IActionResult> SendMessage([FromServices] MobileMessagingClient messaging, [FromServices] IConfiguration configuration, [FromHeader] string auth, [FromQuery] NotificationContent notificationContent)
+    public async Task<IActionResult> SendMessage([FromServices] MobileMessagingClient messaging, [FromServices] IConfiguration configuration, [FromServices] IDbNewsService newsService, [FromHeader] string auth, [FromQuery] NotificationContent notificationContent)
     {
         string? adminPassword = configuration[UserSecrets.AdminPass] ?? Environment.GetEnvironmentVariable(EnvVar.AdminPass);
 
@@ -35,7 +36,7 @@ public class AdminController : Controller
 
         if (result_id != string.Empty)
         {
-            NewsHistory.SaveNewsItem(notificationContent);
+            await newsService.SaveNewsItemAsync(notificationContent);
             return Ok();
         }
         else

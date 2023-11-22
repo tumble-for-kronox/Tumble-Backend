@@ -10,6 +10,8 @@ using Utilities.Pair;
 using TumbleBackend.StringConstants;
 using TumbleHttpClient.Exceptions;
 using System.Net;
+using DatabaseAPI.Interfaces;
+using WebAPIModels.MiscModels;
 
 namespace TumbleBackend.ActionFilters
 {
@@ -19,6 +21,8 @@ namespace TumbleBackend.ActionFilters
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+            var services = context.HttpContext.RequestServices;
+            var config = services.GetService<IConfiguration>();
             var request = context.HttpContext.Request;
             HttpClient pingHttpClient = new();
             HttpPinger pinger = new(pingHttpClient);
@@ -51,15 +55,10 @@ namespace TumbleBackend.ActionFilters
 
             try
             {
-                Pair<SchoolEnum, Uri>[] workingUrls = await Task.WhenAll(schools.Select(async school => new Pair<SchoolEnum, Uri>(school!.Id, await pinger.PingAsync(school.Urls))));
+                int urlCacheTimeout = int.Parse(config![AppSettings.KronoxCacheTTL]);
+                Pair<SchoolEnum, Uri>[] workingUrls = await GetWorkingUrls(services.GetService<IDbKronoxCacheService>()!, urlCacheTimeout, pinger, schools!);
 
-                Pair<SchoolEnum, KronoxRequestClient>[] requestClients = workingUrls.Select(keyValue =>
-                {
-                    KronoxRequestClient client = context.HttpContext.RequestServices.GetService<KronoxRequestClient>()!;
-                    client.SetBaseAddress(keyValue.Value);
-
-                    return new Pair<SchoolEnum, KronoxRequestClient>(keyValue.Key, client);
-                }).ToArray();
+                Pair<SchoolEnum, KronoxRequestClient>[] requestClients = GetRequestClients(services, workingUrls);
 
                 if (requestClients.Length == 1)
                     context.HttpContext.Items.Add(KronoxReqClientKeys.SingleClient, requestClients[0].Value);
@@ -75,6 +74,49 @@ namespace TumbleBackend.ActionFilters
             }
 
             await next();
+        }
+
+        private async Task<Pair<SchoolEnum, Uri>[]> GetWorkingUrls(IDbKronoxCacheService kronoxCacheService, int urlCacheTimeout, HttpPinger pinger, School[] schools)
+        {
+            List<Pair<SchoolEnum, Uri>> workingUrls = new();
+
+            foreach (var school in schools)
+            {
+                Uri? functionalUrl = null;
+                var cachedKronox = await kronoxCacheService.GetKronoxCacheAsync(school.Id.ToString());
+
+                if (cachedKronox != null && (DateTime.Now - cachedKronox.Timestamp).TotalMinutes <= urlCacheTimeout)
+                {
+                    functionalUrl = new Uri(cachedKronox.Url);
+                }
+                else
+                {
+                    functionalUrl = await pinger.PingAsync(school.Urls);
+
+                    var newCacheEntry = new KronoxCache(school.Id.ToString(), functionalUrl.ToString(), DateTime.Now, school.Id);
+                    await kronoxCacheService.UpsertKronoxCacheAsync(newCacheEntry);
+                }
+
+                if (functionalUrl == null)
+                {
+                    throw new NoValidUrlException();
+                }
+
+                workingUrls.Add(new Pair<SchoolEnum, Uri>(school.Id, functionalUrl));
+            }
+
+            return workingUrls.ToArray();
+        }
+
+        private Pair<SchoolEnum, KronoxRequestClient>[] GetRequestClients(IServiceProvider services, Pair<SchoolEnum, Uri>[] urls)
+        {
+            return urls.Select(keyValue =>
+            {
+                KronoxRequestClient client = services.GetService<KronoxRequestClient>()!;
+                client.SetBaseAddress(keyValue.Value);
+
+                return new Pair<SchoolEnum, KronoxRequestClient>(keyValue.Key, client);
+            }).ToArray();
         }
     }
 }
