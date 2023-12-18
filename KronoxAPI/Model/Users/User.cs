@@ -8,6 +8,7 @@ using KronoxAPI.Controller;
 using KronoxAPI.Model.Schools;
 using KronoxAPI.Parser;
 using KronoxAPI.Exceptions;
+using TumbleHttpClient;
 
 namespace KronoxAPI.Model.Users;
 
@@ -36,4 +37,5 @@ public class User
     /// </summary>
     /// <returns><see cref="User"/> with all values set as "N/A".</returns>
     public static User NotAvailable => new("N/A", "N/A", "N/A");
+
 }

@@ -16,7 +16,7 @@ public static class BookingController
 
     public static async Task<string> GetResources(IKronoxRequestClient client)
     {
-        await KronoxEnglishSession.SetSessionEnglish(client);
+        await KronoxSession.SetSessionEnglish(client);
 
         string endpoint = "resursbokning.jsp";
 
@@ -29,7 +29,7 @@ public static class BookingController
 
     public static async Task<string> GetPersonalBookingsForResource(IKronoxRequestClient client, string resourceId)
     {
-        await KronoxEnglishSession.SetSessionEnglish(client);
+        await KronoxSession.SetSessionEnglish(client);
 
         DateTime date = DateTime.Now;
         string endpoint = "minaresursbokningar.jsp";
@@ -49,7 +49,7 @@ public static class BookingController
 
     public static async Task<string> GetResourceAvailability(IKronoxRequestClient client, DateTime date, string resourceId)
     {
-        await KronoxEnglishSession.SetSessionEnglish(client);
+        await KronoxSession.SetSessionEnglish(client);
 
         string endpoint = "ajax/ajax_resursbokning.jsp";
 
@@ -84,7 +84,7 @@ public static class BookingController
     /// <exception cref="ParseException"></exception>
     public static async Task BookResourceLocation(IKronoxRequestClient client, DateTime date, string resourceId, string locationId, string timeSlotId, string resourceType)
     {
-        await KronoxEnglishSession.SetSessionEnglish(client);
+        await KronoxSession.SetSessionEnglish(client);
 
         string endpoint = "ajax/ajax_resursbokning.jsp";
 
@@ -137,7 +137,7 @@ public static class BookingController
     /// <exception cref="ParseException"></exception>
     public static async Task UnbookResourceLocation(IKronoxRequestClient client, string bookingId)
     {
-        await KronoxEnglishSession.SetSessionEnglish(client);
+        await KronoxSession.SetSessionEnglish(client);
 
         string endpoint = "ajax/ajax_resursbokning.jsp";
 
@@ -169,7 +169,7 @@ public static class BookingController
 
     public static async Task ConfirmResourceBooking(IKronoxRequestClient client, string bookingId, string resourceId)
     {
-        await KronoxEnglishSession.SetSessionEnglish(client);
+        await KronoxSession.SetSessionEnglish(client);
 
         string endpoint = "ajax/ajax_resursbokning.jsp";
 

@@ -1,10 +1,8 @@
 using DatabaseAPI;
 using DatabaseAPI.Interfaces;
-using Microsoft.Extensions.Configuration;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using System.Diagnostics;
-using System.Net;
 using TumbleBackend.ActionFilters;
 using TumbleBackend.ExceptionMiddleware;
 using TumbleBackend.Library;
@@ -45,7 +43,8 @@ ConventionRegistry.Register("Custom Conventions", conventions, t => true);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(config => {
+builder.Services.AddSwaggerGen(config =>
+{
     config.OperationFilter<AuthHeaderFilter>();
 });
 builder.Services.AddHttpClient("KronoxClient", client =>
@@ -72,7 +71,7 @@ builder.Services.AddSingleton<IDbKronoxCacheService>(sp => new MongoKronoxCacheS
 
 builder.Services.AddScoped<AuthActionFilter>();
 builder.Services.AddScoped<KronoxUrlFilter>();
-builder.Services.AddTransient<KronoxRequestClient>();
+builder.Services.AddScoped<KronoxRequestClient>();
 
 builder.Services.AddSpaStaticFiles(config =>
 {

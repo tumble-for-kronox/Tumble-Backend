@@ -83,7 +83,7 @@ public static class KronoxFetchController
     /// <exception cref="HttpRequestException"></exception>
     public static async Task<string?> GetUserEvents(IKronoxRequestClient client)
     {
-        await KronoxEnglishSession.SetSessionEnglish(client);
+        await KronoxSession.SetSessionEnglish(client);
 
         string endpoint = "aktivitetsanmalan.jsp";
 

@@ -12,6 +12,7 @@ using TumbleBackend.StringConstants;
 using TumbleBackend.ActionFilters;
 using Microsoft.AspNetCore.Cors;
 using TumbleHttpClient;
+using WebAPIModels.MiscModels;
 
 namespace TumbleBackend.Controllers;
 
@@ -54,7 +55,7 @@ public class UserController : ControllerBase
 
             string updatedExpirationDateRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), creds.Username, creds.Password);
 
-            return Ok(kronoxUser.ToWebModel(updatedExpirationDateRefreshToken));
+            return Ok(kronoxUser.ToWebModel(updatedExpirationDateRefreshToken, new(kronoxUser.SessionToken, kronoxReqClient.BaseUrl!.ToString())));
         }
         catch (LoginException e)
         {
@@ -89,7 +90,7 @@ public class UserController : ControllerBase
 
             string newRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), body.Username, body.Password);
 
-            return Ok(kronoxUser.ToWebModel(newRefreshToken));
+            return Ok(kronoxUser.ToWebModel(newRefreshToken, new(kronoxUser.SessionToken, kronoxReqClient.BaseUrl!.ToString())));
         }
         catch (LoginException e)
         {

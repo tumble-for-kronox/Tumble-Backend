@@ -165,7 +165,7 @@ public class School
     public async Task<Dictionary<string, List<UserEvent>>?> GetUserEvents(IKronoxRequestClient client)
     {
         string? userEventsHtmlResult = await KronoxFetchController.GetUserEvents(client);
-            
+
         if (userEventsHtmlResult == null)
         {
             return null;
@@ -175,5 +175,10 @@ public class School
         userEventHtmlDoc.LoadHtml(userEventsHtmlResult);
 
         return UserEventParser.ParseToDict(userEventHtmlDoc);
+    }
+
+    public async Task<bool> RefreshUserSession(IKronoxRequestClient client)
+    {
+        return await KronoxSession.RefreshSession(client);
     }
 }

@@ -28,6 +28,8 @@ public class KronoxRequestClient : IKronoxRequestClient
 
     public bool IsAuthenticated => _sessionToken != null;
 
+    public string? SessionToken => _sessionToken;
+
     public CookieContainer CookieContainer => _cookieContainer;
 
     public void SetSessionToken(string sessionToken)

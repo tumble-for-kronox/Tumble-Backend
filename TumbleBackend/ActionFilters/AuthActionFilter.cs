@@ -5,12 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Primitives;
 using System.Net;
+using System.Text.RegularExpressions;
 using TumbleBackend.Extensions;
 using TumbleBackend.InternalModels;
 using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
 using TumbleHttpClient;
-using WebAPIModels.RequestModels;
+using WebAPIModels.MiscModels;
 using WebAPIModels.ResponseModels;
 
 namespace TumbleBackend.ActionFilters;
@@ -19,6 +20,7 @@ public class AuthActionFilter : ActionFilterAttribute
 {
     private StringValues refreshToken;
     private StringValues schoolIdQuery;
+    private SessionDetails? sessionDetails;
     private readonly IConfiguration configuration;
 
     public AuthActionFilter(IConfiguration config)
@@ -29,6 +31,12 @@ public class AuthActionFilter : ActionFilterAttribute
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         bool hasAuthHeader = context.HttpContext.Request.Headers.TryGetValue("X-auth-token", out refreshToken);
+        bool hasSessionDetails = context.HttpContext.Request.Headers.TryGetValue("X-session-token", out var sessionDetailsJson);
+
+        if (hasSessionDetails)
+        {
+            sessionDetails = SessionDetails.FromJson(sessionDetailsJson);
+        }
 
         if (!hasAuthHeader)
         {
@@ -68,9 +76,24 @@ public class AuthActionFilter : ActionFilterAttribute
             return;
         }
 
+        KronoxRequestClient requestClient = (KronoxRequestClient)context.HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
+
         try
         {
-            KronoxRequestClient requestClient = (KronoxRequestClient)context.HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
+
+            if (sessionDetails != null)
+            {
+                requestClient.SetSessionToken(sessionDetails.SessionToken);
+
+                bool sessionValid = await school.RefreshUserSession(requestClient);
+                if (sessionValid)
+                {
+                    context.HttpContext.Items[KronoxReqClientKeys.SingleClient] = requestClient;
+
+                    await Next(context, requestClient, next);
+                    return;
+                }
+            }
 
             User? kronoxUser = await school.Login(requestClient, creds.Username, creds.Password);
 
@@ -97,6 +120,19 @@ public class AuthActionFilter : ActionFilterAttribute
             return;
         }
 
+        await Next(context, requestClient, next);
+    }
+
+    private async Task Next(ActionExecutingContext context, KronoxRequestClient requestClient, ActionExecutionDelegate next)
+    {
         await next();
+        if (requestClient.SessionToken == null || requestClient.BaseUrl == null)
+        {
+            return;
+        }
+
+        SessionDetails refreshedSessionDetails = new(requestClient.SessionToken, requestClient.BaseUrl.ToString());
+        var jsonRefreshedSessionDetails = Regex.Unescape(refreshedSessionDetails.ToJson());
+        context.HttpContext.Response.Headers.Add("X-session-token", jsonRefreshedSessionDetails);
     }
 }

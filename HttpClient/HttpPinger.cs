@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Net.Http;
 using TumbleHttpClient.Exceptions;
 
 namespace TumbleHttpClient;
@@ -13,36 +12,54 @@ public class HttpPinger
         _httpClient = client;
     }
 
-    
     /// <summary>
-    /// Takes a list of URLs as strings and returns the first URL to correctly return a 200 http code. If none do, throws <see cref="NoValidUrlException"/>.
+    /// Pings a list of URLs and returns the first URL to correctly return a 200 http code.
+    /// Optionally prioritizes a given URL and returns it immediately if it pings successfully.
+    /// If the prioritized URL fails, returns the first successful URL from the others.
+    /// If none are successful, throws <see cref="NoValidUrlException"/>.
     /// </summary>
-    /// <param name="urls"></param>
-    /// <returns></returns>
+    /// <param name="urls">The list of URLs to ping.</param>
+    /// <param name="priorityUrl">The optional URL to prioritize.</param>
+    /// <returns>The first successful URL, or the prioritized URL if successful.</returns>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="NoValidUrlException"></exception>
-    public async Task<Uri> PingAsync(IEnumerable<string> urls)
+    public async Task<Uri> PingAsync(IEnumerable<string> urls, string? priorityUrl = null)
     {
         if (urls == null)
             throw new ArgumentNullException(nameof(urls));
 
-        List<Task<HttpResponseMessage>> tasks = urls.Select(url => PingUrlAsync(url)).ToList();
+        var tasks = urls.Select(url => PingUrlAsync(url)).ToList();
+        Task<HttpResponseMessage>? priorityTask = null;
 
+        if (!string.IsNullOrEmpty(priorityUrl) && urls.Contains(priorityUrl))
+        {
+            // Create a separate task for the priority URL
+            priorityTask = PingUrlAsync(priorityUrl);
+
+            // Wait for the priority URL to complete
+            var priorityResponse = await priorityTask;
+            if (priorityResponse.StatusCode == HttpStatusCode.OK)
+            {
+                return new Uri(priorityUrl);
+            }
+        }
+
+        // Continue with other URLs if priority URL is not successful
         while (tasks.Count > 0)
         {
-            Task<HttpResponseMessage> completedTask = await Task.WhenAny(tasks);
+            var completedTask = await Task.WhenAny(tasks);
 
             try
             {
-                HttpResponseMessage response = await completedTask;
+                var response = await completedTask;
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     return response.RequestMessage!.RequestUri!;
                 }
             }
-            catch (Exception)
+            catch
             {
-                // Exceptions do not require handling here, we just care if the URLs work or not
+                // Exceptions are ignored as we only care about successful pings
             }
 
             tasks.Remove(completedTask);
