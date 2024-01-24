@@ -1,6 +1,5 @@
 ﻿using KronoxAPI.Model.Schools;
 using Microsoft.AspNetCore.Mvc;
-using WebAPIModels.RequestModels;
 using TumbleBackend.Extensions;
 using WebAPIModels.ResponseModels;
 using WebAPIModels.Extensions;

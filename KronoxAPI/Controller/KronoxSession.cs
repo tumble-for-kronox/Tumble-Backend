@@ -25,6 +25,8 @@ public static class KronoxSession
         using var refreshSessionRequest = new HttpRequestMessage(new HttpMethod("POST"), fullPath);
         var response = await client.SendAsync(refreshSessionRequest);
 
-        return response.IsSuccessStatusCode;
+        var body = await response.Content.ReadAsStringAsync();
+
+        return body == "OK";
     }
 }

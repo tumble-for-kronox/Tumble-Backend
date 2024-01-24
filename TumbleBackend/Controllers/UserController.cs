@@ -30,18 +30,12 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetKronoxUser([FromServices] IConfiguration configuration, [FromQuery] SchoolEnum schoolId, [FromHeader(Name = "X-auth-token")] string refreshToken)
+    public async Task<IActionResult> GetKronoxUser([FromServices] JwtUtil jwtUtil, [FromQuery] SchoolEnum schoolId, [FromHeader(Name = "X-auth-token")] string refreshToken)
     {
         IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
 
-        string? jwtEncKey = configuration[UserSecrets.JwtEncryptionKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtEncryptionKey);
-        string? jwtSigKey = configuration[UserSecrets.JwtSignatureKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtSignatureKey);
-        string? refreshTokenExpiration = configuration[UserSecrets.JwtRefreshTokenExpiration] ?? Environment.GetEnvironmentVariable(EnvVar.JwtRefreshTokenExpiration);
-        if (jwtEncKey == null || refreshTokenExpiration == null || jwtSigKey == null)
-            throw new NullReferenceException("It should not be possible for jwtEncKey OR refreshTokenExpirationTime OR jwtSigKey to be null at this point.");
-
-        RefreshTokenResponseModel? creds = JwtUtil.ValidateAndReadRefreshToken(jwtEncKey, jwtSigKey, refreshToken);
+        RefreshTokenResponseModel? creds = jwtUtil.ValidateAndReadRefreshToken(refreshToken);
 
         if (creds == null)
             return Unauthorized(new Error("Couldn't login user from refreshToken, please log out and back in manually."));
@@ -53,7 +47,7 @@ public class UserController : ControllerBase
             if (kronoxUser == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an unknown error while fetching user data from Kronox."));
 
-            string updatedExpirationDateRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), creds.Username, creds.Password);
+            string updatedExpirationDateRefreshToken = jwtUtil.GenerateRefreshToken(creds.Username, creds.Password);
 
             return Ok(kronoxUser.ToWebModel(updatedExpirationDateRefreshToken, new(kronoxUser.SessionToken, kronoxReqClient.BaseUrl!.ToString())));
         }
@@ -70,7 +64,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> LoginKronoxUser([FromServices] IConfiguration configuration, [FromQuery] SchoolEnum schoolId, [FromBody] LoginRequest body)
+    public async Task<IActionResult> LoginKronoxUser([FromServices] JwtUtil jwtUtil, [FromQuery] SchoolEnum schoolId, [FromBody] LoginRequest body)
     {
         IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
         School school = schoolId.GetSchool()!;
@@ -82,15 +76,13 @@ public class UserController : ControllerBase
             if (kronoxUser == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an unknown error while fetching user data from Kronox."));
 
-            string? jwtEncKey = configuration[UserSecrets.JwtEncryptionKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtEncryptionKey);
-            string? jwtSigKey = configuration[UserSecrets.JwtSignatureKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtSignatureKey);
-            string? refreshTokenExpiration = configuration[UserSecrets.JwtRefreshTokenExpiration] ?? Environment.GetEnvironmentVariable(EnvVar.JwtRefreshTokenExpiration);
-            if (jwtEncKey == null || refreshTokenExpiration == null || jwtSigKey == null)
-                throw new NullReferenceException("It should not be possible for jwtEncKey OR refreshTokenExpirationTime OR jwtSigKey to be null at this point.");
+            string newRefreshToken = jwtUtil.GenerateRefreshToken(body.Username, body.Password);
 
-            string newRefreshToken = JwtUtil.GenerateRefreshToken(jwtEncKey, jwtSigKey, int.Parse(refreshTokenExpiration), body.Username, body.Password);
+            SessionDetails sessionDetails = new(kronoxUser.SessionToken, kronoxReqClient.BaseUrl!.ToString());
 
-            return Ok(kronoxUser.ToWebModel(newRefreshToken, new(kronoxUser.SessionToken, kronoxReqClient.BaseUrl!.ToString())));
+            Response.Headers.Add("X-auth-token", newRefreshToken);
+            Response.Headers.Add("X-session-token", sessionDetails.ToJson());
+            return Ok(kronoxUser.ToWebModel(newRefreshToken, sessionDetails));
         }
         catch (LoginException e)
         {

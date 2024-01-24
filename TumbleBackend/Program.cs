@@ -68,6 +68,7 @@ builder.Services.AddSingleton<IDbSchedulesService>(sp => new MongoSchedulesServi
 builder.Services.AddSingleton<IDbProgrammeFiltersService>(sp => new MongoProgrammeFiltersService(sp.GetService<IDbSettings>()!));
 builder.Services.AddSingleton<IDbNewsService>(sp => new MongoNewsService(sp.GetService<IDbSettings>()!));
 builder.Services.AddSingleton<IDbKronoxCacheService>(sp => new MongoKronoxCacheService(sp.GetService<IDbSettings>()!));
+builder.Services.AddTransient<JwtUtil>();
 
 builder.Services.AddScoped<AuthActionFilter>();
 builder.Services.AddScoped<KronoxUrlFilter>();

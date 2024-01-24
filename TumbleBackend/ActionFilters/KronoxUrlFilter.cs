@@ -21,7 +21,6 @@ namespace TumbleBackend.ActionFilters
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var services = context.HttpContext.RequestServices;
-            var config = services.GetService<IConfiguration>();
             var request = context.HttpContext.Request;
             HttpClient pingHttpClient = new();
             HttpPinger pinger = new(pingHttpClient);

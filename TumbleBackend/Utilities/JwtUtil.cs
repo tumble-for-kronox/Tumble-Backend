@@ -3,16 +3,35 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using TumbleBackend.InternalModels;
+using Microsoft.AspNetCore.Mvc;
+using TumbleBackend.StringConstants;
 
 namespace TumbleBackend.Utilities;
 
-public static class JwtUtil
+public class JwtUtil
 {
-    public static string GenerateRefreshToken(string encKey, string sigKey, int refreshTokenExpiration, string username, string password)
+    readonly string jwtEncryptionKey;
+    readonly string jwtSignatureKey;
+    readonly int refreshTokenExpireTime;
+
+    public JwtUtil([FromServices] IConfiguration configuration)
+    {
+        string? jwtEncKey = configuration[UserSecrets.JwtEncryptionKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtEncryptionKey);
+        string? jwtSigKey = configuration[UserSecrets.JwtSignatureKey] ?? Environment.GetEnvironmentVariable(EnvVar.JwtSignatureKey);
+        string? refreshTokenExpiration = configuration[UserSecrets.JwtRefreshTokenExpiration] ?? Environment.GetEnvironmentVariable(EnvVar.JwtRefreshTokenExpiration);
+        if (jwtEncKey == null || refreshTokenExpiration == null || jwtSigKey == null)
+            throw new NullReferenceException("It should not be possible for jwtEncKey OR refreshTokenExpirationTime OR jwtSigKey to be null at this point.");
+
+        jwtEncryptionKey = jwtEncKey;
+        jwtSignatureKey = jwtSigKey;
+        refreshTokenExpireTime = int.Parse(refreshTokenExpiration);
+    }
+
+    public string GenerateRefreshToken(string username, string password)
     {
         JwtSecurityTokenHandler jwtHandler = new();
-        byte[] ecKeyTemp = Encoding.UTF8.GetBytes(encKey);
-        byte[] scKey = Encoding.UTF8.GetBytes(sigKey);
+        byte[] ecKeyTemp = Encoding.UTF8.GetBytes(jwtEncryptionKey);
+        byte[] scKey = Encoding.UTF8.GetBytes(jwtSignatureKey);
 
         byte[] ecKey = new byte[256 / 8];
         Array.Copy(ecKeyTemp, ecKey, 256 / 8);
@@ -20,7 +39,7 @@ public static class JwtUtil
         SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[] { new Claim("username", username), new Claim("password", password) }),
-            Expires = DateTime.UtcNow + TimeSpan.FromSeconds(refreshTokenExpiration),
+            Expires = DateTime.UtcNow + TimeSpan.FromSeconds(refreshTokenExpireTime),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(scKey), SecurityAlgorithms.HmacSha256Signature),
             EncryptingCredentials = new EncryptingCredentials(new SymmetricSecurityKey(ecKey), SecurityAlgorithms.Aes256KW,
             SecurityAlgorithms.Aes256CbcHmacSha512),
@@ -31,14 +50,14 @@ public static class JwtUtil
         return jwtHandler.CreateEncodedJwt(tokenDescriptor);
     }
 
-    public static RefreshTokenResponseModel? ValidateAndReadRefreshToken(string encKey, string sigKey, string token)
+    public RefreshTokenResponseModel? ValidateAndReadRefreshToken(string token)
     {
         if (token == null)
             return null;
 
         JwtSecurityTokenHandler tokenHandler = new();
-        byte[] ecKeyTemp = Encoding.UTF8.GetBytes(encKey);
-        byte[] scKey = Encoding.UTF8.GetBytes(sigKey);
+        byte[] ecKeyTemp = Encoding.UTF8.GetBytes(jwtEncryptionKey);
+        byte[] scKey = Encoding.UTF8.GetBytes(jwtSignatureKey);
 
         byte[] ecKey = new byte[256 / 8];
         Array.Copy(ecKeyTemp, ecKey, 256 / 8);
