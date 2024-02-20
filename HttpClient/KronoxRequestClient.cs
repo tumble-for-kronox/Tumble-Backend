@@ -6,35 +6,32 @@ namespace TumbleHttpClient;
 public class KronoxRequestClient : IKronoxRequestClient
 {
     private readonly HttpClient _httpClient;
-    private CookieContainer _cookieContainer;
-    private Uri? _baseUrl;
-    private string? _sessionToken;
 
     public KronoxRequestClient(double timeout = 5)
     {
-        _cookieContainer = new();
+        CookieContainer = new CookieContainer();
         HttpClientHandler handler = new()
         {
-            CookieContainer = _cookieContainer
+            CookieContainer = CookieContainer
         };
-        _httpClient = new(handler)
+        _httpClient = new HttpClient(handler)
         {
             Timeout = TimeSpan.FromSeconds(timeout)
         };
         _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36");
     }
 
-    public Uri? BaseUrl => _baseUrl;
+    public Uri? BaseUrl { get; private set; }
 
-    public bool IsAuthenticated => _sessionToken != null;
+    public bool IsAuthenticated => SessionToken != null;
 
-    public string? SessionToken => _sessionToken;
+    public string? SessionToken { get; private set; }
 
-    public CookieContainer CookieContainer => _cookieContainer;
+    public CookieContainer CookieContainer { get; }
 
     public void SetSessionToken(string sessionToken)
     {
-        _cookieContainer.Add(new Cookie()
+        CookieContainer.Add(new Cookie()
         {
             Name = "JSESSIONID",
             Value = sessionToken,
@@ -42,18 +39,18 @@ public class KronoxRequestClient : IKronoxRequestClient
             Path = "/",
             Secure = true
         });
-        _sessionToken = sessionToken;
+        SessionToken = sessionToken;
     }
 
     public void SetBaseAddress(Uri baseAddress)
     {
         _httpClient.BaseAddress = baseAddress;
-        _baseUrl = baseAddress;
+        BaseUrl = baseAddress;
     }
 
-    async public Task<HttpResponseMessage> SendAsync(HttpRequestMessage httpRequestMessage)
+    public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage httpRequestMessage)
     {
-        if (_baseUrl == null)
+        if (BaseUrl == null)
         {
             throw new NullReferenceException("The base address of the KronoxRequestClient must be initialized before sending requests.");
         }

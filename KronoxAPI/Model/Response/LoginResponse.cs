@@ -8,12 +8,12 @@ namespace KronoxAPI.Model.Response;
 
 public class LoginResponse
 {
-    public readonly string sessionToken;
-    public readonly string htmlResult;
+    public readonly string SessionToken;
+    public readonly string HtmlResult;
 
     public LoginResponse(string sessionToken, string htmlResult)
     {
-        this.sessionToken = sessionToken;
-        this.htmlResult = htmlResult;
+        SessionToken = sessionToken;
+        HtmlResult = htmlResult;
     }
 }

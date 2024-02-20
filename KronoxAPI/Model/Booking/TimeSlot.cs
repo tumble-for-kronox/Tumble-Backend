@@ -8,26 +8,21 @@ namespace KronoxAPI.Model.Booking;
 
 public class TimeSlot
 {
-    private readonly int? _id;
-    private readonly DateTime _from;
-    private readonly DateTime _to;
-    private readonly TimeSpan _duration;
-
     public TimeSlot(DateTime from, DateTime to, int? id = null)
     {
-        _id = id;
-        _from = from;
-        _to = to;
-        _duration = to.Subtract(from);
+        Id = id;
+        From = from;
+        To = to;
+        Duration = to.Subtract(from);
     }
 
-    public int? Id => _id;
+    public int? Id { get; }
 
-    public DateTime From => _from;
+    private DateTime From { get; }
 
-    public DateTime To => _to;
+    private DateTime To { get; }
 
-    public TimeSpan Duration => _duration;
+    public TimeSpan Duration { get; }
 
     public override string? ToString()
     {
@@ -41,14 +36,11 @@ public class TimeSlot
 
     public override bool Equals(object? obj)
     {
-        if (obj == null || !GetType().Equals(obj.GetType()))
+        if (obj == null || GetType() != obj.GetType())
         {
             return false;
         }
-        else
-        {
-            TimeSlot t = (TimeSlot)obj;
-            return Id == t.Id;
-        }
+        var t = (TimeSlot)obj;
+        return Id == t.Id;
     }
 }

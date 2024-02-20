@@ -36,13 +36,12 @@ public class SearchParser
         // Get all links in the return html (as per Kronox's standard). Skip the first two as they link to non-programme entities
         IEnumerable<HtmlNode> hyperLinksInPage = document.DocumentNode.Descendants("a").Skip(2);
 
-        foreach (HtmlNode hyperlink in hyperLinksInPage)
+        foreach (var hyperlink in hyperLinksInPage)
         {
             if (hyperlink.GetAttributeValue("target", "") != "_blank") continue;
 
             // Get href value from link
-            string hyperlinkHref = hyperlink.GetAttributeValue("href", "N/A");
-            string id;
+            var hyperlinkHref = hyperlink.GetAttributeValue("href", "N/A");
 
             // If the link can't be found we can' use the entry, hence we don't wish to continue parsing it
             if (hyperlinkHref == "N/A") continue;
@@ -55,12 +54,12 @@ public class SearchParser
             // If the ID can't be matched we can't use the entry, hence we move on
             if (idGroup == null) continue;
 
-            id = idGroup.Value;
+            var id = idGroup.Value;
 
-            string[] splitTitles = hyperlink.InnerText.Split(",");
+            var splitTitles = hyperlink.InnerText.Split(",");
 
-            string title = splitTitles[0];
-            string subtitle = RemoveDuplicateWords(splitTitles[1]);
+            var title = splitTitles[0];
+            var subtitle = RemoveDuplicateWords(splitTitles[1]);
 
             foundProgrammes.Add(new Programme(title, subtitle, id));
         }
@@ -79,13 +78,13 @@ public class SearchParser
     /// </summary>
     /// <param name="stringWithDuplicates"></param>
     /// <returns></returns>
-    public static string RemoveDuplicateWords(string stringWithDuplicates)
+    private static string RemoveDuplicateWords(string stringWithDuplicates)
     {
         var words = new HashSet<string>();
         return Regex.Replace(stringWithDuplicates, "\\w+", m =>
                              words.Add(m.Value.ToUpperInvariant())
                                  ? m.Value
-                                 : String.Empty);
+                                 : string.Empty);
     }
 
 }

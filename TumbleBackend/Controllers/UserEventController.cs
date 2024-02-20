@@ -37,7 +37,7 @@ public class UserEventController : ControllerBase
 
         try
         {
-            Dictionary<string, List<UserEvent>>? userEvents = await school.GetUserEvents(kronoxReqClient);
+            Dictionary<string, List<UserEvent>>? userEvents = await School.GetUserEventsAsync(kronoxReqClient);
             UserEventCollection? webSafeUserEvents = userEvents?.ToWebModel();
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
@@ -67,7 +67,7 @@ public class UserEventController : ControllerBase
 
         try
         {
-            Dictionary<string, List<UserEvent>>? userEvents = await school.GetUserEvents(kronoxReqClient);
+            Dictionary<string, List<UserEvent>>? userEvents = await School.GetUserEventsAsync(kronoxReqClient);
             UserEventCollection? webSafeUserEvents = userEvents?.ToWebModel();
 
             if (webSafeUserEvents == null)
@@ -116,7 +116,7 @@ public class UserEventController : ControllerBase
 
         try
         {
-            Dictionary<string, List<UserEvent>>? userEvents = await school.GetUserEvents(kronoxReqClient);
+            Dictionary<string, List<UserEvent>>? userEvents = await School.GetUserEventsAsync(kronoxReqClient);
             UserEventCollection? webSafeUserEvents = userEvents?.ToWebModel();
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
@@ -162,7 +162,7 @@ public class UserEventController : ControllerBase
 
         try
         {
-            Dictionary<string, List<UserEvent>>? userEvents = await school.GetUserEvents(kronoxReqClient);
+            Dictionary<string, List<UserEvent>>? userEvents = await School.GetUserEventsAsync(kronoxReqClient);
             UserEventCollection? webSafeUserEvents = userEvents?.ToWebModel();
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));

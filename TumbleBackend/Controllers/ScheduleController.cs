@@ -179,7 +179,7 @@ public class ScheduleController : ControllerBase
             return BadRequest(new Error("Invalid school value."));
         try
         {
-            List<Programme> searchResult = await school.SearchProgrammes(kronoxReqClient, searchQuery);
+            List<Programme> searchResult = await School.SearchProgrammesAsync(kronoxReqClient, searchQuery);
             HashSet<string> filter = await programmeFiltersService.GetProgrammeFiltersAsync(school);
 
             if (searchResult.Count <= 0)

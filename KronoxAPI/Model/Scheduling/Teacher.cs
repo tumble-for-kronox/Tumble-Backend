@@ -8,15 +8,11 @@ namespace KronoxAPI.Model.Scheduling;
 
 public class Teacher
 {
-    private readonly string _id;
-    private readonly string _firstName;
-    private readonly string _lastName;
-
     public Teacher(string id, string firstName, string lastName)
     {
-        _id = id;
-        _firstName = firstName;
-        _lastName = lastName;
+        Id = id;
+        FirstName = firstName;
+        LastName = lastName;
     }
 
     /// <summary>
@@ -27,12 +23,12 @@ public class Teacher
 
     public override string? ToString()
     {
-        return $"{_firstName} {_lastName}";
+        return $"{FirstName} {LastName}";
     }
 
-    public string Id => _id;
+    public string Id { get; }
 
-    public string FirstName => _firstName;
+    private string FirstName { get; }
 
-    public string LastName => _lastName;
+    private string LastName { get; }
 }

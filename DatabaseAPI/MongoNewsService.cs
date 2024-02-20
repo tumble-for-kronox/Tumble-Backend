@@ -12,18 +12,15 @@ public class MongoNewsService : IDbNewsService
     public MongoNewsService(IDbSettings settings)
     {
         MongoClient client = new(settings.ConnectionString);
-        IMongoDatabase database = client.GetDatabase(settings.DatabaseName);
+        var database = client.GetDatabase(settings.DatabaseName);
         _newsCollection = database.GetCollection<NotificationContent>("news_history");
     }
 
     public async Task<List<NotificationContent>> GetNewsHistoryAsync()
     {
-        List<NotificationContent> cursor = await _newsCollection.AsQueryable().OrderByDescending(c => c.Timestamp).Take(10).ToListAsync();
+        var cursor = await _newsCollection.AsQueryable().OrderByDescending(c => c.Timestamp).Take(10).ToListAsync();
 
-        if (cursor.Any())
-            return cursor;
-
-        return new();
+        return cursor.Any() ? cursor : new List<NotificationContent>();
     }
 
     public async Task SaveNewsItemAsync(NotificationContent item)

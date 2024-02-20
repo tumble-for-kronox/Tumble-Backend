@@ -35,7 +35,7 @@ public class UserEventParser
     /// <exception cref="LoginException"></exception>
     public static Dictionary<string, List<UserEvent>> ParseToDict(HtmlDocument userEventsHtml)
     {
-        Dictionary<string, List<UserEvent>> userEvents = new() { { "registered", new() }, { "unregistered", new() }, { "upcoming", new() } };
+        Dictionary<string, List<UserEvent>> userEvents = new() { { "registered", new List<UserEvent>() }, { "unregistered", new List<UserEvent>() }, { "upcoming", new List<UserEvent>() } };
 
         // Fetch all individual user event div nodes for scraping.
         try
@@ -46,7 +46,7 @@ public class UserEventParser
 
             if (registeredEvents != null)
             {
-                foreach (HtmlNode registeredEvent in registeredEvents)
+                foreach (var registeredEvent in registeredEvents)
                 {
                     userEvents["registered"].Add(ParseAvailableEvent(registeredEvent, true));
                 }
@@ -54,18 +54,16 @@ public class UserEventParser
 
             if (unregisteredEvents != null)
             {
-                foreach (HtmlNode unregisteredEvent in unregisteredEvents)
+                foreach (var unregisteredEvent in unregisteredEvents)
                 {
                     userEvents["unregistered"].Add(ParseAvailableEvent(unregisteredEvent, false));
                 }
             }
 
-            if (upcomingEvents != null)
+            if (upcomingEvents == null) return userEvents;
+            foreach (var upcomingEvent in upcomingEvents)
             {
-                foreach (HtmlNode upcomingEvent in upcomingEvents)
-                {
-                    userEvents["upcoming"].Add(ParseUpcomingEvent(upcomingEvent));
-                }
+                userEvents["upcoming"].Add(ParseUpcomingEvent(upcomingEvent));
             }
 
             return userEvents;
@@ -84,19 +82,20 @@ public class UserEventParser
     /// Scrape a single Kronox event HTML div element (has the class "tentamen-post") that represents an available user event into an <see cref="AvailableUserEvent"/> object.
     /// </summary>
     /// <param name="userEventHtmlDiv"></param>
+    /// <param name="isRegistered"></param>
     /// <returns>The <see cref="AvailableUserEvent"/> object with the same data as the user event div from <paramref name="userEventHtmlDiv"/>.</returns>
     /// <exception cref="ParseException"></exception>
-    public static AvailableUserEvent ParseAvailableEvent(HtmlNode userEventHtmlDiv, bool isRegistered)
+    private static AvailableUserEvent ParseAvailableEvent(HtmlNode userEventHtmlDiv, bool isRegistered)
     {
         // Variables needed to construct the AvailableUserEvent in the end.
-        bool supportAvailable = false;
-        bool mustChooseLocation = false;
+        var supportAvailable = false;
+        var mustChooseLocation = false;
         string? id = null;
         string? participatorId = null;
         string? supportId = null;
         string title;
         string type;
-        string anonymousCode = string.Empty;
+        var anonymousCode = string.Empty;
         DateTime lastSignupDate;
         DateTime startTime;
         DateTime endTime;
@@ -122,14 +121,14 @@ public class UserEventParser
         IEnumerable<HtmlNode> buttonElements = userEventHtmlDiv.Descendants("a");
 
         // Scrape necessary ids from function calls and determine if support is available.
-        foreach (HtmlNode button in buttonElements)
+        foreach (var button in buttonElements)
         {
             // The button is a support button.
             if (button.GetAttributeValue("onclick", "").ToLowerInvariant().Contains("stod"))
             {
                 supportAvailable = true;
                 // Fetch the 2 ids needed for support adding from the button using regex.
-                Match supportAndParticipatorIds = Regex.Match(HttpUtility.HtmlDecode(button.GetAttributeValue("onclick", "").ToLowerInvariant()), @"visastod\('(.*?)','(.*?)'\)");
+                var supportAndParticipatorIds = Regex.Match(HttpUtility.HtmlDecode(button.GetAttributeValue("onclick", "").ToLowerInvariant()), @"visastod\('(.*?)','(.*?)'\)");
 
                 participatorId = supportAndParticipatorIds.Groups[1].Value;
                 supportId = supportAndParticipatorIds.Groups[2].Value;
@@ -144,12 +143,10 @@ public class UserEventParser
             }
 
             // The button is a "sign up" button.
-            if (button.GetAttributeValue("onclick", "").ToLowerInvariant().Contains("anmal"))
-            {
-                Match eventIdAndLocationChoice = Regex.Match(HttpUtility.HtmlDecode(button.GetAttributeValue("onclick", "").ToLowerInvariant()), @"anmal\('(.*?)',\s*(.*?)\)");
-                id = eventIdAndLocationChoice.Groups[1].Value;
-                if (eventIdAndLocationChoice.Groups[2].Value == "true") mustChooseLocation = true;
-            }
+            if (!button.GetAttributeValue("onclick", "").ToLowerInvariant().Contains("anmal")) continue;
+            var eventIdAndLocationChoice = Regex.Match(HttpUtility.HtmlDecode(button.GetAttributeValue("onclick", "").ToLowerInvariant()), @"anmal\('(.*?)',\s*(.*?)\)");
+            id = eventIdAndLocationChoice.Groups[1].Value;
+            if (eventIdAndLocationChoice.Groups[2].Value == "true") mustChooseLocation = true;
         }
 
         List<HtmlNode> dataNodes = userEventHtmlDiv.Descendants("div").SkipWhile(el => !el.InnerText.ToLowerInvariant().Contains("test date")).ToList();
@@ -195,7 +192,7 @@ public class UserEventParser
     /// <param name="userEventHtmlDiv"></param>
     /// <returns>The <see cref="UpcomingUserEvent"/> corresponding to the input <paramref name="userEventHtmlDiv"/>.</returns>
     /// <exception cref="ParseException"></exception>
-    public static UpcomingUserEvent ParseUpcomingEvent(HtmlNode userEventHtmlDiv)
+    private static UpcomingUserEvent ParseUpcomingEvent(HtmlNode userEventHtmlDiv)
     {
         // Variables needed to construct the UpcomingUserEvent in the end.
         string title;

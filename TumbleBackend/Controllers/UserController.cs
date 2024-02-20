@@ -42,7 +42,7 @@ public class UserController : ControllerBase
 
         try
         {
-            User? kronoxUser = await school.Login(kronoxReqClient, creds.Username, creds.Password);
+            User? kronoxUser = await School.LoginAsync(kronoxReqClient, creds.Username, creds.Password);
 
             if (kronoxUser == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an unknown error while fetching user data from Kronox."));
@@ -71,7 +71,7 @@ public class UserController : ControllerBase
 
         try
         {
-            User? kronoxUser = await school.Login(kronoxReqClient, body.Username, body.Password);
+            User? kronoxUser = await School.LoginAsync(kronoxReqClient, body.Username, body.Password);
 
             if (kronoxUser == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an unknown error while fetching user data from Kronox."));

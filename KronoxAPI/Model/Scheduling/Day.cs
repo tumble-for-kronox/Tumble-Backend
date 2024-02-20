@@ -11,35 +11,23 @@ namespace KronoxAPI.Model.Scheduling;
 /// </summary>
 public class Day
 {
-    private readonly string _id;
-    private readonly string _name;
-    private readonly int _weekNumber;
-    private readonly DateTime _date;
-    private readonly List<Event> _events;
+    public string Name { get; }
 
-    public string Name => _name;
+    public DateTime Date { get; }
 
-    public DateTime Date => _date;
+    public int WeekNumber { get; }
 
-    public int WeekNumber => _weekNumber;
+    public List<Event> Events { get; }
 
-    public List<Event> Events => _events;
-
-    public string Id => _id;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="date"></param>
-    /// <param name="events"></param>
+    public string Id { get; }
+    
     public Day(string name, DateTime date, List<Event> events)
     {
-        _id = Guid.NewGuid().ToString();
-        _name = name;
-        _date = date;
-        _events = events;
+        Id = Guid.NewGuid().ToString();
+        Name = name;
+        Date = date;
+        Events = events;
 
-        _weekNumber = Utilities.DateUtils.GetIso8601WeekOfYear(date);
+        WeekNumber = Utilities.DateUtils.GetIso8601WeekOfYear(date);
     }
 }

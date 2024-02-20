@@ -7,116 +7,81 @@ namespace KronoxAPI.Controller;
 
 public static class BookingController
 {
-    static readonly MultiRequest client;
-
-    static BookingController()
+    public static async Task<string> GetResourcesAsync(IKronoxRequestClient client)
     {
-        client = new MultiRequest();
-    }
+        await KronoxSessionController.SetSessionEnglishAsync(client);
+        const string endpoint = "resursbokning.jsp";
 
-    public static async Task<string> GetResources(IKronoxRequestClient client)
-    {
-        await KronoxSession.SetSessionEnglish(client);
+        var parameters = new Dictionary<string, string>();
 
-        string endpoint = "resursbokning.jsp";
-
-        HttpRequestMessage request = new(new HttpMethod("GET"), endpoint);
-        HttpResponseMessage response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-
+        var response = await HttpUtilities.SendRequestAsync(client, HttpMethod.Get, endpoint, parameters);
         return await response.Content.ReadAsStringAsync();
     }
 
-    public static async Task<string> GetPersonalBookingsForResource(IKronoxRequestClient client, string resourceId)
+    public static async Task<string> GetPersonalBookingsForResourceAsync(IKronoxRequestClient client, string resourceId)
     {
-        await KronoxSession.SetSessionEnglish(client);
+        await KronoxSessionController.SetSessionEnglishAsync(client);
+        var date = DateTime.Now;
+        const string endpoint = "minaresursbokningar.jsp";
 
-        DateTime date = DateTime.Now;
-        string endpoint = "minaresursbokningar.jsp";
-
-        var query = HttpUtility.ParseQueryString("");
-        query["datum"] = $"{date:yy-MM-dd}";
-        query["flik"] = resourceId;
-
-        string fullPath = $"{endpoint}?{query}";
-
-        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
-        HttpResponseMessage response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-
-        return await response.Content.ReadAsStringAsync();
-    }
-
-    public static async Task<string> GetResourceAvailability(IKronoxRequestClient client, DateTime date, string resourceId)
-    {
-        await KronoxSession.SetSessionEnglish(client);
-
-        string endpoint = "ajax/ajax_resursbokning.jsp";
-
-        var query = HttpUtility.ParseQueryString("");
-        query["op"] = "hamtaBokningar";
-        query["datum"] = $"{date:yy-MM-dd}";
-        query["flik"] = resourceId;
-
-        string fullPath = $"{endpoint}?{query}";
-
-        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
-        HttpResponseMessage response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-
-        return await response.Content.ReadAsStringAsync();
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="schoolUrl"></param>
-    /// <param name="date"></param>
-    /// <param name="resourceId"></param>
-    /// <param name="sessionToken"></param>
-    /// <param name="locationId"></param>
-    /// <param name="timeSlotId"></param>
-    /// <param name="resourceType"></param>
-    /// <returns></returns>
-    /// <exception cref="LoginException"></exception>
-    /// <exception cref="BookingCollisionException"></exception>
-    /// <exception cref="MaxBookingsException"></exception>
-    /// <exception cref="ParseException"></exception>
-    public static async Task BookResourceLocation(IKronoxRequestClient client, DateTime date, string resourceId, string locationId, string timeSlotId, string resourceType)
-    {
-        await KronoxSession.SetSessionEnglish(client);
-
-        string endpoint = "ajax/ajax_resursbokning.jsp";
-
-        var query = HttpUtility.ParseQueryString("");
-        query["op"] = "boka";
-        query["datum"] = $"{date:yy-MM-dd}";
-        query["flik"] = resourceId;
-        query["id"] = locationId;
-        query["typ"] = resourceType;
-        query["intervall"] = timeSlotId;
-        query["moment"] = "Booked via Tumble";
-
-        string fullPath = $"{endpoint}?{query}";
-
-        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
-        HttpResponseMessage response = await client.SendAsync(request);
-
-        string responseBody = await response.Content.ReadAsStringAsync();
-        if (responseBody != "OK")
+        var parameters = new Dictionary<string, string>
         {
-            Console.WriteLine(responseBody);
-            if (responseBody == "Your user do not have permissions to book resources.")
+            ["datum"] = $"{date:yy-MM-dd}",
+            ["flik"] = resourceId
+        };
+
+        var response = await HttpUtilities.SendRequestAsync(client, HttpMethod.Get, endpoint, parameters);
+        return await response.Content.ReadAsStringAsync();
+    }
+
+    public static async Task<string> GetResourceAvailabilityAsync(IKronoxRequestClient client, DateTime date, string resourceId)
+    {
+        await KronoxSessionController.SetSessionEnglishAsync(client);
+        const string endpoint = "ajax/ajax_resursbokning.jsp";
+
+        var parameters = new Dictionary<string, string>
+        {
+            ["op"] = "hamtaBokningar",
+            ["datum"] = $"{date:yy-MM-dd}",
+            ["flik"] = resourceId
+        };
+
+        var response = await HttpUtilities.SendRequestAsync(client, HttpMethod.Get, endpoint, parameters);
+        return await response.Content.ReadAsStringAsync();
+    }
+
+    public static async Task BookResourceLocationAsync(IKronoxRequestClient client, DateTime date, string resourceId, string locationId, string timeSlotId, string resourceType)
+    {
+        await KronoxSessionController.SetSessionEnglishAsync(client);
+        const string endpoint = "ajax/ajax_resursbokning.jsp";
+
+        var parameters = new Dictionary<string, string>
+        {
+            ["op"] = "boka",
+            ["datum"] = $"{date:yy-MM-dd}",
+            ["flik"] = resourceId,
+            ["id"] = locationId,
+            ["typ"] = resourceType,
+            ["intervall"] = timeSlotId,
+            ["moment"] = "Booked via Tumble"
+        };
+
+        var response = await HttpUtilities.SendRequestAsync(client, HttpMethod.Get, endpoint, parameters);
+        var content = await response.Content.ReadAsStringAsync();
+        
+        if (content != "OK")
+        {
+            if (content.Equals("Your user do not have permissions to book resources."))
             {
                 throw new LoginException("Kronox failed to authorize the user credentials.");
             }
 
-            if (responseBody.Contains("The booking was not saved because of the following colliding resources:"))
+            if (content.Contains("The booking was not saved because of the following colliding resources:"))
             {
                 throw new BookingCollisionException("Couldn't book resource.");
             }
 
-            if (responseBody == "You have already created max number of bookings.")
+            if (content.Equals("You have already created max number of bookings."))
             {
                 throw new MaxBookingsException("");
             }
@@ -125,64 +90,47 @@ public static class BookingController
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="schoolUrl"></param>
-    /// <param name="sessionToken"></param>
-    /// <param name="bookingId"></param>
-    /// <returns></returns>
-    /// <exception cref="LoginException"></exception>
-    /// <exception cref="BookingCollisionException"></exception>
-    /// <exception cref="ParseException"></exception>
-    public static async Task UnbookResourceLocation(IKronoxRequestClient client, string bookingId)
+    public static async Task UnBookResourceLocationAsync(IKronoxRequestClient client, string bookingId)
     {
-        await KronoxSession.SetSessionEnglish(client);
+        await KronoxSessionController.SetSessionEnglishAsync(client);
+        const string endpoint = "ajax/ajax_resursbokning.jsp";
 
-        string endpoint = "ajax/ajax_resursbokning.jsp";
-
-        var query = HttpUtility.ParseQueryString("");
-        query["op"] = "avboka";
-        query["bokningsId"] = bookingId;
-
-        string fullPath = $"{endpoint}?{query}";
-
-        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
-        HttpResponseMessage response = await client.SendAsync(request);
-
-        string responseBody = await response.Content.ReadAsStringAsync();
-        if (responseBody != "OK")
+        var parameters = new Dictionary<string, string>
         {
-            if (responseBody == "Din användare har inte rättigheter att skapa resursbokningar.")
-            {
-                throw new LoginException("Kronox failed to authorize the user credentials.");
-            }
+            ["op"] = "avboka",
+            ["bokningsId"] = bookingId
+        };
 
-            if (responseBody == "Du kan inte radera resursbokningar där du inte är bokare eller deltagare")
+        var response = await HttpUtilities.SendRequestAsync(client, HttpMethod.Get, endpoint, parameters);
+        var content = await response.Content.ReadAsStringAsync();
+        
+        if (!content.Equals("OK"))
+        {
+            throw content switch
             {
-                throw new BookingCollisionException($"Couldn't unbook resource. Resource details:\n\nschoolUrl: {client.BaseUrl}\nbookingId: {bookingId}");
-            }
-
-            throw new ParseException($"Something went wrong while parsing or handling the requset to unbook a resource. Resource details:\n\nschoolUrl: {client.BaseUrl}\nbookingId: {bookingId}");
+                "Din användare har inte rättigheter att skapa resursbokningar." => new LoginException(
+                    "Kronox failed to authorize the user credentials."),
+                "Du kan inte radera resursbokningar där du inte är bokare eller deltagare" => new
+                    BookingCollisionException(
+                        $"Couldn't unbook resource. Resource details:\n\nschoolUrl: {client.BaseUrl}\nbookingId: {bookingId}"),
+                _ => new ParseException(
+                    $"Something went wrong while parsing or handling the requset to unbook a resource. Resource details:\n\nschoolUrl: {client.BaseUrl}\nbookingId: {bookingId}")
+            };
         }
     }
 
-    public static async Task ConfirmResourceBooking(IKronoxRequestClient client, string bookingId, string resourceId)
+    public static async Task ConfirmResourceBookingAsync(IKronoxRequestClient client, string bookingId, string resourceId)
     {
-        await KronoxSession.SetSessionEnglish(client);
+        await KronoxSessionController.SetSessionEnglishAsync(client);
+        const string endpoint = "ajax/ajax_resursbokning.jsp";
 
-        string endpoint = "ajax/ajax_resursbokning.jsp";
+        var parameters = new Dictionary<string, string>
+        {
+            ["op"] = "konfirmera",
+            ["flik"] = resourceId,
+            ["bokningsId"] = bookingId
+        };
 
-        var query = HttpUtility.ParseQueryString("");
-        query["op"] = "konfirmera";
-        query["flik"] = resourceId;
-        query["bokningsId"] = bookingId;
-
-        string fullPath = $"{endpoint}?{query}";
-
-        HttpRequestMessage request = new(new HttpMethod("GET"), fullPath);
-        HttpResponseMessage response = await client.SendAsync(request);
-
-        response.EnsureSuccessStatusCode();
+        await HttpUtilities.SendRequestAsync(client, HttpMethod.Get, endpoint, parameters);
     }
 }

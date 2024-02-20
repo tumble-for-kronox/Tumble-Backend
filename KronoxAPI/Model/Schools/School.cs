@@ -31,21 +31,15 @@ namespace KronoxAPI.Model.Schools;
 /// </summary>
 public class School
 {
-    private readonly SchoolEnum _id;
-    private readonly string _name;
-    private readonly string[] _urls;
-    private readonly bool _loginRequired;
-    private readonly SchoolResources _resources;
+    public SchoolEnum Id { get; }
 
-    public SchoolEnum Id => _id;
+    public string Name { get; }
 
-    public string Name => _name;
+    public string[] Urls { get; }
 
-    public string[] Urls => _urls;
+    public bool LoginRequired { get; }
 
-    public bool LoginRequired => _loginRequired;
-
-    public SchoolResources Resources => _resources;
+    public SchoolResources Resources { get; }
 
     /// <summary>
     /// <para>
@@ -67,11 +61,11 @@ public class School
     /// <param name="loginRequired"></param>
     public School(SchoolEnum id, string name, string[] urls, bool loginRequired)
     {
-        this._id = id;
-        this._urls = urls;
-        this._loginRequired = loginRequired;
-        this._name = name;
-        this._resources = new SchoolResources();
+        Id = id;
+        Urls = urls;
+        LoginRequired = loginRequired;
+        Name = name;
+        Resources = new SchoolResources();
     }
 
     /// <summary>
@@ -92,14 +86,14 @@ public class School
     /// <param name="startDate"></param>
     /// <returns></returns>
     /// <exception cref="ParseException"></exception>
-    public async Task<Schedule> FetchSchedule(IKronoxRequestClient client, string[] scheduleIds, LangEnum? language = null, DateTime? startDate = null)
+    public static async Task<Schedule> FetchScheduleAsync(IKronoxRequestClient client, string[] scheduleIds, LangEnum? language = null, DateTime? startDate = null)
     {
         try
         {
-            string scheduleXmlString = await KronoxFetchController.GetSchedule(client, scheduleIds, language, startDate);
+            var scheduleXmlString = await KronoxFetchController.GetScheduleAsync(client, scheduleIds, language, startDate);
 
-            XDocument scheduleXml = XDocument.Parse(scheduleXmlString);
-            List<Day> scheduleDaysOfEvents = ScheduleParser.ParseToDays(scheduleXml);
+            var scheduleXml = XDocument.Parse(scheduleXmlString);
+            var scheduleDaysOfEvents = ScheduleParser.ParseToDays(scheduleXml);
 
             return new Schedule(scheduleIds, scheduleDaysOfEvents);
 
@@ -117,19 +111,20 @@ public class School
     /// <summary>
     /// Searches between all schedules available on the relative school, using <paramref name="searchQuery"/> to search directly in Kronox's data.
     /// </summary>
+    /// <param name="client"></param>
     /// <param name="searchQuery"></param>
-    /// <param name="sessionToken"></param>
     /// <returns>The <see cref="List{Programme}"/> objects equivalent to the search results found in Kronox's database.</returns>
     /// <exception cref="LoginException"></exception>
-    public async Task<List<Programme>> SearchProgrammes(IKronoxRequestClient client, string searchQuery)
+    public static async Task<List<Programme>> SearchProgrammesAsync(IKronoxRequestClient client, string searchQuery)
     {
-        string searchResultsHtml = await KronoxFetchController.GetProgrammes(client, searchQuery);
+        string searchResultsHtml = await KronoxFetchController.GetProgrammesAsync(client, searchQuery);
         return SearchParser.ParseToProgrammes(searchResultsHtml);
     }
 
     /// <summary>
     /// Uses the provided <paramref name="username"/> and <paramref name="password"/> to log the user into Kronox.
     /// </summary>
+    /// <param name="client"></param>
     /// <param name="username"></param>
     /// <param name="password"></param>
     /// <returns>
@@ -138,9 +133,9 @@ public class School
     /// </returns>
     /// <exception cref="LoginException"></exception>
     /// <exception cref="ParseException"></exception>
-    public async Task<User?> Login(IKronoxRequestClient client, string username, string password)
+    public static async Task<User?> LoginAsync(IKronoxRequestClient client, string username, string password)
     {
-        Response.LoginResponse? loginResponse = await KronoxPushController.Login(client, username, password);
+        var loginResponse = await KronoxPushController.LoginAsync(client, username, password);
 
         if (loginResponse == null)
         {
@@ -148,11 +143,11 @@ public class School
         }
 
         HtmlDocument loginResponseHtmlDocument = new();
-        loginResponseHtmlDocument.LoadHtml(loginResponse.htmlResult);
+        loginResponseHtmlDocument.LoadHtml(loginResponse.HtmlResult);
 
-        Dictionary<string, string> result = UserParser.ParseToNames(loginResponseHtmlDocument);
+        var result = UserParser.ParseToNames(loginResponseHtmlDocument);
 
-        return new User(result["name"], result["username"], loginResponse.sessionToken);
+        return new User(result["name"], result["username"], loginResponse.SessionToken);
     }
 
     /// <summary>
@@ -162,9 +157,9 @@ public class School
     /// <exception cref="ParseException"></exception>
     /// <exception cref="LoginException"></exception>
     /// <exception cref="HttpRequestException"></exception>
-    public async Task<Dictionary<string, List<UserEvent>>?> GetUserEvents(IKronoxRequestClient client)
+    public static async Task<Dictionary<string, List<UserEvent>>?> GetUserEventsAsync(IKronoxRequestClient client)
     {
-        string? userEventsHtmlResult = await KronoxFetchController.GetUserEvents(client);
+        var userEventsHtmlResult = await KronoxFetchController.GetUserEventsAsync(client);
 
         if (userEventsHtmlResult == null)
         {
@@ -177,8 +172,8 @@ public class School
         return UserEventParser.ParseToDict(userEventHtmlDoc);
     }
 
-    public async Task<bool> RefreshUserSession(IKronoxRequestClient client)
+    public static async Task<bool> RefreshUserSessionAsync(IKronoxRequestClient client)
     {
-        return await KronoxSession.RefreshSession(client);
+        return await KronoxSessionController.RefreshSessionAsync(client);
     }
 }

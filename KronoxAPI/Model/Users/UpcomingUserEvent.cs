@@ -1,21 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KronoxAPI.Model.Users;
+﻿namespace KronoxAPI.Model.Users;
 
 public class UpcomingUserEvent : UserEvent
 {
-    private readonly DateTime _firstSignupDate;
-
     public UpcomingUserEvent(string title, string type, DateTime firstSignupDate, DateTime eventStart, DateTime eventEnd) : base(title, type, eventStart, eventEnd)
     {
-        _firstSignupDate = firstSignupDate;
+        FirstSignupDate = firstSignupDate;
     }
 
-    public DateTime FirstSignupDate => _firstSignupDate;
+    public DateTime FirstSignupDate { get; }
 
     /// <summary>
     /// For use as default or in case an event is not found/can't be parsed.

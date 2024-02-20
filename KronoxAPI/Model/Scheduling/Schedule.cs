@@ -11,22 +11,13 @@ namespace KronoxAPI.Model.Scheduling;
 /// </summary>
 public class Schedule
 {
-    private readonly string[] _ids;
-    private List<Day> _days;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="days"></param>
-    /// <param name="courses"></param>
     public Schedule(string[] ids, List<Day> days)
     {
-        _ids = ids;
-        _days = days;
+        Ids = ids;
+        Days = days;
     }
 
-    public string[] Ids => _ids;
+    public string[] Ids { get; }
 
-    public List<Day> Days { get => _days; set => _days = value; }
+    public List<Day> Days { get; set; }
 }
