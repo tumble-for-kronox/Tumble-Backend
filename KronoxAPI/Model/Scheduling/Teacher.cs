@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KronoxAPI.Model.Scheduling;
+﻿namespace KronoxAPI.Model.Scheduling;
 
 public class Teacher
 {
@@ -28,7 +22,7 @@ public class Teacher
 
     public string Id { get; }
 
-    private string FirstName { get; }
+    public string FirstName { get; }
 
-    private string LastName { get; }
+    public string LastName { get; }
 }
