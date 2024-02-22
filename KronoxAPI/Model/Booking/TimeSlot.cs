@@ -18,9 +18,9 @@ public class TimeSlot
 
     public int? Id { get; }
 
-    private DateTime From { get; }
+    public DateTime From { get; }
 
-    private DateTime To { get; }
+    public DateTime To { get; }
 
     public TimeSpan Duration { get; }
 

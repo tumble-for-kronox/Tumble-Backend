@@ -7,9 +7,9 @@ public class AvailableUserEvent : UserEvent
 {
     public string? Id { get; }
 
-    private string? ParticipatorId { get; }
+    public string? ParticipatorId { get; }
 
-    private string? SupportId { get; }
+    public string? SupportId { get; }
 
     public string AnonymousCode { get; }
 
