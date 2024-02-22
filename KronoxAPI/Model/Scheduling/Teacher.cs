@@ -1,22 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KronoxAPI.Model.Scheduling;
+﻿namespace KronoxAPI.Model.Scheduling;
 
 public class Teacher
 {
-    private readonly string _id;
-    private readonly string _firstName;
-    private readonly string _lastName;
-
     public Teacher(string id, string firstName, string lastName)
     {
-        _id = id;
-        _firstName = firstName;
-        _lastName = lastName;
+        Id = id;
+        FirstName = firstName;
+        LastName = lastName;
     }
 
     /// <summary>
@@ -27,12 +17,12 @@ public class Teacher
 
     public override string? ToString()
     {
-        return $"{_firstName} {_lastName}";
+        return $"{FirstName} {LastName}";
     }
 
-    public string Id => _id;
+    public string Id { get; }
 
-    public string FirstName => _firstName;
+    public string FirstName { get; }
 
-    public string LastName => _lastName;
+    public string LastName { get; }
 }

@@ -11,30 +11,21 @@ namespace KronoxAPI.Model.Booking;
 
 public class AvailabilitySlot
 {
-    private readonly Availability _availability;
-    private readonly string? _locationId;
-    private readonly string? _resourceType;
-    private readonly string? _timeSlotId;
-    private readonly string? _bookedBy;
-
-    public AvailabilitySlot(Availability availability, string? locationId = null, string? resourceType = null, string? timeSlotId = null, string? bookedBy = null)
+    public AvailabilitySlot(Availability availability, string? locationId = null, string? resourceType = null, string? timeSlotId = null)
     {
-        _availability = availability;
-        _locationId = locationId;
-        _resourceType = resourceType;
-        _timeSlotId = timeSlotId;
-        _bookedBy = bookedBy;
+        Availability = availability;
+        LocationId = locationId;
+        ResourceType = resourceType;
+        TimeSlotId = timeSlotId;
     }
 
-    public Availability Availability => _availability;
+    public Availability Availability { get; }
 
-    public string? LocationId => _locationId;
+    public string? LocationId { get; }
 
-    public string? ResourceType => _resourceType;
+    public string? ResourceType { get; }
 
-    public string? TimeSlotId => _timeSlotId;
-
-    public string? BookedBy => _bookedBy;
+    public string? TimeSlotId { get; }
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

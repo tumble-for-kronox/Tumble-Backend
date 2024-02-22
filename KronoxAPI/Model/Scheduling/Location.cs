@@ -8,19 +8,13 @@ namespace KronoxAPI.Model.Scheduling;
 
 public class Location
 {
-    private readonly string _id;
-    private readonly string _name;
-    private readonly string _building;
-    private readonly string _floor;
-    private readonly int _maxSeats;
-
     public Location(string id, string name, string building, string floor, int maxSeats)
     {
-        _id = id;
-        _name = name;
-        _building = building;
-        _floor = floor;
-        _maxSeats = maxSeats;
+        Id = id;
+        Name = name;
+        Building = building;
+        Floor = floor;
+        MaxSeats = maxSeats;
     }
 
     /// <summary>
@@ -31,16 +25,16 @@ public class Location
 
     public override string? ToString()
     {
-        return $"{_id}";
+        return $"{Id}";
     }
 
-    public string Id => _id;
+    public string Id { get; }
 
-    public string Name => _name;
+    public string Name { get; }
 
-    public string Building => _building;
+    public string Building { get; }
 
-    public string Floor => _floor;
+    public string Floor { get; }
 
-    public int MaxSeats => _maxSeats;
+    public int MaxSeats { get; }
 }

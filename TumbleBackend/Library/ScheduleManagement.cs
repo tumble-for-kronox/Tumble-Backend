@@ -26,7 +26,7 @@ public class ScheduleManagement
     {
         try
         {
-            Schedule schedule = await school.FetchSchedule(client, new string[] { scheduleId }, null, startDate);
+            Schedule schedule = await School.FetchScheduleAsync(client, new string[] { scheduleId }, null, startDate);
 
             //Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(TranslatorUtil.SwedishToEnglish(kvp.Value.Name).Result)).ToDictionary(course => course.Id);
             Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(kvp.Value.Name)).ToDictionary(course => course.Id);
@@ -55,7 +55,7 @@ public class ScheduleManagement
     {
         try
         {
-            Schedule schedule = await school.FetchSchedule(client, scheduleIds, null, startDate);
+            Schedule schedule = await School.FetchScheduleAsync(client, scheduleIds, null, startDate);
 
             //Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(TranslatorUtil.SwedishToEnglish(kvp.Value.Name).Result)).ToDictionary(course => course.Id);
             Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(kvp.Value.Name)).ToDictionary(course => course.Id);

@@ -11,67 +11,41 @@ namespace KronoxAPI.Model.Scheduling;
 /// </summary>
 public class Event
 {
-    private readonly string _id;
-    private readonly string[] _scheduleIds;
-    private readonly string _title;
-    private readonly Course _course;
-    private readonly List<Teacher> _teachers;
-    private readonly DateTime _timeStart;
-    private readonly DateTime _timeEnd;
-    private readonly List<Location> _locations;
-    private readonly DateTime _lastModified;
-    private readonly bool _isSpecial;
+    public string Title { get; }
 
-    public string Title => _title;
+    public Course Course { get; }
 
-    public Course Course => _course;
+    public DateTime TimeStart { get; }
 
-    public DateTime TimeStart => _timeStart;
+    public DateTime TimeEnd { get; }
 
-    public DateTime TimeEnd => _timeEnd;
+    public List<Location> Locations { get; }
 
-    public List<Location> Locations => _locations;
+    public List<Teacher> Teachers { get; }
 
-    public List<Teacher> Teachers => _teachers;
+    public string Id { get; }
 
-    public string Id => _id;
+    public string[] ScheduleIds { get; }
 
-    public string[] ScheduleIds => _scheduleIds;
+    public bool IsSpecial { get; }
 
-    public bool IsSpecial => _isSpecial;
+    public DateTime LastModified { get; }
 
-    public DateTime LastModified => _lastModified;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="scheduleId"></param>
-    /// <param name="title"></param>
-    /// <param name="course"></param>
-    /// <param name="teachers"></param>
-    /// <param name="timeStart"></param>
-    /// <param name="timeEnd"></param>
-    /// <param name="locations"></param>
-    /// <param name="isSpecial"></param>
-    /// <param name="lastModified"></param>
     public Event(string id, string[] scheduleIds, string title, Course course, List<Teacher> teachers, DateTime timeStart, DateTime timeEnd, List<Location> locations, bool isSpecial, DateTime lastModified)
     {
-        _id = id;
-        _scheduleIds = scheduleIds;
-        _title = title;
-        _course = course;
-        _timeStart = timeStart;
-        _timeEnd = timeEnd;
-        _locations = locations;
-        _teachers = teachers;
-        _lastModified = lastModified;
-        _isSpecial = isSpecial;
+        Id = id;
+        ScheduleIds = scheduleIds;
+        Title = title;
+        Course = course;
+        TimeStart = timeStart;
+        TimeEnd = timeEnd;
+        Locations = locations;
+        Teachers = teachers;
+        LastModified = lastModified;
+        IsSpecial = isSpecial;
     }
 
     public override string? ToString()
-    {
-        return $"Id: {_id}\nScheduleId: {_scheduleIds}\nCourse: {_course}\nTitle: {_title}\nStarts: {_timeStart:yyyy-MM-dd HH:mm}" +
-            $"\nEnds: {_timeEnd:yyyy-MM-dd HH:mm}\nTeachers: [{String.Join(", ", _teachers)}]\nLocations: [{String.Join(", ", _locations)}]";
-    }
+        => $"Id: {Id}\nScheduleId: {ScheduleIds}\nCourse: {Course}\nTitle: {Title}\nStarts: {TimeStart:yyyy-MM-dd HH:mm}" +
+           $"\nEnds: {TimeEnd:yyyy-MM-dd HH:mm}\nTeachers: [{String.Join(", ", Teachers)}]\nLocations: [{String.Join(", ", Locations)}]";
 }

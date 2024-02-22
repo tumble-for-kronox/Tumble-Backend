@@ -11,12 +11,9 @@ namespace KronoxAPI.Model.Scheduling;
 /// </summary>
 public class Course
 {
-    private readonly string _name;
-    private readonly string _id;
+    public string Name { get; }
 
-    public string Name => _name;
-
-    public string Id => _id;
+    public string Id { get; }
 
     /// <summary>
     /// For use as default or in case a course is not found.
@@ -24,16 +21,9 @@ public class Course
     /// <returns><see cref="Course"/> wiht all values set as "N/A".</returns>
     public static Course NotAvailable => new("N/A", "N/A");
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="id"></param>
     public Course(string name, string id)
     {
-        _name = name;
-        _id = id;
+        Name = name;
+        Id = id;
     }
-
-
 }

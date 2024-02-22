@@ -83,7 +83,7 @@ public class AuthActionFilter : ActionFilterAttribute
             {
                 requestClient.SetSessionToken(sessionDetails.SessionToken);
 
-                bool sessionValid = await school.RefreshUserSession(requestClient);
+                bool sessionValid = await School.RefreshUserSessionAsync(requestClient);
                 if (sessionValid)
                 {
                     context.HttpContext.Items[KronoxReqClientKeys.SingleClient] = requestClient;
@@ -95,7 +95,7 @@ public class AuthActionFilter : ActionFilterAttribute
                 }
             }
 
-            User? kronoxUser = await school.Login(requestClient, creds.Username, creds.Password);
+            User? kronoxUser = await School.LoginAsync(requestClient, creds.Username, creds.Password);
 
             if (kronoxUser == null)
             {

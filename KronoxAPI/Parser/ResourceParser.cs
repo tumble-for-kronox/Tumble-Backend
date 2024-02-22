@@ -9,19 +9,11 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace KronoxAPI.Parser;
 
 public static class ResourceParser
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="resourcesHtml"></param>
-    /// <returns></returns>
-    /// <exception cref="LoginException"></exception>
-    /// <exception cref="ParseException"></exception>
     public static List<Resource> ParseAllSchoolResources(HtmlDocument resourcesHtml)
     {
         List<Resource> resources = new();
@@ -32,20 +24,19 @@ public static class ResourceParser
             foreach (HtmlNode li in resourceLiList)
             {
                 // /resursbokning.jsp?flik='resourceId' <- we want that resourceId
-                string linkContainingResourceId = li.SelectSingleNode("a").GetAttributeValue("href", string.Empty);
+                var linkContainingResourceId = li.SelectSingleNode("a").GetAttributeValue("href", string.Empty);
                 if (linkContainingResourceId == string.Empty)
                     continue;
 
                 try
                 {
-                    string resourceId = Regex.Match(linkContainingResourceId, @"flik=(.*)").Groups[1].Value.Trim();
-                    string resourceName = li.SelectSingleNode("a/em/b").InnerText.Trim();
+                    var resourceId = Regex.Match(linkContainingResourceId, @"flik=(.*)").Groups[1].Value.Trim();
+                    var resourceName = li.SelectSingleNode("a/em/b").InnerText.Trim();
                     resources.Add(new Resource(resourceId, resourceName));
                 }
                 catch (IndexOutOfRangeException e)
                 {
                     Console.WriteLine(e);
-                    continue;
                 }
             }
         }
@@ -60,14 +51,6 @@ public static class ResourceParser
         return resources;
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="resource"></param>
-    /// <param name="resourceAvailableHtml"></param>
-    /// <param name="resourceDate"></param>
-    /// <exception cref="LoginException"></exception>
-    /// <exception cref="ParseException"></exception>
     public static void ParseResourceAvailability(this Resource resource, HtmlDocument resourceAvailableHtml, DateOnly resourceDate)
     {
         try
@@ -82,17 +65,17 @@ public static class ResourceParser
 
             // Put together location ids, timeslots and their availability
             Dictionary<string, Dictionary<int, AvailabilitySlot>> availability = new();
-            for (int i = 0; i < resource.LocationIds.Count; i++)
+            for (var i = 0; i < resource.LocationIds.Count; i++)
             {
-                availability.Add(resource.LocationIds[i], new());
-                for (int j = 0; j < resource.TimeSlots.Count; j++)
+                availability.Add(resource.LocationIds[i], new Dictionary<int, AvailabilitySlot>());
+                for (var j = 0; j < resource.TimeSlots.Count; j++)
                 {
                     if (resource.TimeSlots[j].Id == null)
                     {
                         throw new ParseException($"A TimeSlot didn't have an Id which is required for parsing availability. TimeSlot: {resource.TimeSlots[j]}");
                     }
 
-                    HtmlNode availabilityNode = resourceAvailableHtml.DocumentNode.SelectSingleNode($"//tr[{i + 2}]/td[{j + 2}]");
+                    var availabilityNode = resourceAvailableHtml.DocumentNode.SelectSingleNode($"//tr[{i + 2}]/td[{j + 2}]");
                     switch (availabilityNode.GetAttributeValue("class", " ").Split(" ")[0])
                     {
 
@@ -104,8 +87,6 @@ public static class ResourceParser
                             break;
                         case "grupprum-ledig":
                             availability[resource.LocationIds[i]].Add(resource.TimeSlots[j].Id!.Value, ParseAvailable(availabilityNode));
-                            break;
-                        default:
                             break;
                     }
                 }
@@ -127,46 +108,38 @@ public static class ResourceParser
         }
     }
 
-    public static AvailabilitySlot ParseUnavailable()
+    private static AvailabilitySlot ParseUnavailable()
     {
         return new AvailabilitySlot(Availability.UNAVAILABLE);
     }
 
-    public static AvailabilitySlot ParseBooked(HtmlNode slotNode)
+    private static AvailabilitySlot ParseBooked(HtmlNode slotNode)
     {
-        return new AvailabilitySlot(Availability.BOOKED, bookedBy: HttpUtility.HtmlDecode(slotNode.SelectSingleNode("center").InnerText).Trim());
+        return new AvailabilitySlot(Availability.BOOKED);
     }
 
-    public static AvailabilitySlot ParseAvailable(HtmlNode slotNode)
+    private static AvailabilitySlot ParseAvailable(HtmlNode slotNode)
     {
-        string onClick = slotNode.SelectSingleNode("a").GetAttributeValue("onclick", string.Empty);
+        var onClick = slotNode.SelectSingleNode("a").GetAttributeValue("onclick", string.Empty);
         if (string.IsNullOrEmpty(onClick))
             throw new ParseException("The on click attribute of a supposedly available slot returned empty, can't get necessary info for booking.");
 
-        Match regexOnClickMatch = Regex.Match(onClick, "boka\\('(.*?)','(.*?)','(.*?)','(.*?)'\\)");
+        var regexOnClickMatch = Regex.Match(onClick, @"boka\('(.*?)','(.*?)','(.*?)','(.*?)'\)");
         return new AvailabilitySlot(Availability.AVAILABLE, locationId: regexOnClickMatch.Groups[1].Value, resourceType: regexOnClickMatch.Groups[2].Value, timeSlotId: regexOnClickMatch.Groups[3].Value);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="resourceHtml"></param>
-    /// <param name="resourceDate"></param>
-    /// <returns></returns>
-    /// <exception cref="LoginException"></exception>
-    /// <exception cref="ParseException"></exception>
-    public static List<TimeSlot> ParseResourceTimeSlots(HtmlDocument resourceHtml, DateOnly resourceDate)
+    private static List<TimeSlot> ParseResourceTimeSlots(HtmlDocument resourceHtml, DateOnly resourceDate)
     {
         try
         {
             List<TimeSlot> timeSlots = new();
 
-            IEnumerable<string> timeRangeStrings = resourceHtml.DocumentNode.SelectNodes("//tr[1]/td/b").Select(e => e.InnerText.Trim());
+            var timeRangeStrings = resourceHtml.DocumentNode.SelectNodes("//tr[1]/td/b").Select(e => e.InnerText.Trim());
 
-            foreach ((string timeRange, int i) in timeRangeStrings.WithIndex())
+            foreach (var (timeRange, i) in timeRangeStrings.WithIndex())
             {
-                DateTime from = resourceDate.ToDateTime(TimeOnly.ParseExact(timeRange.Split(" - ")[0], "HH:mm", CultureInfo.InvariantCulture));
-                DateTime to = resourceDate.ToDateTime(TimeOnly.ParseExact(timeRange.Split(" - ")[1], "HH:mm", CultureInfo.InvariantCulture));
+                var from = resourceDate.ToDateTime(TimeOnly.ParseExact(timeRange.Split(" - ")[0], "HH:mm", CultureInfo.InvariantCulture));
+                var to = resourceDate.ToDateTime(TimeOnly.ParseExact(timeRange.Split(" - ")[1], "HH:mm", CultureInfo.InvariantCulture));
 
                 timeSlots.Add(new TimeSlot(id: i, from: from, to: to));
             }
@@ -183,14 +156,7 @@ public static class ResourceParser
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="resourceHtml"></param>
-    /// <returns></returns>
-    /// <exception cref="LoginException"></exception>
-    /// <exception cref="ParseException"></exception>
-    public static List<string> ParseResourceLocationIds(HtmlDocument resourceHtml)
+    private static List<string> ParseResourceLocationIds(HtmlDocument resourceHtml)
     {
         try
         {
@@ -206,19 +172,9 @@ public static class ResourceParser
         }
     }
 
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="resourceHtml"></param>
-    /// <param name="e"></param>
-    /// <returns></returns>
-    /// <exception cref="LoginException"></exception>
-    /// <exception cref="ParseException"></exception>
     private static Exception OnError(HtmlDocument resourceHtml, Exception e)
     {
-        HtmlNode loginNode = resourceHtml.DocumentNode.SelectSingleNode("//div[@id='boka-dialog-login']");
+        var loginNode = resourceHtml.DocumentNode.SelectSingleNode("//div[@id='boka-dialog-login']");
 
         if (loginNode != null || resourceHtml.DocumentNode.InnerText == "Din användare har inte rättigheter att skapa resursbokningar.")
         {

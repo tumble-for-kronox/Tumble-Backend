@@ -14,7 +14,7 @@ namespace KronoxAPI.Parser;
 
 public static class PersonalBookingParser
 {
-    public static List<Booking> ParsePersonalBookings(HtmlDocument personalBookingsHtml, string resourceId)
+    public static IEnumerable<Booking> ParsePersonalBookings(HtmlDocument personalBookingsHtml, string resourceId)
     {
         try
         {
@@ -25,35 +25,34 @@ public static class PersonalBookingParser
 
             foreach (HtmlNode bookingNode in personalBookingsNodes)
             {
-                // Get raw data, some will need processing before being built into data object
-                bool showConfirmButton = false;
-                bool showUnbookButton = false;
+                var showConfirmButton = false;
+                var showUnBookButton = false;
 
                 IEnumerable<HtmlNode>? buttons = bookingNode.SelectNodes("div[1]/div[1]/a");
                 buttons ??= new List<HtmlNode>();
 
-                foreach (HtmlNode button in buttons)
+                foreach (var button in buttons)
                 {
-                    if (button.InnerText == "Confirm")
+                    switch (button.InnerText)
                     {
-                        showConfirmButton = true;
-                    }
-                    else if (button.InnerText == "Cancel booking")
-                    {
-                        showUnbookButton = true;
+                        case "Confirm":
+                            showConfirmButton = true;
+                            break;
+                        case "Cancel booking":
+                            showUnBookButton = true;
+                            break;
                     }
                 }
 
-                string bookingId = bookingNode.GetAttributeValue("id", "").Trim().Replace("post_", "");
-                string date = bookingNode.SelectSingleNode("div[1]/a").InnerText.Trim();
-                string combinedTime = bookingNode.SelectSingleNode("div[1]/text()").InnerText.Trim();
-                string locationId = bookingNode.SelectSingleNode("div[1]/b").InnerText.Split(",").Last().Trim();
+                var bookingId = bookingNode.GetAttributeValue("id", "").Trim().Replace("post_", "");
+                var date = bookingNode.SelectSingleNode("div[1]/a").InnerText.Trim();
+                var combinedTime = bookingNode.SelectSingleNode("div[1]/text()").InnerText.Trim();
+                var locationId = bookingNode.SelectSingleNode("div[1]/b").InnerText.Split(",").Last().Trim();
 
-                string? confirmationTimeString = bookingNode.SelectSingleNode("div[2]/span")?.InnerText.Replace("Must be confirmed between ", "").Trim();
+                var confirmationTimeString = bookingNode.SelectSingleNode("div[2]/span")?.InnerText.Replace("Must be confirmed between ", "").Trim();
 
-                // Start date conversions
-                DateTime from = DateTime.ParseExact(date + ' ' + combinedTime.Split(" - ")[0], "yy-MM-dd HH:mm", CultureInfo.InvariantCulture);
-                DateTime to = DateTime.ParseExact(date + ' ' + combinedTime.Split(" - ")[1], "yy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+                var from = DateTime.ParseExact(date + ' ' + combinedTime.Split(" - ")[0], "yy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+                var to = DateTime.ParseExact(date + ' ' + combinedTime.Split(" - ")[1], "yy-MM-dd HH:mm", CultureInfo.InvariantCulture);
 
                 DateTime? confirmTo = null;
                 DateTime? confirmFrom = null;
@@ -66,7 +65,7 @@ public static class PersonalBookingParser
 
                 TimeSlot bookingTimeSlot = new(from, to);
 
-                bookings.Add(new(bookingId, resourceId, bookingTimeSlot, locationId, showConfirmButton, showUnbookButton, confirmFrom, confirmTo));
+                bookings.Add(new Booking(bookingId, resourceId, bookingTimeSlot, locationId, showConfirmButton, showUnBookButton, confirmFrom, confirmTo));
             }
 
             return bookings;

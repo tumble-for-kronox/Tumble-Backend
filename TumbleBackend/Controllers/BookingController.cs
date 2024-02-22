@@ -37,7 +37,7 @@ public class BookingController : ControllerBase
 
         try
         {
-            return Ok(await school.Resources.GetResources(kronoxReqClient));
+            return Ok(await SchoolResources.GetResourcesAsync(kronoxReqClient));
         }
         catch (LoginException e)
         {
@@ -63,7 +63,7 @@ public class BookingController : ControllerBase
 
         try
         {
-            List<Resource> sparseResources = await school.Resources.GetResources(kronoxReqClient);
+            List<Resource> sparseResources = await SchoolResources.GetResourcesAsync(kronoxReqClient);
             IEnumerable<Task<Resource>> fullResourcesTasks = sparseResources.Select(async e => await e.FetchData(kronoxReqClient, date));
             return Ok(await Task.WhenAll(fullResourcesTasks));
         }
@@ -96,7 +96,7 @@ public class BookingController : ControllerBase
 
         try
         {
-            List<Booking> bookings = await school.Resources.GetUserBookings(kronoxReqClient);
+            List<Booking> bookings = await SchoolResources.GetUserBookingsAsync(kronoxReqClient);
             return Ok(bookings);
         }
         catch (LoginException e)
@@ -122,7 +122,7 @@ public class BookingController : ControllerBase
 
         try
         {
-            List<Resource> resources = await school.Resources.GetResources(kronoxReqClient);
+            List<Resource> resources = await SchoolResources.GetResourcesAsync(kronoxReqClient);
             Resource resource = await resources.Where(e => e.Id == resourceId).First().FetchData(kronoxReqClient, date);
             return Ok(resource);
         }
@@ -154,9 +154,9 @@ public class BookingController : ControllerBase
 
         try
         {
-            await school.Resources.BookResource(kronoxReqClient, bookingRequest.ResourceId, bookingRequest.Date, bookingRequest.Slot);
+            await SchoolResources.BookResourceAsync(kronoxReqClient, bookingRequest.ResourceId, bookingRequest.Date, bookingRequest.Slot);
 
-            List<Booking> bookings = await school.Resources.GetUserBookings(kronoxReqClient);
+            List<Booking> bookings = await SchoolResources.GetUserBookingsAsync(kronoxReqClient);
             bookings.Sort((x, y) =>
             {
                 return int.Parse(x.Id[20..]) > int.Parse(y.Id[20..]) ? 0 : 1;
@@ -205,7 +205,7 @@ public class BookingController : ControllerBase
 
         try
         {
-            await school.Resources.UnbookResource(kronoxReqClient, bookingId);
+            await SchoolResources.UnBookResourceAsync(kronoxReqClient, bookingId);
 
             return Ok();
         }
@@ -237,7 +237,7 @@ public class BookingController : ControllerBase
 
         try
         {
-            await school.Resources.ConfirmResourceBooking(kronoxReqClient, data.BookingId, data.ResourceId);
+            await SchoolResources.ConfirmResourceBookingAsync(kronoxReqClient, data.BookingId, data.ResourceId);
 
             return Ok();
         }
