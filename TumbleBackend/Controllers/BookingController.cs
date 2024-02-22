@@ -167,10 +167,10 @@ public class BookingController : ControllerBase
 
             if (newBooking == null)
             {
-                return Accepted();
+                return StatusCode(StatusCodes.Status500InternalServerError, new Error("The requested resource was not booked for unknown reasons."));
             }
 
-            return Ok(newBooking);
+            return Accepted(newBooking);
         }
         catch (LoginException e)
         {
@@ -207,7 +207,7 @@ public class BookingController : ControllerBase
         {
             await SchoolResources.UnBookResourceAsync(kronoxReqClient, bookingId);
 
-            return Ok();
+            return Accepted();
         }
         catch (LoginException e)
         {
