@@ -30,26 +30,26 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetKronoxUser([FromServices] JwtUtil jwtUtil, [FromQuery] SchoolEnum schoolId, [FromHeader(Name = "X-auth-token")] string refreshToken)
+    public async Task<IActionResult> GetKronoxUserAsync([FromServices] JwtUtil jwtUtil, [FromQuery] SchoolEnum schoolId, [FromHeader(Name = "X-auth-token")] string refreshToken)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
-        School school = schoolId.GetSchool()!;
+        var kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
+        var school = schoolId.GetSchool()!;
 
-        RefreshTokenResponseModel? creds = jwtUtil.ValidateAndReadRefreshToken(refreshToken);
+        var creds = jwtUtil.ValidateAndReadRefreshToken(refreshToken);
 
         if (creds == null)
             return Unauthorized(new Error("Couldn't login user from refreshToken, please log out and back in manually."));
 
         try
         {
-            User? kronoxUser = await School.LoginAsync(kronoxReqClient, creds.Username, creds.Password);
+            var kronoxUser = await School.LoginAsync(kronoxReqClient, creds.Username, creds.Password);
 
             if (kronoxUser == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an unknown error while fetching user data from Kronox."));
 
-            string updatedExpirationDateRefreshToken = jwtUtil.GenerateRefreshToken(creds.Username, creds.Password);
+            var updatedExpirationDateRefreshToken = jwtUtil.GenerateRefreshToken(creds.Username, creds.Password);
 
-            return Ok(kronoxUser.ToWebModel(updatedExpirationDateRefreshToken, new(kronoxUser.SessionToken, kronoxReqClient.BaseUrl!.ToString())));
+            return Ok(kronoxUser.ToWebModel(updatedExpirationDateRefreshToken, "", new SessionDetails(kronoxUser.SessionToken, kronoxReqClient.BaseUrl!.ToString())));
         }
         catch (LoginException e)
         {
@@ -64,25 +64,25 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> LoginKronoxUser([FromServices] JwtUtil jwtUtil, [FromQuery] SchoolEnum schoolId, [FromBody] LoginRequest body)
+    public async Task<IActionResult> LoginKronoxUserAsync([FromServices] JwtUtil jwtUtil, [FromQuery] SchoolEnum schoolId, [FromBody] LoginRequest body)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
-        School school = schoolId.GetSchool()!;
+        var kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
+        var school = schoolId.GetSchool()!;
 
         try
         {
-            User? kronoxUser = await School.LoginAsync(kronoxReqClient, body.Username, body.Password);
+            var kronoxUser = await School.LoginAsync(kronoxReqClient, body.Username, body.Password);
 
             if (kronoxUser == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an unknown error while fetching user data from Kronox."));
 
-            string newRefreshToken = jwtUtil.GenerateRefreshToken(body.Username, body.Password);
+            var newRefreshToken = jwtUtil.GenerateRefreshToken(body.Username, body.Password);
 
             SessionDetails sessionDetails = new(kronoxUser.SessionToken, kronoxReqClient.BaseUrl!.ToString());
 
             Response.Headers.Add("X-auth-token", newRefreshToken);
             Response.Headers.Add("X-session-token", sessionDetails.ToJson());
-            return Ok(kronoxUser.ToWebModel(newRefreshToken, sessionDetails));
+            return Ok(kronoxUser.ToWebModel(newRefreshToken, "", sessionDetails));
         }
         catch (LoginException e)
         {

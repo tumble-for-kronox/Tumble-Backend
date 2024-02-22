@@ -9,27 +9,23 @@ namespace WebAPIModels.ResponseModels;
 
 public class KronoxUserWebModel
 {
-    private readonly string _name;
-    private readonly string _username;
-    private readonly string _refreshToken;
-    private readonly SessionDetails _sessionDetails;
+    public string Name { get; }
 
+    public string Username { get; }
 
-    public string Name => _name;
+    public string RefreshToken { get; }
+    
+    public string SessionToken { get; }
 
-    public string Username => _username;
+    public SessionDetails SessionDetails { get; }
 
-    public string RefreshToken => _refreshToken;
-
-    [Obsolete("This token is only used temporarily while passing to web api. Do not use!")]
-    public SessionDetails SessionDetails => _sessionDetails;
-
-    public KronoxUserWebModel(string name, string username, string refreshToken, SessionDetails sessionDetails)
+    public KronoxUserWebModel(string name, string username, string refreshToken, string sessionToken, SessionDetails sessionDetails)
     {
-        _name = name;
-        _username = username;
-        this._refreshToken = refreshToken;
-        this._sessionDetails = sessionDetails;
+        Name = name;
+        Username = username;
+        RefreshToken = refreshToken;
+        SessionToken = sessionToken;
+        SessionDetails = sessionDetails;
     }
 
 }

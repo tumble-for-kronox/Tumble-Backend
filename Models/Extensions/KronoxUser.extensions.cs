@@ -11,8 +11,8 @@ namespace WebAPIModels.Extensions;
 
 public static class KronoxUserExtensions
 {
-    public static KronoxUserWebModel ToWebModel(this User user, string refreshToken, SessionDetails sessionDetails)
+    public static KronoxUserWebModel ToWebModel(this User user, string refreshToken, string sessionToken, SessionDetails sessionDetails)
     {
-        return new(user.Name, user.Username, refreshToken, sessionDetails);
+        return new(user.Name, user.Username, refreshToken, sessionToken, sessionDetails);
     }
 }
