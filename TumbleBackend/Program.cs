@@ -11,16 +11,23 @@ using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
 using TumbleHttpClient;
 using WebAPIModels.ResponseModels;
+using Prometheus;
+using Microsoft.Extensions.Configuration.Json;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseIISIntegration();
 
+// Kubernetes specific secrets config
+builder.Configuration.AddJsonFile("secrets/secrets.json", optional: true);
+builder.Configuration.AddEnvironmentVariables();
 
-string? dbConnectionString = builder.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.DbConnection] : Environment.GetEnvironmentVariable(EnvVar.DbConnection);
+// Configuration and service registration
+string? dbConnectionString = builder.Configuration[UserSecrets.DbConnection];
 string? dbName = builder.Environment.IsDevelopment() ? builder.Configuration[AppSettings.DevDatabase] : builder.Configuration[AppSettings.ProdDatabase];
 MongoDBSettings dbSettings = new(dbConnectionString!, dbName);
+
 string? awsAccessKey = builder.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.AwsAccessKey] : Environment.GetEnvironmentVariable(EnvVar.AwsAccessKey);
 string? awsSecretKey = builder.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.AwsSecretKey] : Environment.GetEnvironmentVariable(EnvVar.AwsSecretKey);
+
 var dbglistener = new TextWriterTraceListener(Console.Out);
 Trace.Listeners.Add(dbglistener);
 
@@ -35,12 +42,11 @@ BsonClassMap.RegisterClassMap<EventWebModel>(cm =>
 });
 
 ConventionPack conventions = new()
-        {
-            new CamelCaseElementNameConvention()
-        };
+{
+    new CamelCaseElementNameConvention()
+};
 ConventionRegistry.Register("Custom Conventions", conventions, t => true);
 
-// Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(config =>
@@ -54,11 +60,7 @@ builder.Services.AddHttpClient("KronoxClient", client =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(
-      "CorsPolicy",
-      builder => builder.AllowAnyOrigin()
-      .AllowAnyMethod()
-      .AllowAnyHeader());
+    options.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
 builder.Services.AddSingleton(builder.Configuration);
@@ -81,40 +83,33 @@ builder.Services.AddSpaStaticFiles(config =>
 
 var app = builder.Build();
 
-app.Use(async (context, next) =>
-{
-    await next();
-
-    if (context.Response.StatusCode == 404)
-    {
-        context.Request.Path = "/";
-        await next();
-    }
-});
+// Middleware configuration
+app.UseRouting();
 app.UseCors("CorsPolicy");
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-EmailUtil.Init(awsAccessKey!, awsSecretKey!);
-
-app.UseCors();
-
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
 app.UseDefaultFiles();
-
 app.UseSpaStaticFiles();
 
 app.MapControllers();
 
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapMetrics();
+    endpoints.MapControllers();
+});
+
 app.UseMiddleware<GeneralExceptionMiddleware>();
 app.UseMiddleware<TimeoutExceptionMiddleware>();
+
+EmailUtil.Init(awsAccessKey!, awsSecretKey!);
 
 app.Run();
