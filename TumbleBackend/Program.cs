@@ -14,7 +14,6 @@ using TumbleBackend.Utilities;
 using TumbleHttpClient;
 using WebAPIModels.ResponseModels;
 using Prometheus;
-using Microsoft.Extensions.Configuration.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,12 +23,12 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddRateLimiter(_ => _
     .AddFixedWindowLimiter(policyName: "fixed", options =>
-    {
-        options.PermitLimit = 4;
-        options.Window = TimeSpan.FromSeconds(12);
-        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        options.QueueLimit = 2;
-    }));
+        {
+            options.PermitLimit = 4;
+            options.Window = TimeSpan.FromSeconds(12);
+            options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            options.QueueLimit = 2;
+        }));
 
 // Configuration and service registration
 string? dbConnectionString = builder.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.DbConnection] : Environment.GetEnvironmentVariable(EnvVar.DbConnection);
@@ -118,6 +117,9 @@ app.UseEndpoints(endpoints =>
     endpoints.MapMetrics();
     endpoints.MapControllers();
 });
+
+app.UseMetricServer("/metrics");
+app.UseHttpMetrics();
 
 app.UseMiddleware<GeneralExceptionMiddleware>();
 app.UseMiddleware<TimeoutExceptionMiddleware>();
