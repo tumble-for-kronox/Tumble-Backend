@@ -2,6 +2,8 @@ using DatabaseAPI;
 using DatabaseAPI.Interfaces;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 using System.Diagnostics;
 using TumbleBackend.ActionFilters;
 using TumbleBackend.ExceptionMiddleware;
@@ -16,12 +18,21 @@ using Microsoft.Extensions.Configuration.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Kubernetes specific secrets config
+// Kubernetes specific configuration for secrets
 builder.Configuration.AddJsonFile("secrets/secrets.json", optional: true);
 builder.Configuration.AddEnvironmentVariables();
 
+builder.Services.AddRateLimiter(_ => _
+    .AddFixedWindowLimiter(policyName: "fixed", options =>
+    {
+        options.PermitLimit = 4;
+        options.Window = TimeSpan.FromSeconds(12);
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        options.QueueLimit = 2;
+    }));
+
 // Configuration and service registration
-string? dbConnectionString = builder.Configuration[UserSecrets.DbConnection];
+string? dbConnectionString = builder.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.DbConnection] : Environment.GetEnvironmentVariable(EnvVar.DbConnection);
 string? dbName = builder.Environment.IsDevelopment() ? builder.Configuration[AppSettings.DevDatabase] : builder.Configuration[AppSettings.ProdDatabase];
 MongoDBSettings dbSettings = new(dbConnectionString!, dbName);
 
@@ -86,6 +97,7 @@ var app = builder.Build();
 // Middleware configuration
 app.UseRouting();
 app.UseCors("CorsPolicy");
+app.UseRateLimiter();
 
 if (app.Environment.IsDevelopment())
 {

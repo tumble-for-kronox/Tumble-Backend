@@ -6,5 +6,5 @@ bin/
 obj/
 TumbleBackend/Properties/
 TumbleBackend/TumbleBackend.csproj.user
-
+.idea/
 serviceAccountKey.json
