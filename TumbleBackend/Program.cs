@@ -1,10 +1,15 @@
 using DatabaseAPI;
 using DatabaseAPI.Interfaces;
+using Grafana.OpenTelemetry;
+using Microsoft.AspNetCore.RateLimiting;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
-using Microsoft.AspNetCore.RateLimiting;
-using System.Threading.RateLimiting;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using Prometheus;
 using System.Diagnostics;
+using System.Threading.RateLimiting;
 using TumbleBackend.ActionFilters;
 using TumbleBackend.ExceptionMiddleware;
 using TumbleBackend.Library;
@@ -13,117 +18,163 @@ using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
 using TumbleHttpClient;
 using WebAPIModels.ResponseModels;
-using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Kubernetes specific configuration for secrets
-builder.Configuration.AddJsonFile("secrets/secrets.json", optional: true);
-builder.Configuration.AddEnvironmentVariables();
+// Configuration
+ConfigureConfiguration(builder);
+ConfigureTracing(builder);
+ConfigureRateLimiting(builder);
+ConfigureMongoDb();
 
-builder.Services.AddRateLimiter(_ => _
-    .AddFixedWindowLimiter(policyName: "fixed", options =>
+// Service registration
+RegisterServices(builder.Services, builder.Configuration, builder.Environment);
+
+// Build and configure middleware
+var app = builder.Build();
+ConfigureMiddleware(app);
+
+// Initialize utilities
+EmailUtil.Init(GetAwsAccessKey(builder.Environment, builder.Configuration), GetAwsSecretKey(builder.Environment, builder.Configuration));
+
+app.Run();
+
+void ConfigureConfiguration(WebApplicationBuilder builder)
+{
+    builder.Configuration.AddJsonFile("secrets/secrets.json", optional: true);
+    builder.Configuration.AddEnvironmentVariables();
+}
+
+void ConfigureTracing(WebApplicationBuilder builder)
+{
+    builder.Services.AddOpenTelemetry()
+        .WithTracing(tracerProviderBuilder =>
+        {
+            tracerProviderBuilder
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .UseGrafana() // Sets up Grafana's OpenTelemetry distribution
+                .AddConsoleExporter();
+        });
+
+    builder.Logging.AddOpenTelemetry(options =>
+    {
+        options.UseGrafana().AddConsoleExporter();
+    });
+}
+
+void ConfigureRateLimiting(WebApplicationBuilder builder)
+{
+    builder.Services.AddRateLimiter(_ => _
+        .AddFixedWindowLimiter(policyName: "fixed", options =>
         {
             options.PermitLimit = 4;
             options.Window = TimeSpan.FromSeconds(12);
             options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
             options.QueueLimit = 2;
         }));
-
-// Configuration and service registration
-string? dbConnectionString = builder.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.DbConnection] : Environment.GetEnvironmentVariable(EnvVar.DbConnection);
-string? dbName = builder.Environment.IsDevelopment() ? builder.Configuration[AppSettings.DevDatabase] : builder.Configuration[AppSettings.ProdDatabase];
-MongoDBSettings dbSettings = new(dbConnectionString!, dbName);
-
-string? awsAccessKey = builder.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.AwsAccessKey] : Environment.GetEnvironmentVariable(EnvVar.AwsAccessKey);
-string? awsSecretKey = builder.Environment.IsDevelopment() ? builder.Configuration[UserSecrets.AwsSecretKey] : Environment.GetEnvironmentVariable(EnvVar.AwsSecretKey);
-
-var dbglistener = new TextWriterTraceListener(Console.Out);
-Trace.Listeners.Add(dbglistener);
-
-BsonClassMap.RegisterClassMap<EventWebModel>(cm =>
-{
-    cm.AutoMap();
-    cm.UnmapProperty(c => c.Id);
-    cm.MapMember(c => c.Id)
-        .SetElementName("id")
-        .SetOrder(0)
-        .SetIsRequired(true);
-});
-
-ConventionPack conventions = new()
-{
-    new CamelCaseElementNameConvention()
-};
-ConventionRegistry.Register("Custom Conventions", conventions, t => true);
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(config =>
-{
-    config.OperationFilter<AuthHeaderFilter>();
-});
-builder.Services.AddHttpClient("KronoxClient", client =>
-{
-    client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36");
-});
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-});
-
-builder.Services.AddSingleton(builder.Configuration);
-builder.Services.AddSingleton<MobileMessagingClient>();
-builder.Services.AddSingleton<IDbSettings>(dbSettings);
-builder.Services.AddSingleton<IDbSchedulesService>(sp => new MongoSchedulesService(sp.GetService<IDbSettings>()!));
-builder.Services.AddSingleton<IDbProgrammeFiltersService>(sp => new MongoProgrammeFiltersService(sp.GetService<IDbSettings>()!));
-builder.Services.AddSingleton<IDbNewsService>(sp => new MongoNewsService(sp.GetService<IDbSettings>()!));
-builder.Services.AddSingleton<IDbKronoxCacheService>(sp => new MongoKronoxCacheService(sp.GetService<IDbSettings>()!));
-builder.Services.AddTransient<JwtUtil>();
-
-builder.Services.AddScoped<AuthActionFilter>();
-builder.Services.AddScoped<KronoxUrlFilter>();
-builder.Services.AddScoped<KronoxRequestClient>();
-
-builder.Services.AddSpaStaticFiles(config =>
-{
-    config.RootPath = "wwwroot";
-});
-
-var app = builder.Build();
-
-// Middleware configuration
-app.UseRouting();
-app.UseCors("CorsPolicy");
-app.UseRateLimiter();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-app.UseAuthorization();
-
-app.UseDefaultFiles();
-app.UseSpaStaticFiles();
-
-app.MapControllers();
-
-app.UseEndpoints(endpoints =>
+void ConfigureMongoDb()
 {
-    endpoints.MapMetrics();
-    endpoints.MapControllers();
-});
+    BsonClassMap.RegisterClassMap<EventWebModel>(cm =>
+    {
+        cm.AutoMap();
+        cm.UnmapProperty(c => c.Id);
+        cm.MapMember(c => c.Id)
+            .SetElementName("id")
+            .SetOrder(0)
+            .SetIsRequired(true);
+    });
 
-app.UseMetricServer("/metrics");
-app.UseHttpMetrics();
+    ConventionPack conventions = new()
+    {
+        new CamelCaseElementNameConvention()
+    };
+    ConventionRegistry.Register("Custom Conventions", conventions, t => true);
+}
 
-app.UseMiddleware<GeneralExceptionMiddleware>();
-app.UseMiddleware<TimeoutExceptionMiddleware>();
+void RegisterServices(IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
+{
+    string? dbConnectionString = GetDbConnectionString(environment, configuration);
+    string? dbName = GetDbName(environment, configuration);
+    MongoDBSettings dbSettings = new(dbConnectionString!, dbName);
 
-EmailUtil.Init(awsAccessKey!, awsSecretKey!);
+    services.AddSingleton(configuration);
+    services.AddSingleton(dbSettings);
+    services.AddSingleton<IDbSettings>(dbSettings);
+    services.AddSingleton<IDbSchedulesService>(sp => new MongoSchedulesService(sp.GetService<IDbSettings>()!));
+    services.AddSingleton<IDbProgrammeFiltersService>(sp => new MongoProgrammeFiltersService(sp.GetService<IDbSettings>()!));
+    services.AddSingleton<IDbNewsService>(sp => new MongoNewsService(sp.GetService<IDbSettings>()!));
+    services.AddSingleton<IDbKronoxCacheService>(sp => new MongoKronoxCacheService(sp.GetService<IDbSettings>()!));
+    services.AddSingleton<MobileMessagingClient>();
+    services.AddTransient<JwtUtil>();
 
-app.Run();
+    services.AddScoped<AuthActionFilter>();
+    services.AddScoped<KronoxUrlFilter>();
+    services.AddScoped<KronoxRequestClient>();
+
+    services.AddControllers();
+    services.AddEndpointsApiExplorer();
+    services.AddSwaggerGen(config =>
+    {
+        config.OperationFilter<AuthHeaderFilter>();
+    });
+
+    services.AddHttpClient("KronoxClient", client =>
+    {
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36");
+    });
+
+    services.AddCors(options =>
+    {
+        options.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+    });
+
+    services.AddSpaStaticFiles(config => { config.RootPath = "wwwroot"; });
+
+    var dbglistener = new TextWriterTraceListener(Console.Out);
+    Trace.Listeners.Add(dbglistener);
+}
+
+void ConfigureMiddleware(WebApplication app)
+{
+    app.UseRouting();
+    app.UseCors("CorsPolicy");
+    app.UseRateLimiter();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseAuthorization();
+    app.UseDefaultFiles();
+    app.UseSpaStaticFiles();
+
+    app.UseMiddleware<GeneralExceptionMiddleware>();
+    app.UseMiddleware<TimeoutExceptionMiddleware>();
+
+    app.UseMetricServer("/metrics");
+    app.UseHttpMetrics();
+
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapMetrics();
+        endpoints.MapControllers();
+    });
+}
+
+string? GetDbConnectionString(IWebHostEnvironment environment, IConfiguration configuration) =>
+    environment.IsDevelopment() ? configuration[UserSecrets.DbConnection] : Environment.GetEnvironmentVariable(EnvVar.DbConnection);
+
+string? GetDbName(IWebHostEnvironment environment, IConfiguration configuration) =>
+    environment.IsDevelopment() ? configuration[AppSettings.DevDatabase] : configuration[AppSettings.ProdDatabase];
+
+string? GetAwsAccessKey(IWebHostEnvironment environment, IConfiguration configuration) =>
+    environment.IsDevelopment() ? configuration[UserSecrets.AwsAccessKey] : Environment.GetEnvironmentVariable(EnvVar.AwsAccessKey);
+
+string? GetAwsSecretKey(IWebHostEnvironment environment, IConfiguration configuration) =>
+    environment.IsDevelopment() ? configuration[UserSecrets.AwsSecretKey] : Environment.GetEnvironmentVariable(EnvVar.AwsSecretKey);
