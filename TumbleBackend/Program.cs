@@ -149,7 +149,6 @@ void ConfigureMiddleware(WebApplication app)
         app.UseSwaggerUI();
     }
 
-    app.UseHttpsRedirection();
     app.UseAuthorization();
     app.UseDefaultFiles();
     app.UseSpaStaticFiles();
