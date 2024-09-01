@@ -1,20 +1,21 @@
 ﻿using KronoxAPI.Exceptions;
 using KronoxAPI.Model.Schools;
 using KronoxAPI.Model.Users;
+using KronoxService.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Primitives;
 using System.Net;
 using System.Text.RegularExpressions;
-using TumbleBackend.Extensions;
+using KronoxService.Extensions;
 using TumbleBackend.InternalModels;
-using TumbleBackend.StringConstants;
-using TumbleBackend.Utilities;
+using KronoxService.Constants;
+using KronoxService.Utilities;
 using TumbleHttpClient;
 using WebAPIModels.MiscModels;
 using WebAPIModels.ResponseModels;
 
-namespace TumbleBackend.ActionFilters;
+namespace KronoxService.ActionFilters;
 
 public class AuthActionFilter : ActionFilterAttribute
 {
@@ -78,6 +79,7 @@ public class AuthActionFilter : ActionFilterAttribute
 
         try
         {
+
             if (sessionDetails != null)
             {
                 requestClient.SetSessionToken(sessionDetails.SessionToken);
