@@ -7,9 +7,9 @@ on:
       - main  # Adjust based on your branch
 
 jobs:
-  build:
-    uses: ./.github/workflows/build.yml  # Reference the build job
+  publish-docker:
+    uses: ./.github/workflows/docker-image.yml
 
   deploy:
-    needs: build  # Ensure deploy runs after build
-    uses: ./.github/workflows/deploy.yml  # Reference the deploy job
+    needs: publish-docker
+    uses: ./.github/workflows/deploy.yml
