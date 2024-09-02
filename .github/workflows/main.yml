@@ -1,0 +1,15 @@
+# .github/workflows/main.yml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Adjust based on your branch
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml  # Reference the build job
+
+  deploy:
+    needs: build  # Ensure deploy runs after build
+    uses: ./.github/workflows/deploy.yml  # Reference the deploy job
