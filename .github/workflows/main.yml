@@ -4,7 +4,7 @@ name: CI/CD Pipeline
 on:
   pull_request:
     branches:
-      - main  # Adjust based on your branch
+      - main
 
 jobs:
   publish-docker:
