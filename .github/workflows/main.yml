@@ -2,7 +2,7 @@
 name: CI/CD Pipeline
 
 on:
-  push:
+  pull_request:
     branches:
       - main  # Adjust based on your branch
 
