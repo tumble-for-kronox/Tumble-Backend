@@ -13,10 +13,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Set up kubeconfig
-        run: |
-          echo "${{ secrets.KUBECONF }}" > $HOME/.kube/config
-
       # Step 2: Set up DigitalOcean CLI and kubectl
       - name: Set up DigitalOcean CLI
         uses: digitalocean/action-doctl@v2
@@ -24,10 +20,8 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
       # Step 3: Install kubectl and configure it for DigitalOcean Kubernetes
-      - name: Set up Kubernetes
-        uses: azure/setup-kubectl@v3
-        with:
-          version: "latest"
+      - name: Install kubectl and configure kubeconfig
+        run: doctl kubernetes cluster kubeconfig save do-ams3-k8s-tumble
 
       # Step 4: Deploy to Kubernetes using kubectl
       - name: Deploy to Kubernetes
