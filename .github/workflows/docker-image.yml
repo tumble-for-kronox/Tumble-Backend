@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check out Tumble-Cluster repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: tumble-for-kronox/Tumble-Cluster
           ssh-key: ${{ secrets.SSH_TUMBLE_CLUSTER_KEY }}
