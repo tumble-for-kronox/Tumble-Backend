@@ -21,3 +21,4 @@ jobs:
   deploy:
     needs: publish-docker
     uses: ./.github/workflows/deploy.yml
+    secrets: inherit
