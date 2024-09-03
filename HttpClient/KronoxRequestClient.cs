@@ -10,11 +10,11 @@ public class KronoxRequestClient : IKronoxRequestClient
     public KronoxRequestClient(double timeout = 5)
     {
         CookieContainer = new CookieContainer();
-        HttpClientHandler handler = new()
-        {
-            CookieContainer = CookieContainer
-        };
-        _httpClient = new HttpClient(handler)
+        var httpClientHandler = new HttpClientHandler
+            {
+                CookieContainer = CookieContainer,
+            };
+        _httpClient = new HttpClient(httpClientHandler)
         {
             Timeout = TimeSpan.FromSeconds(timeout)
         };
