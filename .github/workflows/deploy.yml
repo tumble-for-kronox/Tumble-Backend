@@ -22,4 +22,4 @@ jobs:
       # Step 3: Deploy to Kubernetes using kubectl
       - name: Deploy to Kubernetes
         run: |
-          kubectl rollout restart
+          kubectl rollout restart deployment -n production tumble-backend
