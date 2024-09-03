@@ -18,21 +18,8 @@ jobs:
       id-token: write
       
     steps:
-      # - name: Install SSH Client 🔑
-      #   uses: webfactory/ssh-agent@v0.4.0
-      #   with:
-      #     ssh-private-key: ${{ secrets.SSH_TUMBLE_CLUSTER_KEY }}
-    
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Check out Tumble-Cluster repository
-        uses: actions/checkout@v4
-        with:
-          repository: tumble-for-kronox/Tumble-Ops
-          ref: main
-          ssh-key: ${{ secrets.SSH_TUMBLE_CLUSTER_KEY }}
-          path: tumble-cluster
         
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
@@ -52,7 +39,6 @@ jobs:
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: .
-          file: ./tumble-cluster/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
