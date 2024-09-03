@@ -26,7 +26,7 @@ jobs:
         with:
           repository: tumble-for-kronox/Tumble-Ops
           ref: main
-          ssh-key: ${{ secrets.SSH_TUMBLE_CLUSTER_KEY }}
+          token: ${{ secrets.SSH_TUMBLE_CLUSTER_KEY }}
           path: tumble-cluster
         
       - name: Log in to the Container registry
