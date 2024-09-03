@@ -17,7 +17,7 @@ jobs:
 
       # Step 2: Install kubectl and configure it for DigitalOcean Kubernetes
       - name: Install kubectl and configure kubeconfig
-        run: doctl kubernetes cluster kubeconfig save do-ams3-k8s-tumble
+        run: doctl kubernetes cluster kubeconfig save k8s-tumble
 
       # Step 3: Deploy to Kubernetes using kubectl
       - name: Deploy to Kubernetes
