@@ -2,12 +2,16 @@
 name: CI/CD Pipeline
 
 on:
-  workflow_call:
+  pull_request:
+    types:
+      - opened
+    branches:
+      - 'main'
 
 jobs:
   publish-docker:
     uses: ./.github/workflows/docker-image.yml
 
-  deploy:
-    needs: publish-docker
-    uses: ./.github/workflows/deploy.yml
+  # deploy:
+  #   needs: publish-docker
+  #   uses: ./.github/workflows/deploy.yml
