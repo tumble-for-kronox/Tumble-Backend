@@ -9,21 +9,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the code (to access Kubernetes manifests)
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      # Step 2: Set up DigitalOcean CLI and kubectl
+      # Step 1: Set up DigitalOcean CLI and kubectl
       - name: Set up DigitalOcean CLI
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      # Step 3: Install kubectl and configure it for DigitalOcean Kubernetes
+      # Step 2: Install kubectl and configure it for DigitalOcean Kubernetes
       - name: Install kubectl and configure kubeconfig
         run: doctl kubernetes cluster kubeconfig save do-ams3-k8s-tumble
 
-      # Step 4: Deploy to Kubernetes using kubectl
+      # Step 3: Deploy to Kubernetes using kubectl
       - name: Deploy to Kubernetes
         run: |
           kubectl rollout restart
