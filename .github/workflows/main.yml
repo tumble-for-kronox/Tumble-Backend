@@ -12,6 +12,7 @@ on:
 jobs:
   publish-docker:
     uses: ./.github/workflows/docker-image.yml
+    secrets: inherit
     permissions:
       contents: read
       packages: write
