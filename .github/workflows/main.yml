@@ -3,14 +3,13 @@ name: CI/CD Pipeline
 
 on:
   pull_request:
-    types:
-      - opened
-      - reopened
-    branches:
-      - 'main'
+    branches: 
+      - main
+    types: [closed]
 
 jobs:
   publish-docker:
+    if: ${{ github.event.pull_request.merged }}
     uses: ./.github/workflows/docker-image.yml
     secrets: inherit
     permissions:
@@ -19,6 +18,7 @@ jobs:
       id-token: write
 
   deploy:
+    if: ${{ github.event.pull_request.merged }}
     needs: publish-docker
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
