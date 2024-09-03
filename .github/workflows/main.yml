@@ -18,6 +18,6 @@ jobs:
       packages: write
       id-token: write
 
-  # deploy:
-  #   needs: publish-docker
-  #   uses: ./.github/workflows/deploy.yml
+  deploy:
+    needs: publish-docker
+    uses: ./.github/workflows/deploy.yml
