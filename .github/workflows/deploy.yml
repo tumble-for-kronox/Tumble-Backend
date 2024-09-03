@@ -4,9 +4,6 @@ name: Deploy to DigitalOcean Kubernetes
 on:
   workflow_call:
 
-env:
-  KUBECONF: ${{ secrets.KUBECONF }}
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -16,9 +13,9 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Pull kubeconfig
+      - name: Set up kubeconfig
         run: |
-          echo "$KUBECONF" > kubeconfig
+          echo "${{ secrets.KUBECONF }}" > $HOME/.kube/config
 
       # Step 2: Set up DigitalOcean CLI and kubectl
       - name: Set up DigitalOcean CLI
@@ -27,11 +24,12 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
       # Step 3: Install kubectl and configure it for DigitalOcean Kubernetes
-      - name: Install kubectl and configure kubeconfig
-        run: doctl kubernetes cluster kubeconfig save do-ams3-k8s-tumble
+      - name: Set up Kubernetes
+        uses: azure/setup-kubectl@v3
+        with:
+          version: "latest"
 
       # Step 4: Deploy to Kubernetes using kubectl
       - name: Deploy to Kubernetes
         run: |
-          kubectl apply -f tumble-cluster/kubernetes/backend/deployment.yml
-          kubectl apply -f tumble-cluster/kubernetes/backend/service.yml
+          kubectl rollout restart
