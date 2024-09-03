@@ -25,6 +25,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: tumble-for-kronox/Tumble-Cluster
+          ref: main
           ssh-key: ${{ secrets.SSH_TUMBLE_CLUSTER_KEY }}
           path: tumble-cluster
         
