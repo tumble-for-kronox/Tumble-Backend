@@ -2,9 +2,7 @@
 name: CI/CD Pipeline
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_call:
 
 jobs:
   publish-docker:
