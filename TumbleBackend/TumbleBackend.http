@@ -1,0 +1,6 @@
+@TumbleBackend_HostAddress = http://localhost:5098
+
+GET {{TumbleBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -16,7 +16,6 @@
     <PackageReference Include="FirebaseAdmin" Version="2.3.0" />
     <PackageReference Include="Grafana.OpenTelemetry" Version="0.9.0-beta.1" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Cors" Version="5.2.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.RateLimiting" Version="7.0.0-rc.2.22476.2" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.13" />
