@@ -1,3 +1,4 @@
+using KronoxAPI.Model.Users;
 using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
 
@@ -5,17 +6,15 @@ namespace TumbleBackend.Utilities;
 
 public class TestUserUtil {
     private readonly IConfiguration _configuration;
-    private readonly string _testUserPass;
-    private readonly string _testUserEmail;
 
     public TestUserUtil(IConfiguration configuration) {
         _configuration = configuration;
-        _testUserPass = _configuration[UserSecrets.TestUserPass] ?? Environment.GetEnvironmentVariable(EnvVar.TestUserPass) ?? throw new NullReferenceException("Ensure that TestUserPass is defined in the environment.");
     }
 
     public bool IsTestUser(string username, string password) {
         string? testUserPass = _configuration[UserSecrets.TestUserPass] ?? Environment.GetEnvironmentVariable(EnvVar.TestUserPass);
         string? testUserEmail = _configuration[UserSecrets.TestUserEmail] ?? Environment.GetEnvironmentVariable(EnvVar.TestUserEmail);
+        string? testUserSessionToken = _configuration[UserSecrets.TestUserSessionToken] ?? Environment.GetEnvironmentVariable(EnvVar.TestUserSessionToken);
 
         if (testUserPass == null || testUserEmail == null)
             throw new NullReferenceException("It should not be possible for testUserPass OR testUserEmail to be null at this point.");
@@ -23,4 +22,18 @@ public class TestUserUtil {
         return username == testUserEmail && password == testUserPass;
     }
     
+    public User GetTestUser() {
+        string? testUserEmail = _configuration[UserSecrets.TestUserEmail] ?? Environment.GetEnvironmentVariable(EnvVar.TestUserEmail);
+        string? testUserPass = _configuration[UserSecrets.TestUserPass] ?? Environment.GetEnvironmentVariable(EnvVar.TestUserPass);
+
+        if (testUserEmail == null || testUserPass == null)
+            throw new NullReferenceException("Ensure that TestUserEmail and TestUserPass are defined in the environment.");
+
+        return new User("Test User", testUserEmail, "testSessionToken");
+    }
+
+    public string GetTestUserSessionToken() {
+        string? testUserSessionToken = (_configuration[UserSecrets.TestUserSessionToken] ?? Environment.GetEnvironmentVariable(EnvVar.TestUserSessionToken)) ?? throw new NullReferenceException("Ensure that TestUserSessionToken is defined in the environment.");
+        return testUserSessionToken;
+    }
 }

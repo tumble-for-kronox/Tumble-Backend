@@ -109,6 +109,7 @@ void RegisterServices(IServiceCollection services, IConfiguration configuration,
     services.AddSingleton<IDbKronoxCacheService>(sp => new MongoKronoxCacheService(sp.GetService<IDbSettings>()!));
     services.AddSingleton<MobileMessagingClient>();
     services.AddTransient<JwtUtil>();
+    services.AddTransient<TestUserUtil>();
 
     services.AddScoped<AuthActionFilter>();
     services.AddScoped<KronoxUrlFilter>();
@@ -121,10 +122,6 @@ void RegisterServices(IServiceCollection services, IConfiguration configuration,
         config.OperationFilter<AuthHeaderFilter>();
     });
 
-    services.AddHttpClient("KronoxClient", client =>
-    {
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36");
-    });
 
     services.AddCors(options =>
     {
