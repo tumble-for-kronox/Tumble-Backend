@@ -11,5 +11,4 @@ public static class UserSecrets
     public static string AdminPass => "Admin:Pass";
     public static string TestUserPass => "TestUser:Pass";
     public static string TestUserEmail => "TestUser:Email";
-    public static string TestUserSessionToken => "TestUser:SessionToken";
 }

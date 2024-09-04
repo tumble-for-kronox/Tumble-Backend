@@ -1,17 +1,8 @@
 using DatabaseAPI;
 using DatabaseAPI.Interfaces;
-using Grafana.OpenTelemetry;
-using Microsoft.AspNetCore.RateLimiting;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Conventions;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
-using Prometheus;
-using System.Diagnostics;
-using System.Threading.RateLimiting;
 using TumbleBackend.ActionFilters;
 using TumbleBackend.ExceptionMiddleware;
+using TumbleBackend.Middleware;
 using TumbleBackend.Library;
 using TumbleBackend.OperationFilters;
 using TumbleBackend.StringConstants;
@@ -21,20 +12,16 @@ using WebAPIModels.ResponseModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuration
 ConfigureConfiguration(builder);
 ConfigureTracing(builder);
 ConfigureRateLimiting(builder);
 ConfigureMongoDb();
 
-// Service registration
 RegisterServices(builder.Services, builder.Configuration, builder.Environment);
 
-// Build and configure middleware
 var app = builder.Build();
 ConfigureMiddleware(app);
 
-// Initialize utilities
 EmailUtil.Init(GetAwsAccessKey(builder.Environment, builder.Configuration), GetAwsSecretKey(builder.Environment, builder.Configuration));
 
 app.Run();
@@ -53,7 +40,7 @@ void ConfigureTracing(WebApplicationBuilder builder)
             tracerProviderBuilder
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation()
-                .UseGrafana() // Sets up Grafana's OpenTelemetry distribution
+                .UseGrafana()
                 .AddConsoleExporter();
         });
 
@@ -152,6 +139,7 @@ void ConfigureMiddleware(WebApplication app)
 
     app.UseMiddleware<GeneralExceptionMiddleware>();
     app.UseMiddleware<TimeoutExceptionMiddleware>();
+    app.UseMiddleware<TestUserMiddleware>();
 
     app.UseMetricServer("/metrics");
     app.UseHttpMetrics();

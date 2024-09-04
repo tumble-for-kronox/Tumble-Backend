@@ -26,7 +26,7 @@ public class UserEventController : ControllerBase
         _logger = logger;
     }
 
-    private IKronoxRequestClient GetAuthenticatedClient()
+    private static IKronoxRequestClient GetAuthenticatedClient()
     {
         if (HttpContext.Items[KronoxReqClientKeys.SingleClient] is not IKronoxRequestClient client || !client.IsAuthenticated)
         {

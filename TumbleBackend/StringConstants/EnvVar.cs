@@ -11,5 +11,4 @@ public static class EnvVar
     public static string AdminPass => "AdminPass";
     public static string TestUserPass => "TestUserPass";
     public static string TestUserEmail => "TestUserEmail";
-    public static string TestUserSessionToken => "TestUserSessionToken";
 }

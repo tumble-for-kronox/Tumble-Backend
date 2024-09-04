@@ -1,8 +1,6 @@
 ﻿using KronoxAPI.Exceptions;
 using KronoxAPI.Model.Booking;
 using KronoxAPI.Model.Schools;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
 using TumbleBackend.ActionFilters;
 using TumbleBackend.Extensions;
 using TumbleBackend.StringConstants;

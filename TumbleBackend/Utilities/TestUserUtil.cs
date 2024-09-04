@@ -31,9 +31,4 @@ public class TestUserUtil {
 
         return new User("Test User", testUserEmail, "testSessionToken");
     }
-
-    public string GetTestUserSessionToken() {
-        string? testUserSessionToken = (_configuration[UserSecrets.TestUserSessionToken] ?? Environment.GetEnvironmentVariable(EnvVar.TestUserSessionToken)) ?? throw new NullReferenceException("Ensure that TestUserSessionToken is defined in the environment.");
-        return testUserSessionToken;
-    }
 }
