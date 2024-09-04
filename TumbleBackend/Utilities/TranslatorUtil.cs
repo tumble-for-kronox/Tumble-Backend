@@ -1,9 +1,4 @@
-﻿using System;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using WebAPIModels;
-using TumbleBackend.Exceptions;
+﻿using System.Text;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 

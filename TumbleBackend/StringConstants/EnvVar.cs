@@ -9,6 +9,6 @@ public static class EnvVar
     public static string AwsAccessKey => "AwsAccessKey";
     public static string AwsSecretKey => "AwsSecretKey";
     public static string AdminPass => "AdminPass";
-
-    public static string LokiUri => "LokiUri";
+    public static string TestUserPass => "TestUserPass";
+    public static string TestUserEmail => "TestUserEmail";
 }

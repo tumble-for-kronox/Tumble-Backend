@@ -22,11 +22,8 @@ public class AdminController : Controller
     [HttpPut("notification")]
     public async Task<IActionResult> SendMessage([FromServices] MobileMessagingClient messaging, [FromServices] IConfiguration configuration, [FromServices] IDbNewsService newsService, [FromHeader] string auth, [FromQuery] NotificationContent notificationContent)
     {
-        string? adminPassword = configuration[UserSecrets.AdminPass] ?? Environment.GetEnvironmentVariable(EnvVar.AdminPass);
-
-        if (adminPassword == null)
-            throw new NullReferenceException("Ensure that AdminPass is defined in the environment.");
-
+        string? adminPassword = (configuration[UserSecrets.AdminPass] ?? Environment.GetEnvironmentVariable(EnvVar.AdminPass)) ?? throw new NullReferenceException("Ensure that AdminPass is defined in the environment.");
+        
         if (auth != adminPassword)
         {
             return Unauthorized();
