@@ -26,7 +26,7 @@ public class UserEventController : ControllerBase
         _logger = logger;
     }
 
-    private static IKronoxRequestClient GetAuthenticatedClient()
+    private IKronoxRequestClient GetAuthenticatedClient()
     {
         if (HttpContext.Items[KronoxReqClientKeys.SingleClient] is not IKronoxRequestClient client || !client.IsAuthenticated)
         {
@@ -34,6 +34,7 @@ public class UserEventController : ControllerBase
         }
         return client;
     }
+
 
     private IActionResult HandleError(Exception ex, string message, int statusCode = StatusCodes.Status500InternalServerError)
     {

@@ -1,4 +1,7 @@
+using System.Text.Json;
+using KronoxAPI.Model.Booking;
 using TumbleBackend.Utilities;
+using WebAPIModels.Extensions;
 using WebAPIModels.MiscModels;
 
 namespace TumbleBackend.Middleware;
@@ -48,15 +51,18 @@ public class TestUserMiddleware
         return context.Request.Method == HttpMethods.Post && context.Request.Path == "/api/users/login";
     }
 
-    private static bool TryGetCredentials(HttpContext context, out string username, out string password)
+    private static bool TryGetCredentials(HttpContext context, out string? username, out string? password)
     {
         username = context.Request.Form["username"].FirstOrDefault();
         password = context.Request.Form["password"].FirstOrDefault();
         return username != null && password != null;
     }
 
-    private static async Task HandleTestUserLoginResponse(HttpContext context, JwtUtil jwtUtil, TestUserUtil testUserUtil, string username, string password)
+    private static async Task HandleTestUserLoginResponse(HttpContext context, JwtUtil jwtUtil, TestUserUtil testUserUtil, string? username, string? password)
     {
+        if (username == null || password == null)
+            throw new ArgumentNullException("Username and password must be provided.");
+            
         var testUser = testUserUtil.GetTestUser();
         var newRefreshToken = jwtUtil.GenerateRefreshToken(username, password);
         var sessionDetails = new SessionDetails("", "");

@@ -9,6 +9,15 @@ using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
 using TumbleHttpClient;
 using WebAPIModels.ResponseModels;
+using OpenTelemetry.Trace;
+using Grafana.OpenTelemetry;
+using OpenTelemetry.Logs;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Conventions;
+using System.Diagnostics;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,7 +94,7 @@ void RegisterServices(IServiceCollection services, IConfiguration configuration,
 {
     string? dbConnectionString = GetDbConnectionString(environment, configuration);
     string? dbName = GetDbName(environment, configuration);
-    MongoDBSettings dbSettings = new(dbConnectionString!, dbName);
+    MongoDBSettings dbSettings = new(dbConnectionString!, dbName!);
 
     services.AddSingleton(configuration);
     services.AddSingleton(dbSettings);
@@ -141,7 +150,7 @@ void ConfigureMiddleware(WebApplication app)
     app.UseMiddleware<TimeoutExceptionMiddleware>();
     app.UseMiddleware<TestUserMiddleware>();
 
-    app.UseMetricServer("/metrics");
+    app.UseMetricServer();
     app.UseHttpMetrics();
 
     app.UseEndpoints(endpoints =>
