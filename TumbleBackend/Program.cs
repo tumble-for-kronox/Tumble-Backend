@@ -21,8 +21,8 @@ using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
-ConfigureConfiguration(builder);
-ConfigureTracing(builder);
+ConfigureEnvironmentAndSecrets(builder);
+//ConfigureTracing(builder);
 ConfigureRateLimiting(builder);
 ConfigureMongoDb();
 
@@ -35,7 +35,7 @@ EmailUtil.Init(GetAwsAccessKey(builder.Environment, builder.Configuration), GetA
 
 app.Run();
 
-void ConfigureConfiguration(WebApplicationBuilder builder)
+void ConfigureEnvironmentAndSecrets(WebApplicationBuilder builder)
 {
     builder.Configuration.AddJsonFile("secrets/secrets.json", optional: true);
     builder.Configuration.AddEnvironmentVariables();

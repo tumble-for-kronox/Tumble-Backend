@@ -31,14 +31,12 @@ public class UserController : ControllerBase
     /// Retrieves a KronoxUser object for the user with the provided refreshToken. If the user is a test user, a test user object is returned with mock data upon further requests.
     /// </summary>
     /// <param name="jwtUtil"></param>
-    /// <param name="testUserUtil"></param>
     /// <param name="schoolId"></param>
     /// <param name="refreshToken"></param>
     /// <returns></returns> <summary>
     /// 
     /// </summary>
     /// <param name="jwtUtil"></param>
-    /// <param name="testUserUtil"></param>
     /// <param name="schoolId"></param>
     /// <param name="refreshToken"></param>
     /// <returns></returns>
@@ -46,12 +44,13 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetKronoxUserAsync([FromServices] JwtUtil jwtUtil, [FromQuery] SchoolEnum schoolId, [FromHeader(Name = "X-auth-token")] string refreshToken)
     {
         var kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
+        var school = schoolId.GetSchool()!;
+
         var creds = jwtUtil.ValidateAndReadRefreshToken(refreshToken);
 
         if (creds == null)
             return Unauthorized(new Error("Couldn't login user from refreshToken, please log out and back in manually."));
-        
-        // If the user is not a test user, attempt to auto-login the user and return the KronoxUser object.
+
         try
         {
             var kronoxUser = await School.LoginAsync(kronoxReqClient, creds.Username, creds.Password);

@@ -1,0 +1,489 @@
+[
+  {
+    "id": "FLIK_0005",
+    "name": "Grouproom building15",
+    "timeSlots": [
+      {
+        "id": 0,
+        "from": "0001-01-01T08:00:00",
+        "to": "0001-01-01T09:00:00",
+        "duration": "01:00:00"
+      },
+      {
+        "id": 1,
+        "from": "0001-01-01T09:00:00",
+        "to": "0001-01-01T12:00:00",
+        "duration": "03:00:00"
+      },
+      {
+        "id": 2,
+        "from": "0001-01-01T12:00:00",
+        "to": "0001-01-01T15:00:00",
+        "duration": "03:00:00"
+      },
+      {
+        "id": 3,
+        "from": "0001-01-01T15:00:00",
+        "to": "0001-01-01T18:00:00",
+        "duration": "03:00:00"
+      }
+    ],
+    "date": "0001-01-01T00:00:00",
+    "locationIds": ["15-416", "15-417", "15-430", "15-431", "15-432"],
+    "availabilities": {
+      "15-416": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "3": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "15-417": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "3": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "15-430": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "3": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "15-431": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "3": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "15-432": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "3": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      }
+    }
+  },
+  {
+    "id": "FLIK_0010",
+    "name": "Grouproom in the library.",
+    "timeSlots": [
+      {
+        "id": 0,
+        "from": "0001-01-01T08:00:00",
+        "to": "0001-01-01T09:00:00",
+        "duration": "01:00:00"
+      },
+      {
+        "id": 1,
+        "from": "0001-01-01T09:00:00",
+        "to": "0001-01-01T12:00:00",
+        "duration": "03:00:00"
+      },
+      {
+        "id": 2,
+        "from": "0001-01-01T12:00:00",
+        "to": "0001-01-01T15:00:00",
+        "duration": "03:00:00"
+      }
+    ],
+    "date": "0001-01-01T00:00:00",
+    "locationIds": [
+      "07-320A",
+      "07-320B",
+      "07-320C",
+      "07-320D",
+      "07-320E",
+      "07-320F",
+      "07-320G",
+      "07-320H",
+      "07-320J",
+      "07-320K",
+      "07-320L",
+      "07-320M",
+      "07-320N",
+      "07-320O"
+    ],
+    "availabilities": {
+      "07-320A": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "07-320B": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "07-320C": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "07-320D": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "07-320E": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "07-320F": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "07-320G": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "07-320H": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "07-320J": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "07-320K": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "07-320L": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "07-320M": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "07-320N": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      },
+      "07-320O": {
+        "0": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "1": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        },
+        "2": {
+          "availability": "UNAVAILABLE",
+          "locationId": null,
+          "resourceType": null,
+          "timeSlotId": null
+        }
+      }
+    }
+  }
+]

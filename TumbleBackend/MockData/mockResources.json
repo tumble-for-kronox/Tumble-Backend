@@ -1,0 +1,94 @@
+[
+  {
+    "id": "string",
+    "name": "string",
+    "timeSlots": [
+      {
+        "id": 0,
+        "from": "2024-09-07T15:34:24.615Z",
+        "to": "2024-09-07T15:34:24.615Z",
+        "duration": {
+          "ticks": 0,
+          "days": 0,
+          "hours": 0,
+          "milliseconds": 0,
+          "microseconds": 0,
+          "nanoseconds": 0,
+          "minutes": 0,
+          "seconds": 0,
+          "totalDays": 0,
+          "totalHours": 0,
+          "totalMilliseconds": 0,
+          "totalMicroseconds": 0,
+          "totalNanoseconds": 0,
+          "totalMinutes": 0,
+          "totalSeconds": 0
+        }
+      }
+    ],
+    "date": "2024-09-07T15:34:24.615Z",
+    "locationIds": ["string"],
+    "availabilities": {
+      "additionalProp1": {
+        "additionalProp1": {
+          "availability": "UNAVAILABLE",
+          "locationId": "string",
+          "resourceType": "string",
+          "timeSlotId": "string"
+        },
+        "additionalProp2": {
+          "availability": "UNAVAILABLE",
+          "locationId": "string",
+          "resourceType": "string",
+          "timeSlotId": "string"
+        },
+        "additionalProp3": {
+          "availability": "UNAVAILABLE",
+          "locationId": "string",
+          "resourceType": "string",
+          "timeSlotId": "string"
+        }
+      },
+      "additionalProp2": {
+        "additionalProp1": {
+          "availability": "UNAVAILABLE",
+          "locationId": "string",
+          "resourceType": "string",
+          "timeSlotId": "string"
+        },
+        "additionalProp2": {
+          "availability": "UNAVAILABLE",
+          "locationId": "string",
+          "resourceType": "string",
+          "timeSlotId": "string"
+        },
+        "additionalProp3": {
+          "availability": "UNAVAILABLE",
+          "locationId": "string",
+          "resourceType": "string",
+          "timeSlotId": "string"
+        }
+      },
+      "additionalProp3": {
+        "additionalProp1": {
+          "availability": "UNAVAILABLE",
+          "locationId": "string",
+          "resourceType": "string",
+          "timeSlotId": "string"
+        },
+        "additionalProp2": {
+          "availability": "UNAVAILABLE",
+          "locationId": "string",
+          "resourceType": "string",
+          "timeSlotId": "string"
+        },
+        "additionalProp3": {
+          "availability": "UNAVAILABLE",
+          "locationId": "string",
+          "resourceType": "string",
+          "timeSlotId": "string"
+        }
+      }
+    }
+  }
+]
