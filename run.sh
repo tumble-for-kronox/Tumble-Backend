@@ -1,0 +1,1 @@
+kubectl port-forward svc/tumble-backend -n development 7036:80
