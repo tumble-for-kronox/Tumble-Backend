@@ -3,6 +3,7 @@ using KronoxAPI.Model.Booking;
 using TumbleBackend.Utilities;
 using WebAPIModels.Extensions;
 using WebAPIModels.MiscModels;
+using WebAPIModels.ResponseModels;
 
 namespace TumbleBackend.Middleware;
 
@@ -27,11 +28,14 @@ public class TestUserMiddleware
         context.Request.EnableBuffering();
         var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
         context.Request.Body.Position = 0;
+
+        _logger.LogInformation("HTTP path: " + path);
         
         if (IsLoginRequest(context) && TryGetCredentials(body, out var username, out var password))
         {
             if (testUserUtil.IsTestUser(username, password))
             {
+                _logger.LogInformation("Handling test user login response.");
                 await HandleTestUserLoginResponse(context, jwtUtil, testUserUtil, username, password);
                 return;
             }
@@ -44,14 +48,14 @@ public class TestUserMiddleware
             {
                 if (path.StartsWithSegments("/api/resources"))
                 {
+                    _logger.LogInformation("Handling test user booking routes.");
                     await HandleTestUserBookingRoutes(context, path);
                     return;
                 }
 
-                if (path.StartsWithSegments("/api/users"))
-                {
-                    _logger.LogInformation("Returning test user information.");
-                    await HandleTestUserInfoResponse(context, jwtUtil, testUserUtil, creds.Username, creds.Password);
+                if (path.StartsWithSegments("/api/users")) {
+                    _logger.LogInformation("Handling test user routes.");
+                    await HandleTestUserRoutes(context, jwtUtil, testUserUtil, path, creds.Username, creds.Password);
                     return;
                 }
 
@@ -78,16 +82,26 @@ public class TestUserMiddleware
         await context.Response.WriteAsJsonAsync(testUserModel);
     }
 
+    private async Task HandleTestUserRoutes(HttpContext context, JwtUtil jwtUtil, TestUserUtil testUserUtil, PathString path, string username, string password)
+    {
+        if (context.Request.Method == HttpMethods.Get && path == "/api/users/events/") {
+            _logger.LogInformation("Returning mock user events.");
+            await ReturnMockUserEvents(context);
+        }
+        else if (context.Request.Method == HttpMethods.Get && path == "/api/users")
+        {
+            _logger.LogInformation("Returning test user information.");
+            await HandleTestUserInfoResponse(context, jwtUtil, testUserUtil, username, password);
+            return;
+        }
+    }
+
 
     private static bool IsLoginRequest(HttpContext context)
     {
         return context.Request.Method == HttpMethods.Post && context.Request.Path == "/api/users/login";
     }
 
-    private static bool IsGetUserRequest(HttpContext context)
-    {
-        return context.Request.Method == HttpMethods.Get && context.Request.Path == "/api/users";
-    }
 
     private static bool TryGetCredentials(string body, out string? username, out string? password)
     {
@@ -135,35 +149,58 @@ public class TestUserMiddleware
 
     private async Task HandleTestUserBookingRoutes(HttpContext context, PathString path)
     {
+        _logger.LogInformation("Mock data path is: " + _mockDataPath);
         if (context.Request.Method == HttpMethods.Get && path == "/api/resources")
         {
+            _logger.LogInformation("Returning mock resources.");
             await ReturnMockResources(context);
         }
         else if (context.Request.Method == HttpMethods.Get && path == "/api/resources/all")
         {
+            _logger.LogInformation("Returning mock resources with availabilities.");
             await ReturnMockResourcesWithAvailabilities(context);
+        }
+        else if (context.Request.Method == HttpMethods.Get && path == "/api/users/events") {
+            _logger.LogInformation("Returning mock user events.");
+            await ReturnMockUserEvents(context);
         }
         else if (context.Request.Method == HttpMethods.Get && path == "/api/resources/userbookings")
         {
+            _logger.LogInformation("Returning mock user bookings.");
             await ReturnMockUserBookings(context);
         }
         else if (context.Request.Method == HttpMethods.Put && path.StartsWithSegments("/api/resources/book"))
         {
+            _logger.LogInformation("Returning mock booking result.");
             await ReturnMockBookingResult(context);
         }
         else if (context.Request.Method == HttpMethods.Put && path.StartsWithSegments("/api/resources/unbook"))
         {
+            _logger.LogInformation("Returning mock unbooking result.");
             await ReturnMockUnbookingResult(context);
         }
         else if (context.Request.Method == HttpMethods.Put && path.StartsWithSegments("/api/resources/confirm"))
         {
+            _logger.LogInformation("Returning mock booking confirmation.");
             await ReturnMockBookingConfirmation(context);
         }
+    }
+
+    private async Task ReturnMockUserEvents(HttpContext context)
+    {
+        var mockFilePath = Path.Combine(_mockDataPath, "mockUserEvents.json");
+        _logger.LogInformation("Retrieving mock data from path: " + mockFilePath);
+        var mockEvents = await File.ReadAllTextAsync(mockFilePath);
+        var events = JsonSerializer.Deserialize<UserEventCollection>(mockEvents);
+
+        context.Response.StatusCode = StatusCodes.Status200OK;
+        await context.Response.WriteAsJsonAsync(events);
     }
 
     private async Task ReturnMockResources(HttpContext context)
     {
         var mockFilePath = Path.Combine(_mockDataPath, "mockResources.json");
+        _logger.LogInformation("Retrieving mock data from path: " + mockFilePath);
         var mockResources = await File.ReadAllTextAsync(mockFilePath);
         var resources = JsonSerializer.Deserialize<List<Resource>>(mockResources);
 
@@ -171,9 +208,11 @@ public class TestUserMiddleware
         await context.Response.WriteAsJsonAsync(resources);
     }
 
+
     private async Task ReturnMockResourcesWithAvailabilities(HttpContext context)
     {
         var mockFilePath = Path.Combine(_mockDataPath, "mockResourcesWithAvailabilities.json");
+        _logger.LogInformation("Retrieving mock data from path: " + mockFilePath);
         var mockResources = await File.ReadAllTextAsync(mockFilePath);
         var resources = JsonSerializer.Deserialize<List<Resource>>(mockResources);
 
@@ -184,6 +223,7 @@ public class TestUserMiddleware
     private async Task ReturnMockUserBookings(HttpContext context)
     {
         var mockFilePath = Path.Combine(_mockDataPath, "mockUserBookings.json");
+        _logger.LogInformation("Retrieving mock data from path: " + mockFilePath);
         var mockBookings = await File.ReadAllTextAsync(mockFilePath);
         var bookings = JsonSerializer.Deserialize<List<Booking>>(mockBookings);
 
@@ -194,6 +234,7 @@ public class TestUserMiddleware
     private async Task ReturnMockBookingResult(HttpContext context)
     {
         var mockFilePath = Path.Combine(_mockDataPath, "mockBookingResult.json");
+        _logger.LogInformation("Retrieving mock data from path: " + mockFilePath);
         var mockResult = await File.ReadAllTextAsync(mockFilePath);
 
         context.Response.StatusCode = StatusCodes.Status200OK;
@@ -203,6 +244,7 @@ public class TestUserMiddleware
     private async Task ReturnMockUnbookingResult(HttpContext context)
     {
         var mockFilePath = Path.Combine(_mockDataPath, "mockUnbookingResult.json");
+        _logger.LogInformation("Retrieving mock data from path: " + mockFilePath);
         var mockResult = await File.ReadAllTextAsync(mockFilePath);
 
         context.Response.StatusCode = StatusCodes.Status200OK;
@@ -212,6 +254,7 @@ public class TestUserMiddleware
     private async Task ReturnMockBookingConfirmation(HttpContext context)
     {
         var mockFilePath = Path.Combine(_mockDataPath, "mockBookingConfirmation.json");
+        _logger.LogInformation("Retrieving mock data from path: " + mockFilePath);
         var mockResult = await File.ReadAllTextAsync(mockFilePath);
 
         context.Response.StatusCode = StatusCodes.Status200OK;

@@ -1,199 +1,193 @@
 [
   {
-    "id": "FLIK_0005",
-    "name": "Grouproom building15",
-    "timeSlots": [
+    "Id": "FLIK_0005",
+    "Name": "Grouproom building15",
+    "TimeSlots": [
       {
-        "id": 0,
-        "from": "2024-09-09T08:00:00",
-        "to": "2024-09-09T09:00:00",
-        "duration": "01:00:00"
+        "Id": 0,
+        "From": "2024-09-09T08:00:00",
+        "To": "2024-09-09T09:00:00",
+        "Duration": "01:00:00"
       },
       {
-        "id": 1,
-        "from": "2024-09-09T09:00:00",
-        "to": "2024-09-09T12:00:00",
-        "duration": "03:00:00"
+        "Id": 1,
+        "From": "2024-09-09T09:00:00",
+        "To": "2024-09-09T12:00:00",
+        "Duration": "03:00:00"
       },
       {
-        "id": 2,
-        "from": "2024-09-09T12:00:00",
-        "to": "2024-09-09T15:00:00",
-        "duration": "03:00:00"
+        "Id": 2,
+        "From": "2024-09-09T12:00:00",
+        "To": "2024-09-09T15:00:00",
+        "Duration": "03:00:00"
       },
       {
-        "id": 3,
-        "from": "2024-09-09T15:00:00",
-        "to": "2024-09-09T18:00:00",
-        "duration": "03:00:00"
+        "Id": 3,
+        "From": "2024-09-09T15:00:00",
+        "To": "2024-09-09T18:00:00",
+        "Duration": "03:00:00"
       }
     ],
-    "date": "2024-09-09T00:00:00",
-    "locationIds": [
-      "15-416",
-      "15-417",
-      "15-430",
-      "15-431",
-      "15-432"
-    ],
-    "availabilities": {
+    "Date": "2024-09-09T00:00:00",
+    "LocationIds": ["15-416", "15-417", "15-430", "15-431", "15-432"],
+    "Availabilities": {
       "15-416": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "15-416",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-416",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "AVAILABLE",
-          "locationId": "15-416",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "1"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-416",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "1"
         },
         "2": {
-          "availability": "AVAILABLE",
-          "locationId": "15-416",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "2"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-416",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "2"
         },
         "3": {
-          "availability": "AVAILABLE",
-          "locationId": "15-416",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "3"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-416",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "3"
         }
       },
       "15-417": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "15-417",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-417",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         },
         "2": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         },
         "3": {
-          "availability": "AVAILABLE",
-          "locationId": "15-417",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "3"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-417",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "3"
         }
       },
       "15-430": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "15-430",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-430",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "AVAILABLE",
-          "locationId": "15-430",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "1"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-430",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "1"
         },
         "2": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         },
         "3": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         }
       },
       "15-431": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "15-431",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-431",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "AVAILABLE",
-          "locationId": "15-431",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "1"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-431",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "1"
         },
         "2": {
-          "availability": "AVAILABLE",
-          "locationId": "15-431",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "2"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-431",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "2"
         },
         "3": {
-          "availability": "AVAILABLE",
-          "locationId": "15-431",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "3"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-431",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "3"
         }
       },
       "15-432": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "15-432",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-432",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "AVAILABLE",
-          "locationId": "15-432",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "1"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-432",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "1"
         },
         "2": {
-          "availability": "AVAILABLE",
-          "locationId": "15-432",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "2"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-432",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "2"
         },
         "3": {
-          "availability": "AVAILABLE",
-          "locationId": "15-432",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "3"
+          "Availability": "AVAILABLE",
+          "LocationId": "15-432",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "3"
         }
       }
     }
   },
   {
-    "id": "FLIK_0010",
-    "name": "Grouproom in the library.",
-    "timeSlots": [
+    "Id": "FLIK_0010",
+    "Name": "Grouproom in the library.",
+    "TimeSlots": [
       {
-        "id": 0,
-        "from": "2024-09-09T08:00:00",
-        "to": "2024-09-09T09:00:00",
-        "duration": "01:00:00"
+        "Id": 0,
+        "From": "2024-09-09T08:00:00",
+        "To": "2024-09-09T09:00:00",
+        "Duration": "01:00:00"
       },
       {
-        "id": 1,
-        "from": "2024-09-09T09:00:00",
-        "to": "2024-09-09T12:00:00",
-        "duration": "03:00:00"
+        "Id": 1,
+        "From": "2024-09-09T09:00:00",
+        "To": "2024-09-09T12:00:00",
+        "Duration": "03:00:00"
       },
       {
-        "id": 2,
-        "from": "2024-09-09T12:00:00",
-        "to": "2024-09-09T15:00:00",
-        "duration": "03:00:00"
+        "Id": 2,
+        "From": "2024-09-09T12:00:00",
+        "To": "2024-09-09T15:00:00",
+        "Duration": "03:00:00"
       }
     ],
-    "date": "2024-09-09T00:00:00",
-    "locationIds": [
+    "Date": "2024-09-09T00:00:00",
+    "LocationIds": [
       "07-320A",
       "07-320B",
       "07-320C",
@@ -209,285 +203,285 @@
       "07-320N",
       "07-320O"
     ],
-    "availabilities": {
+    "Availabilities": {
       "07-320A": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320A",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320A",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320A",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "1"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320A",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "1"
         },
         "2": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         }
       },
       "07-320B": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320B",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320B",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320B",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "1"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320B",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "1"
         },
         "2": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         }
       },
       "07-320C": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320C",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320C",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         },
         "2": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         }
       },
       "07-320D": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320D",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320D",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320D",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "1"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320D",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "1"
         },
         "2": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         }
       },
       "07-320E": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320E",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320E",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         },
         "2": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320E",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "2"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320E",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "2"
         }
       },
       "07-320F": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320F",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320F",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         },
         "2": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         }
       },
       "07-320G": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320G",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320G",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         },
         "2": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         }
       },
       "07-320H": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320H",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320H",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320H",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "1"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320H",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "1"
         },
         "2": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         }
       },
       "07-320J": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320J",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320J",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         },
         "2": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         }
       },
       "07-320K": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320K",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320K",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320K",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "1"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320K",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "1"
         },
         "2": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         }
       },
       "07-320L": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320L",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320L",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         },
         "2": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         }
       },
       "07-320M": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320M",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320M",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         },
         "2": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         }
       },
       "07-320N": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320N",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320N",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         },
         "2": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         }
       },
       "07-320O": {
         "0": {
-          "availability": "AVAILABLE",
-          "locationId": "07-320O",
-          "resourceType": "RESURSER_LOKALER",
-          "timeSlotId": "0"
+          "Availability": "AVAILABLE",
+          "LocationId": "07-320O",
+          "ResourceType": "RESURSER_LOKALER",
+          "TimeSlotId": "0"
         },
         "1": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         },
         "2": {
-          "availability": "BOOKED",
-          "locationId": null,
-          "resourceType": null,
-          "timeSlotId": null
+          "Availability": "BOOKED",
+          "LocationId": null,
+          "ResourceType": null,
+          "TimeSlotId": null
         }
       }
     }

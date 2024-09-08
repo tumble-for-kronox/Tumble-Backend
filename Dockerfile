@@ -2,6 +2,12 @@
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /build
 
+RUN apt-get update && \
+    apt-get install -y \
+    curl \
+    vim \
+    nano
+
 # Copy csproj and restore as distinct layers
 COPY ["TumbleBackend/*.csproj", "TumbleBackend/"]
 RUN dotnet restore "TumbleBackend/TumbleBackend.csproj"

@@ -22,7 +22,7 @@ using Prometheus;
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigureEnvironmentAndSecrets(builder);
-//ConfigureTracing(builder);
+ConfigureTracing(builder);
 ConfigureRateLimiting(builder);
 ConfigureMongoDb();
 
