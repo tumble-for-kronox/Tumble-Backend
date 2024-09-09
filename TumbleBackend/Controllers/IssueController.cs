@@ -1,8 +1,6 @@
-﻿using DatabaseAPI;
-using DatabaseAPI.Interfaces;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using TumbleBackend.Utilities;
+using TumbleBackend.Modules;
 using WebAPIModels.RequestModels;
 
 namespace TumbleBackend.Controllers;
@@ -10,7 +8,7 @@ namespace TumbleBackend.Controllers;
 [EnableCors("CorsPolicy")]
 [ApiController]
 [Route("api/misc")]
-public class MiscController : ControllerBase
+public class IssueController : ControllerBase
 {
 
     [HttpPost("submitIssue")]
@@ -19,9 +17,4 @@ public class MiscController : ControllerBase
         return new StatusCodeResult(statusCode: (int)await EmailUtil.SendNewIssueEmail(issue.title, issue.description));
     }
 
-    [HttpGet("news")]
-    public async Task<IActionResult> GetNewsHistory([FromServices] IDbNewsService newsService)
-    {
-        return Ok(await newsService.GetNewsHistoryAsync());
-    }
 }

@@ -1,7 +1,7 @@
 ﻿using KronoxAPI.Model.Scheduling;
 using KronoxAPI.Model.Schools;
-using TumbleBackend.Utilities;
-using TumbleBackend.Extensions;
+using KronoxBackend.Utilities;
+using KronoxBackend.Extensions;
 using WebAPIModels.Extensions;
 using WebAPIModels.ResponseModels;
 using KronoxAPI.Exceptions;
@@ -9,7 +9,7 @@ using WebAPIModels.RequestModels;
 using TumbleHttpClient;
 using Utilities.Pair;
 
-namespace TumbleBackend.Library;
+namespace KronoxBackend.Library;
 
 public class ScheduleManagement
 {
@@ -28,7 +28,6 @@ public class ScheduleManagement
         {
             Schedule schedule = await School.FetchScheduleAsync(client, new string[] { scheduleId }, null, startDate);
 
-            //Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(TranslatorUtil.SwedishToEnglish(kvp.Value.Name).Result)).ToDictionary(course => course.Id);
             Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(kvp.Value.Name)).ToDictionary(course => course.Id);
             ScheduleWebModel webSafeSchedule = schedule.ToWebModel(courses);
             webSafeSchedule.Days = webSafeSchedule.Days.PadScheduleDays(startDate);
@@ -57,7 +56,6 @@ public class ScheduleManagement
         {
             Schedule schedule = await School.FetchScheduleAsync(client, scheduleIds, null, startDate);
 
-            //Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(TranslatorUtil.SwedishToEnglish(kvp.Value.Name).Result)).ToDictionary(course => course.Id);
             Dictionary<string, CourseWebModel> courses = schedule.Courses().Select((kvp, index) => kvp.Value.ToWebModel(kvp.Value.Name)).ToDictionary(course => course.Id);
             MultiScheduleWebModel webSafeSchedule = schedule.ToMultiWebModel(courses);
             webSafeSchedule.Days = webSafeSchedule.Days.PadScheduleDays(startDate);

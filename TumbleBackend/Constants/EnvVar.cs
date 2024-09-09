@@ -1,4 +1,4 @@
-﻿namespace KronoxBackend.StringConstants;
+﻿namespace TumbleBackend.Constants;
 
 public static class EnvVar
 {
@@ -8,6 +8,7 @@ public static class EnvVar
     public static string DbConnection => "DbConnectionString";
     public static string AwsAccessKey => "AwsAccessKey";
     public static string AwsSecretKey => "AwsSecretKey";
+    public static string AdminPass => "AdminPass";
 
     public static string LokiUri => "LokiUri";
 }

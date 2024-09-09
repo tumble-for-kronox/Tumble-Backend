@@ -2,7 +2,7 @@
 using WebAPIModels.Extensions;
 using WebAPIModels;
 
-namespace TumbleBackend.Utilities;
+namespace KronoxBackend.Utilities;
 
 public static class CourseColorUtil
 {

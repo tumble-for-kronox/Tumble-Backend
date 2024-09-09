@@ -1,4 +1,4 @@
-﻿namespace TumbleBackend.Extensions;
+﻿namespace KronoxBackend.Extensions;
 
 public static class TaskExtensions
 {

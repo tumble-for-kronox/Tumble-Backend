@@ -2,11 +2,11 @@
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using TumbleBackend.InternalModels;
+using KronoxBackend.InternalModels;
 using Microsoft.AspNetCore.Mvc;
-using TumbleBackend.StringConstants;
+using KronoxBackend.StringConstants;
 
-namespace TumbleBackend.Utilities;
+namespace KronoxBackend.Utilities;
 
 public class JwtUtil
 {

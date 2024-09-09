@@ -1,21 +1,20 @@
 ﻿using KronoxAPI.Model.Scheduling;
 using KronoxAPI.Model.Schools;
 using Microsoft.AspNetCore.Mvc;
-using TumbleBackend.Extensions;
+using KronoxBackend.Extensions;
 using WebAPIModels.ResponseModels;
 using WebAPIModels.RequestModels;
-using DatabaseAPI;
-using static TumbleBackend.Library.ScheduleManagement;
+using static KronoxBackend.Library.ScheduleManagement;
 using KronoxAPI.Exceptions;
-using TumbleBackend.StringConstants;
-using TumbleBackend.ActionFilters;
+using KronoxBackend.StringConstants;
+using KronoxBackend.ActionFilters;
 using Microsoft.AspNetCore.Cors;
 using TumbleHttpClient;
 using KronoxAPI.Extensions;
 using Utilities.Pair;
 using DatabaseAPI.Interfaces;
 
-namespace TumbleBackend.Controllers;
+namespace KronoxBackend.Controllers;
 
 [EnableCors("CorsPolicy")]
 [ApiController]

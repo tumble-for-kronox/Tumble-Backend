@@ -10,12 +10,12 @@ using OpenTelemetry.Trace;
 using Prometheus;
 using System.Diagnostics;
 using System.Threading.RateLimiting;
-using TumbleBackend.ActionFilters;
-using TumbleBackend.ExceptionMiddleware;
-using TumbleBackend.Library;
-using TumbleBackend.OperationFilters;
-using TumbleBackend.StringConstants;
-using TumbleBackend.Utilities;
+using KronoxBackend.ActionFilters;
+using KronoxBackend.ExceptionMiddleware;
+using KronoxBackend.Library;
+using KronoxBackend.OperationFilters;
+using KronoxBackend.StringConstants;
+using KronoxBackend.Utilities;
 using TumbleHttpClient;
 using WebAPIModels.ResponseModels;
 
@@ -34,8 +34,6 @@ RegisterServices(builder.Services, builder.Configuration, builder.Environment);
 var app = builder.Build();
 ConfigureMiddleware(app);
 
-// Initialize utilities
-EmailUtil.Init(GetAwsAccessKey(builder.Environment, builder.Configuration), GetAwsSecretKey(builder.Environment, builder.Configuration));
 
 app.Run();
 
@@ -107,7 +105,6 @@ void RegisterServices(IServiceCollection services, IConfiguration configuration,
     services.AddSingleton<IDbProgrammeFiltersService>(sp => new MongoProgrammeFiltersService(sp.GetService<IDbSettings>()!));
     services.AddSingleton<IDbNewsService>(sp => new MongoNewsService(sp.GetService<IDbSettings>()!));
     services.AddSingleton<IDbKronoxCacheService>(sp => new MongoKronoxCacheService(sp.GetService<IDbSettings>()!));
-    services.AddSingleton<MobileMessagingClient>();
     services.AddTransient<JwtUtil>();
 
     services.AddScoped<AuthActionFilter>();

@@ -1,4 +1,4 @@
-﻿namespace TumbleBackend.InternalModels;
+﻿namespace KronoxBackend.InternalModels;
 
 public class RefreshTokenResponseModel
 {

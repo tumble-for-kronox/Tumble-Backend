@@ -2,17 +2,17 @@
 using KronoxAPI.Model.Schools;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TumbleBackend.Extensions;
+using KronoxBackend.Extensions;
 using TumbleHttpClient;
 using WebAPIModels.RequestModels;
 using WebAPIModels.ResponseModels;
 using Utilities.Pair;
-using TumbleBackend.StringConstants;
+using KronoxBackend.StringConstants;
 using TumbleHttpClient.Exceptions;
 using System.Net;
 using WebAPIModels.MiscModels;
 
-namespace TumbleBackend.ActionFilters
+namespace KronoxBackend.ActionFilters
 {
     public class KronoxUrlFilter : ActionFilterAttribute
     {

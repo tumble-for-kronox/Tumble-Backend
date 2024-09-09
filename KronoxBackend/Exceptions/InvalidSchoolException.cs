@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace TumbleBackend.Exceptions
+namespace KronoxBackend.Exceptions
 {
     public class InvalidSchoolException : Exception
     {

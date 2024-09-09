@@ -4,7 +4,7 @@ using System.Globalization;
 using WebAPIModels.ResponseModels;
 using KronoxAPI.Model.Schools;
 
-namespace TumbleBackend.Extensions;
+namespace KronoxBackend.Extensions;
 
 public static class ListExtensions
 {

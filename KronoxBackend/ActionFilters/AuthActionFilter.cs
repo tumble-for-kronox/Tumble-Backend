@@ -6,15 +6,15 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Primitives;
 using System.Net;
 using System.Text.RegularExpressions;
-using TumbleBackend.Extensions;
-using TumbleBackend.InternalModels;
-using TumbleBackend.StringConstants;
-using TumbleBackend.Utilities;
+using KronoxBackend.Extensions;
+using KronoxBackend.InternalModels;
+using KronoxBackend.StringConstants;
+using KronoxBackend.Utilities;
 using TumbleHttpClient;
 using WebAPIModels.MiscModels;
 using WebAPIModels.ResponseModels;
 
-namespace TumbleBackend.ActionFilters;
+namespace KronoxBackend.ActionFilters;
 
 public class AuthActionFilter : ActionFilterAttribute
 {

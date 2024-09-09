@@ -1,6 +1,6 @@
 ﻿using KronoxAPI.Model.Schools;
 
-namespace TumbleBackend.Extensions;
+namespace KronoxBackend.Extensions;
 
 public static class SchoolEnumExtensions
 {

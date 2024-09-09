@@ -3,14 +3,14 @@ using KronoxAPI.Model.Booking;
 using KronoxAPI.Model.Schools;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using TumbleBackend.ActionFilters;
-using TumbleBackend.Extensions;
-using TumbleBackend.StringConstants;
+using KronoxBackend.ActionFilters;
+using KronoxBackend.Extensions;
+using KronoxBackend.StringConstants;
 using TumbleHttpClient;
 using WebAPIModels.RequestModels;
 using WebAPIModels.ResponseModels;
 
-namespace TumbleBackend.Controllers;
+namespace KronoxBackend.Controllers;
 
 [EnableCors("CorsPolicy")]
 [ApiController]

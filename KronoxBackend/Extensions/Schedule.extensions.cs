@@ -1,6 +1,6 @@
 ﻿using KronoxAPI.Model.Scheduling;
 
-namespace TumbleBackend.Extensions
+namespace KronoxBackend.Extensions
 {
     public static class ScheduleExtensions
     {

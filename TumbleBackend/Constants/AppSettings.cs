@@ -1,4 +1,4 @@
-﻿namespace KronoxBackend.StringConstants;
+﻿namespace TumbleBackend.Constants;
 
 public static class AppSettings
 {

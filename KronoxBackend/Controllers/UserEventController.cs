@@ -1,16 +1,16 @@
 ﻿using KronoxAPI.Model.Schools;
 using Microsoft.AspNetCore.Mvc;
-using TumbleBackend.Extensions;
+using KronoxBackend.Extensions;
 using WebAPIModels.ResponseModels;
 using WebAPIModels.Extensions;
 using KronoxAPI.Model.Users;
 using KronoxAPI.Exceptions;
-using TumbleBackend.ActionFilters;
+using KronoxBackend.ActionFilters;
 using Microsoft.AspNetCore.Cors;
 using TumbleHttpClient;
-using TumbleBackend.StringConstants;
+using KronoxBackend.StringConstants;
 
-namespace TumbleBackend.Controllers;
+namespace KronoxBackend.Controllers;
 
 [EnableCors("CorsPolicy")]
 [ApiController]

@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using WebAPIModels.ResponseModels;
 
-namespace KronoxBackend.ExceptionMiddleware;
+namespace TumbleBackend.Middleware.Exceptions;
 
 public class TimeoutExceptionMiddleware
 {

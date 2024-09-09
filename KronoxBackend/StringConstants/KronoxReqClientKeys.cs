@@ -1,4 +1,4 @@
-﻿namespace TumbleBackend.StringConstants;
+﻿namespace KronoxBackend.StringConstants;
 
 public static class KronoxReqClientKeys
 {

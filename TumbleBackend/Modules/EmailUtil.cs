@@ -4,7 +4,7 @@ using Amazon;
 using Amazon.SimpleEmailV2.Model;
 using System.Net;
 
-namespace TumbleBackend.Utilities;
+namespace TumbleBackend.Modules;
 
 public class EmailUtil
 {

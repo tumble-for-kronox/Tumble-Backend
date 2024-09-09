@@ -2,7 +2,7 @@
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 
-namespace TumbleBackend.Library;
+namespace TumbleBackend.Modules;
 
 public class MobileMessagingClient
 {
