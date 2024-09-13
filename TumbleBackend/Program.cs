@@ -1,66 +1,43 @@
 using DatabaseAPI;
 using DatabaseAPI.Interfaces;
-using Grafana.OpenTelemetry;
-using Microsoft.AspNetCore.RateLimiting;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Conventions;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
-using Prometheus;
-using System.Diagnostics;
-using System.Threading.RateLimiting;
 using TumbleBackend.ActionFilters;
 using TumbleBackend.ExceptionMiddleware;
+using TumbleBackend.Middleware;
 using TumbleBackend.Library;
 using TumbleBackend.OperationFilters;
 using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
 using TumbleHttpClient;
 using WebAPIModels.ResponseModels;
+using OpenTelemetry.Trace;
+using Grafana.OpenTelemetry;
+using OpenTelemetry.Logs;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Conventions;
+using System.Diagnostics;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuration
-ConfigureConfiguration(builder);
-ConfigureTracing(builder);
+ConfigureEnvironmentAndSecrets(builder);
 ConfigureRateLimiting(builder);
 ConfigureMongoDb();
 
-// Service registration
 RegisterServices(builder.Services, builder.Configuration, builder.Environment);
 
-// Build and configure middleware
 var app = builder.Build();
 ConfigureMiddleware(app);
 
-// Initialize utilities
 EmailUtil.Init(GetAwsAccessKey(builder.Environment, builder.Configuration), GetAwsSecretKey(builder.Environment, builder.Configuration));
 
 app.Run();
 
-void ConfigureConfiguration(WebApplicationBuilder builder)
+void ConfigureEnvironmentAndSecrets(WebApplicationBuilder builder)
 {
     builder.Configuration.AddJsonFile("secrets/secrets.json", optional: true);
     builder.Configuration.AddEnvironmentVariables();
-}
-
-void ConfigureTracing(WebApplicationBuilder builder)
-{
-    builder.Services.AddOpenTelemetry()
-        .WithTracing(tracerProviderBuilder =>
-        {
-            tracerProviderBuilder
-                .AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation()
-                .UseGrafana() // Sets up Grafana's OpenTelemetry distribution
-                .AddConsoleExporter();
-        });
-
-    builder.Logging.AddOpenTelemetry(options =>
-    {
-        options.UseGrafana().AddConsoleExporter();
-    });
 }
 
 void ConfigureRateLimiting(WebApplicationBuilder builder)
@@ -98,7 +75,7 @@ void RegisterServices(IServiceCollection services, IConfiguration configuration,
 {
     string? dbConnectionString = GetDbConnectionString(environment, configuration);
     string? dbName = GetDbName(environment, configuration);
-    MongoDBSettings dbSettings = new(dbConnectionString!, dbName);
+    MongoDBSettings dbSettings = new(dbConnectionString!, dbName!);
 
     services.AddSingleton(configuration);
     services.AddSingleton(dbSettings);
@@ -109,6 +86,7 @@ void RegisterServices(IServiceCollection services, IConfiguration configuration,
     services.AddSingleton<IDbKronoxCacheService>(sp => new MongoKronoxCacheService(sp.GetService<IDbSettings>()!));
     services.AddSingleton<MobileMessagingClient>();
     services.AddTransient<JwtUtil>();
+    services.AddTransient<TestUserUtil>();
 
     services.AddScoped<AuthActionFilter>();
     services.AddScoped<KronoxUrlFilter>();
@@ -121,10 +99,6 @@ void RegisterServices(IServiceCollection services, IConfiguration configuration,
         config.OperationFilter<AuthHeaderFilter>();
     });
 
-    services.AddHttpClient("KronoxClient", client =>
-    {
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36");
-    });
 
     services.AddCors(options =>
     {
@@ -155,8 +129,9 @@ void ConfigureMiddleware(WebApplication app)
 
     app.UseMiddleware<GeneralExceptionMiddleware>();
     app.UseMiddleware<TimeoutExceptionMiddleware>();
+    app.UseMiddleware<TestUserMiddleware>();
 
-    app.UseMetricServer("/metrics");
+    app.UseMetricServer();
     app.UseHttpMetrics();
 
     app.UseEndpoints(endpoints =>

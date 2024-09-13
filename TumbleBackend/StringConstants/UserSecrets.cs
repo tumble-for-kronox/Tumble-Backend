@@ -9,4 +9,6 @@ public static class UserSecrets
     public static string AwsAccessKey => "Aws:AccessKey";
     public static string AwsSecretKey => "Aws:SecretKey";
     public static string AdminPass => "Admin:Pass";
+    public static string TestUserPass => "TestUser:Pass";
+    public static string TestUserEmail => "TestUser:Email";
 }

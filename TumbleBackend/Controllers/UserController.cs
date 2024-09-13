@@ -3,11 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using TumbleBackend.Extensions;
 using WebAPIModels.ResponseModels;
 using WebAPIModels.RequestModels;
-using KronoxAPI.Model.Users;
 using KronoxAPI.Exceptions;
 using TumbleBackend.Utilities;
 using WebAPIModels.Extensions;
-using TumbleBackend.InternalModels;
 using TumbleBackend.StringConstants;
 using TumbleBackend.ActionFilters;
 using Microsoft.AspNetCore.Cors;
@@ -29,6 +27,19 @@ public class UserController : ControllerBase
         _logger = logger;
     }
 
+    /// <summary>
+    /// Retrieves a KronoxUser object for the user with the provided refreshToken. If the user is a test user, a test user object is returned with mock data upon further requests.
+    /// </summary>
+    /// <param name="jwtUtil"></param>
+    /// <param name="schoolId"></param>
+    /// <param name="refreshToken"></param>
+    /// <returns></returns> <summary>
+    /// 
+    /// </summary>
+    /// <param name="jwtUtil"></param>
+    /// <param name="schoolId"></param>
+    /// <param name="refreshToken"></param>
+    /// <returns></returns>
     [HttpGet]
     public async Task<IActionResult> GetKronoxUserAsync([FromServices] JwtUtil jwtUtil, [FromQuery] SchoolEnum schoolId, [FromHeader(Name = "X-auth-token")] string refreshToken)
     {
@@ -63,11 +74,18 @@ public class UserController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Logs in a user with the provided username and password. If the user is a test user, a test user object is returned with mock data upon further requests.
+    /// </summary>
+    /// <param name="jwtUtil"></param>
+    /// <param name="testUserUtil"></param>
+    /// <param name="schoolId"></param>
+    /// <param name="body"></param>
+    /// <returns></returns>
     [HttpPost("login")]
     public async Task<IActionResult> LoginKronoxUserAsync([FromServices] JwtUtil jwtUtil, [FromQuery] SchoolEnum schoolId, [FromBody] LoginRequest body)
     {
         var kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
-        var school = schoolId.GetSchool()!;
 
         try
         {
@@ -77,11 +95,11 @@ public class UserController : ControllerBase
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an unknown error while fetching user data from Kronox."));
 
             var newRefreshToken = jwtUtil.GenerateRefreshToken(body.Username, body.Password);
-
             SessionDetails sessionDetails = new(kronoxUser.SessionToken, kronoxReqClient.BaseUrl!.ToString());
 
             Response.Headers.Add("X-auth-token", newRefreshToken);
             Response.Headers.Add("X-session-token", sessionDetails.ToJson());
+
             return Ok(kronoxUser.ToWebModel(newRefreshToken, "", sessionDetails));
         }
         catch (LoginException e)

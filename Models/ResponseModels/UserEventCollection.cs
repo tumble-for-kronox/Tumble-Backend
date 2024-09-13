@@ -1,31 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 using KronoxAPI.Model.Users;
 
-namespace WebAPIModels.ResponseModels;
-
-public class UserEventCollection
+namespace WebAPIModels.ResponseModels
 {
-    private readonly List<UpcomingUserEvent> _upcomingEvents;
-    private readonly List<AvailableUserEvent> _registeredEvents;
-    private readonly List<AvailableUserEvent> _unregisteredEvents;
-
-    public List<UpcomingUserEvent> UpcomingEvents => _upcomingEvents;
-
-    public List<AvailableUserEvent> RegisteredEvents => _registeredEvents;
-
-    public List<AvailableUserEvent> UnregisteredEvents => _unregisteredEvents;
-
-    public UserEventCollection(List<UpcomingUserEvent> upcomingUserEvents, List<AvailableUserEvent> registeredUserEvents, List<AvailableUserEvent> unregisteredUserEvents)
+    public class UserEventCollection
     {
-        _upcomingEvents = upcomingUserEvents;
-        _registeredEvents = registeredUserEvents;
-        _unregisteredEvents = unregisteredUserEvents;
-    }
+        // Use public properties for JSON deserialization
+        public List<UpcomingUserEvent> UpcomingEvents { get; set; }
 
-    public string ToJson() => JsonSerializer.Serialize(this, new JsonSerializerOptions() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        public List<AvailableUserEvent> RegisteredEvents { get; set; }
+
+        public List<AvailableUserEvent> UnregisteredEvents { get; set; }
+
+        // Parameterless constructor is required for deserialization
+        public UserEventCollection() { }
+
+        public UserEventCollection(List<UpcomingUserEvent> upcomingUserEvents, List<AvailableUserEvent> registeredUserEvents, List<AvailableUserEvent> unregisteredUserEvents)
+        {
+            UpcomingEvents = upcomingUserEvents;
+            RegisteredEvents = registeredUserEvents;
+            UnregisteredEvents = unregisteredUserEvents;
+        }
+
+        public string ToJson() => JsonSerializer.Serialize(this, new JsonSerializerOptions() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+    }
 }

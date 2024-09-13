@@ -26,49 +26,50 @@ public class UserEventController : ControllerBase
         _logger = logger;
     }
 
+    private IKronoxRequestClient GetAuthenticatedClient()
+    {
+        if (HttpContext.Items[KronoxReqClientKeys.SingleClient] is not IKronoxRequestClient client || !client.IsAuthenticated)
+        {
+            throw new UnauthorizedAccessException("Requires provided auth token");
+        }
+        return client;
+    }
+
+
+    private IActionResult HandleError(Exception ex, string message, int statusCode = StatusCodes.Status500InternalServerError)
+    {
+        _logger.LogError(ex.ToString());
+        return StatusCode(statusCode, new Error(message));
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAllUserEvents([FromQuery] SchoolEnum schoolId)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
-        School school = schoolId.GetSchool()!;
-
-        if (!kronoxReqClient.IsAuthenticated)
-            return BadRequest(new Error("Requires provided auth token"));
-
         try
         {
-            Dictionary<string, List<UserEvent>>? userEvents = await School.GetUserEventsAsync(kronoxReqClient);
-            UserEventCollection? webSafeUserEvents = userEvents?.ToWebModel();
+            var kronoxReqClient = GetAuthenticatedClient();
+            var userEvents = await School.GetUserEventsAsync(kronoxReqClient);
+            var webSafeUserEvents = userEvents?.ToWebModel();
+
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
 
             return Ok(webSafeUserEvents);
         }
-        catch (ParseException e)
+        catch (Exception ex) when (ex is ParseException or LoginException or HttpRequestException)
         {
-            _logger.LogError(e.ToString());
-            return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
-        }
-        catch (LoginException e)
-        {
-            _logger.LogError(e.ToString());
-            return Unauthorized(new Error("There was an issue with your login information, please log back in or try again later."));
+            return HandleError(ex, "We're having trouble getting your data from Kronox, please try again later.");
         }
     }
 
     [HttpPut("register/all")]
     public async Task<IActionResult> RegisterAllAvailableResults([FromQuery] SchoolEnum schoolId)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
-        School school = schoolId.GetSchool()!;
-
-        if (!kronoxReqClient.IsAuthenticated)
-            return BadRequest(new Error("Requires provided auth token"));
-
         try
         {
-            Dictionary<string, List<UserEvent>>? userEvents = await School.GetUserEventsAsync(kronoxReqClient);
-            UserEventCollection? webSafeUserEvents = userEvents?.ToWebModel();
+            var kronoxReqClient = GetAuthenticatedClient();
+            var userEvents = await School.GetUserEventsAsync(kronoxReqClient);
+            var webSafeUserEvents = userEvents?.ToWebModel();
 
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
@@ -76,125 +77,85 @@ public class UserEventController : ControllerBase
             if (!webSafeUserEvents.UnregisteredEvents.Any())
                 return NotFound(new Error("No unregistered events."));
 
-            List<AvailableUserEvent> failedRegistrations = new();
-            List<AvailableUserEvent> successfulRegistrations = new();
-            foreach (AvailableUserEvent availableUserEvent in webSafeUserEvents.UnregisteredEvents)
-            {
-                if (!await availableUserEvent.Register(kronoxReqClient))
-                    failedRegistrations.Add(availableUserEvent);
-                else
-                    successfulRegistrations.Add(availableUserEvent);
-            }
+            var (successfulRegistrations, failedRegistrations) = await RegisterEventsAsync(kronoxReqClient, webSafeUserEvents.UnregisteredEvents);
 
             return Ok(new MultiRegistrationResult(successfulRegistrations, failedRegistrations));
         }
-        catch (ParseException e)
+        catch (Exception ex) when (ex is ParseException or LoginException or HttpRequestException)
         {
-            _logger.LogError(e.ToString());
-            return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
-        }
-        catch (LoginException e)
-        {
-            _logger.LogError(e.ToString());
-            return Unauthorized(new Error("There was an issue with your login information, please log back in or try again later."));
-        }
-        catch (HttpRequestException e)
-        {
-            _logger.LogError(e.ToString());
-            return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
+            return HandleError(ex, "We're having trouble getting your data from Kronox, please try again later.");
         }
     }
 
     [HttpPut("register/{eventId}")]
     public async Task<IActionResult> RegisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
-        School school = schoolId.GetSchool()!;
-
-        if (!kronoxReqClient.IsAuthenticated)
-            return BadRequest(new Error("Requires provided auth token"));
-
         try
         {
-            Dictionary<string, List<UserEvent>>? userEvents = await School.GetUserEventsAsync(kronoxReqClient);
-            UserEventCollection? webSafeUserEvents = userEvents?.ToWebModel();
+            var kronoxReqClient = GetAuthenticatedClient();
+            var userEvents = await School.GetUserEventsAsync(kronoxReqClient);
+            var webSafeUserEvents = userEvents?.ToWebModel();
+
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
 
-            foreach (AvailableUserEvent userEvent in webSafeUserEvents.UnregisteredEvents)
-            {
-                if (userEvent.Id == eventId)
-                {
-                    if (await userEvent.Register(kronoxReqClient))
-                        return Ok();
+            var eventToRegister = webSafeUserEvents.UnregisteredEvents.FirstOrDefault(e => e.Id == eventId);
 
-                    return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an error signing up to the event, please try again later."));
-                }
-            }
+            if (eventToRegister == null)
+                return NotFound(new Error("The event specified couldn't be found in Kronox's system, please log out and back in or try again later."));
 
-            return NotFound(new Error("The event specified couldn't be found in Kronox's system, please log out and back in or try again later."));
+            if (await eventToRegister.Register(kronoxReqClient))
+                return Ok();
+
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an error signing up to the event, please try again later."));
         }
-        catch (ParseException e)
+        catch (Exception ex) when (ex is ParseException or LoginException or HttpRequestException)
         {
-            _logger.LogError(e.ToString());
-            return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
-        }
-        catch (LoginException e)
-        {
-            _logger.LogError(e.ToString());
-            return Unauthorized(new Error("There was an issue with your login information, please log back in or try again later."));
-        }
-        catch (HttpRequestException e)
-        {
-            _logger.LogError(e.ToString());
-            return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
+            return HandleError(ex, "We're having trouble getting your data from Kronox, please try again later.");
         }
     }
 
     [HttpPut("unregister/{eventId}")]
     public async Task<IActionResult> UnregisterUserEvent([FromRoute] string eventId, [FromQuery] SchoolEnum schoolId)
     {
-        IKronoxRequestClient kronoxReqClient = (IKronoxRequestClient)HttpContext.Items[KronoxReqClientKeys.SingleClient]!;
-        School school = schoolId.GetSchool()!;
-
-        if (!kronoxReqClient.IsAuthenticated)
-            return BadRequest(new Error("Requires provided auth token"));
-
         try
         {
-            Dictionary<string, List<UserEvent>>? userEvents = await School.GetUserEventsAsync(kronoxReqClient);
-            UserEventCollection? webSafeUserEvents = userEvents?.ToWebModel();
+            var kronoxReqClient = GetAuthenticatedClient();
+            var userEvents = await School.GetUserEventsAsync(kronoxReqClient);
+            var webSafeUserEvents = userEvents?.ToWebModel();
+
             if (webSafeUserEvents == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
 
-            foreach (AvailableUserEvent userEvent in webSafeUserEvents.RegisteredEvents)
-            {
-                if (userEvent.Id == eventId)
-                {
-                    if (await userEvent.Unregister(kronoxReqClient))
-                        return Ok();
+            var eventToUnregister = webSafeUserEvents.RegisteredEvents.FirstOrDefault(e => e.Id == eventId);
 
-                    return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an error signing up to the event, please try again later."));
-                }
-            }
+            if (eventToUnregister == null)
+                return NotFound(new Error("The event specified couldn't be found in Kronox's system, please log out and back in or try again later."));
 
-            return NotFound(new Error("The event specified couldn't be found in Kronox's system, please log out and back in or try again later."));
+            if (await eventToUnregister.Unregister(kronoxReqClient))
+                return Ok();
+
+            return StatusCode(StatusCodes.Status500InternalServerError, new Error("There was an error signing up to the event, please try again later."));
         }
-        catch (ParseException e)
+        catch (Exception ex) when (ex is ParseException or LoginException or HttpRequestException)
         {
-            _logger.LogError(e.ToString());
-            return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
-        }
-        catch (LoginException e)
-        {
-            _logger.LogError(e.ToString());
-            return Unauthorized(new Error("There was an issue with your login information, please log back in or try again later."));
-        }
-        catch (HttpRequestException e)
-        {
-            _logger.LogError(e.ToString());
-            return StatusCode(StatusCodes.Status500InternalServerError, new Error("We're having trouble getting your data from Kronox, please try again later."));
+            return HandleError(ex, "We're having trouble getting your data from Kronox, please try again later.");
         }
     }
 
+    private async Task<(List<AvailableUserEvent> successful, List<AvailableUserEvent> failed)> RegisterEventsAsync(IKronoxRequestClient client, IEnumerable<AvailableUserEvent> events)
+    {
+        var successful = new List<AvailableUserEvent>();
+        var failed = new List<AvailableUserEvent>();
+
+        foreach (var userEvent in events)
+        {
+            if (await userEvent.Register(client))
+                successful.Add(userEvent);
+            else
+                failed.Add(userEvent);
+        }
+
+        return (successful, failed);
+    }
 }

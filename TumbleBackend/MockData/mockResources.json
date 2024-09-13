@@ -1,0 +1,18 @@
+[
+  {
+    "Id": "FLIK_0005",
+    "Name": "Grouproom building15",
+    "TimeSlots": null,
+    "Date": null,
+    "LocationIds": null,
+    "Availabilities": null
+  },
+  {
+    "Id": "FLIK_0010",
+    "Name": "Grouproom in the library.",
+    "TimeSlots": null,
+    "Date": null,
+    "LocationIds": null,
+    "Availabilities": null
+  }
+]

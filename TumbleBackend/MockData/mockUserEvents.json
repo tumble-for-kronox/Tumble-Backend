@@ -1,0 +1,30 @@
+{
+  "UpcomingEvents": [
+    {
+      "Title": "English Exam",
+      "Type": "Written exam",
+      "EventStart": "2024-12-01T09:00:00",
+      "EventEnd": "2024-12-01T12:00:00",
+      "Location": "Room 101",
+      "FirstSignupDate": "2024-11-01T00:00:00"
+    }
+  ],
+  "RegisteredEvents": [],
+  "UnregisteredEvents": [
+    {
+      "Id": "1",
+      "ParticipatorId": "1",
+      "SupportId": null,
+      "AnonymousCode": "",
+      "IsRegistered": false,
+      "ShowConfirmButton": false,
+      "RequiresChoosingLocation": false,
+      "Title": "Math Exam",
+      "Type": "Written exam",
+      "EventStart": "2024-12-02T10:00:00",
+      "EventEnd": "2024-12-02T14:00:00",
+      "Location": "Room 131",
+      "LastSignupDate": "2024-11-29T00:00:00"
+    }
+  ]
+}

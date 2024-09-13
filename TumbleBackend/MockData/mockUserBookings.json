@@ -1,0 +1,17 @@
+[
+  {
+    "Id": "BokningsId_20240907_000000015",
+    "ResourceId": "FLIK_0005",
+    "TimeSlot": {
+      "Id": null,
+      "From": "2024-09-09T08:00:00",
+      "To": "2024-09-09T09:00:00",
+      "Duration": "01:00:00"
+    },
+    "LocationId": "15-416",
+    "ShowConfirmButton": false,
+    "ShowUnbookButton": true,
+    "ConfirmationOpen": "2024-09-09T07:30:00",
+    "ConfirmationClosed": "2024-09-09T08:15:00"
+  }
+]
