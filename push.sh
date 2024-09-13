@@ -1,34 +1,55 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Ensure one argument is provided
-if [ "$#" -ne 1 ]; then
+set -euo pipefail
+
+usage() {
   echo "Usage: $0 <dotnet-version>"
+  echo "Example: $0 6.0"
   exit 1
-fi
+}
 
-# Assign argument to variable
-DOTNET_VERSION=$1
+get_arch() {
+  local arch
+  arch=$(uname -m)
+  case "$arch" in
+  x86_64) echo "amd64" ;;
+  aarch64) echo "arm64" ;;
+  arm64) echo "arm64" ;;
+  *) echo "unsupported" ;;
+  esac
+}
 
-# Determine the architecture of the current machine
-ARCH=$(uname -m)
+build_docker_image() {
+  local dotnet_version=$1
+  local architecture=$2
+  local image_name="ghcr.io/tumble-for-kronox/tumble-backend-dotnet-${dotnet_version}-${architecture}_notrace:1.0.0"
 
-# Translate the architecture to the desired format
-case "$ARCH" in
-  x86_64)
-    LOCAL_PC_ARCHITECTURE="amd64"
-    ;;
-  aarch64)
-    LOCAL_PC_ARCHITECTURE="arm64"
-    ;;
-  *)
-    echo "Unsupported architecture: $ARCH"
+  echo "Building Docker image: $image_name"
+  if docker buildx build -t "$image_name" . --push; then
+    echo "Successfully built and pushed: $image_name"
+  else
+    echo "Failed to build or push: $image_name" >&2
     exit 1
-    ;;
-esac
+  fi
+}
 
-# Construct the Docker buildx build command
-DOCKER_COMMAND="docker buildx build -t ghcr.io/tumble-for-kronox/tumble-backend-dotnet-${DOTNET_VERSION}-${LOCAL_PC_ARCHITECTURE}_notrace:1.0.0 . --push"
+main() {
+  [[ $# -eq 1 ]] || usage
 
-# Run the Docker buildx build command
-echo "Running: $DOCKER_COMMAND"
-$DOCKER_COMMAND
+  [[ $1 =~ ^[0-9]+(\.[0-9]+)*$ ]] || {
+    echo "Invalid dotnet version format. Example: 6.0" >&2
+    exit 1
+  }
+
+  DOTNET_VERSION=$1
+  ARCH=$(get_arch)
+
+  if [[ $ARCH == "unsupported" ]]; then
+    echo "Unsupported architecture: $(uname -m)" >&2
+    exit 1
+  fi
+
+  build_docker_image "$DOTNET_VERSION" "$ARCH"
+}
+
+main "$@"

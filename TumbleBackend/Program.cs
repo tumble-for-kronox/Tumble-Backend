@@ -22,7 +22,6 @@ using Prometheus;
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigureEnvironmentAndSecrets(builder);
-ConfigureTracing(builder);
 ConfigureRateLimiting(builder);
 ConfigureMongoDb();
 
@@ -39,24 +38,6 @@ void ConfigureEnvironmentAndSecrets(WebApplicationBuilder builder)
 {
     builder.Configuration.AddJsonFile("secrets/secrets.json", optional: true);
     builder.Configuration.AddEnvironmentVariables();
-}
-
-void ConfigureTracing(WebApplicationBuilder builder)
-{
-    builder.Services.AddOpenTelemetry()
-        .WithTracing(tracerProviderBuilder =>
-        {
-            tracerProviderBuilder
-                .AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation()
-                .UseGrafana()
-                .AddConsoleExporter();
-        });
-
-    builder.Logging.AddOpenTelemetry(options =>
-    {
-        options.UseGrafana().AddConsoleExporter();
-    });
 }
 
 void ConfigureRateLimiting(WebApplicationBuilder builder)
