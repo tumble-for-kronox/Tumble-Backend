@@ -22,10 +22,11 @@ get_arch() {
 build_docker_image() {
   local dotnet_version=$1
   local architecture=$2
-  local image_name="ghcr.io/tumble-for-kronox/tumble-backend-dotnet-${dotnet_version}-${architecture}_notrace:1.0.0"
+  local app_version=$3
+  local image_name="ghcr.io/tumble-for-kronox/tumble-backend-dotnet-${dotnet_version}-${architecture}:${app_version}"
 
   echo "Building Docker image: $image_name"
-  if docker buildx build -t "$image_name" . --push; then
+  if docker buildx build --platform=linux/amd64 -t "$image_name" . --push; then
     echo "Successfully built and pushed: $image_name"
   else
     echo "Failed to build or push: $image_name" >&2
@@ -34,22 +35,20 @@ build_docker_image() {
 }
 
 main() {
-  [[ $# -eq 1 ]] || usage
-
-  [[ $1 =~ ^[0-9]+(\.[0-9]+)*$ ]] || {
-    echo "Invalid dotnet version format. Example: 6.0" >&2
-    exit 1
-  }
-
   DOTNET_VERSION=$1
-  ARCH=$(get_arch)
+  APP_VERSION=$2
+  if [[ -z "${3:-}" ]]; then
+    ARCH=$(get_arch)
+  else
+    ARCH=$3
+  fi
 
   if [[ $ARCH == "unsupported" ]]; then
     echo "Unsupported architecture: $(uname -m)" >&2
     exit 1
   fi
 
-  build_docker_image "$DOTNET_VERSION" "$ARCH"
+  build_docker_image "$DOTNET_VERSION" "$ARCH" "$APP_VERSION"
 }
 
 main "$@"

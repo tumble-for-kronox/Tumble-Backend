@@ -9,20 +9,21 @@ using TumbleBackend.StringConstants;
 using TumbleBackend.Utilities;
 using TumbleHttpClient;
 using WebAPIModels.ResponseModels;
-using OpenTelemetry.Trace;
-using Grafana.OpenTelemetry;
-using OpenTelemetry.Logs;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using System.Diagnostics;
 using Prometheus;
+using Serilog;
+using Serilog.Formatting.Compact;
+using Serilog.Sinks.Grafana.Loki;
 
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigureEnvironmentAndSecrets(builder);
 ConfigureRateLimiting(builder);
+ConfigureLogging(builder);
 ConfigureMongoDb();
 
 RegisterServices(builder.Services, builder.Configuration, builder.Environment);
@@ -31,8 +32,30 @@ var app = builder.Build();
 ConfigureMiddleware(app);
 
 EmailUtil.Init(GetAwsAccessKey(builder.Environment, builder.Configuration), GetAwsSecretKey(builder.Environment, builder.Configuration));
+app.UseSerilogRequestLogging();
 
 app.Run();
+
+void ConfigureLogging(WebApplicationBuilder builder)
+{
+    Log.Logger = new LoggerConfiguration()
+        .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .CreateLogger();
+
+    builder.Services.AddSerilog(options =>
+    {
+        options.Enrich.WithProperty("Application", "ProductAPI")
+        .Enrich.WithProperty("Environment", GetEnvironment(builder.Environment))
+        .WriteTo.Console(new RenderedCompactJsonFormatter());
+    });
+}
+
+string GetEnvironment(IWebHostEnvironment environment)
+{
+    return environment.IsDevelopment() ? "Development" : "Production";
+}
 
 void ConfigureEnvironmentAndSecrets(WebApplicationBuilder builder)
 {
