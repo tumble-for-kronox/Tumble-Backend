@@ -264,12 +264,18 @@ public static class ScheduleParser
     /// <returns>The <see cref="string"/> of the event's related course id.</returns>
     private static string GetEventCourseId(XContainer eventElement)
     {
-        return eventElement.Element("resursTrad")!
-             .Elements("resursNod")
-             .Where(el => el.Attribute("resursTypId") != null && el.Attribute("resursTypId")!.Value == "UTB_KURSINSTANS_GRUPPER")
-             .FirstOrDefault(new XElement("fail"))
-             .Element("resursId")!
-             .Value;
+        var courseElements = eventElement.Element("resursTrad")!
+         .Elements("resursNod")
+         .Where(el => el.Attribute("resursTypId") != null && el.Attribute("resursTypId")!.Value == "UTB_KURSINSTANS_GRUPPER");
+
+        if (!courseElements.Any())
+        {
+            return "N/A";
+        }
+
+        return courseElements
+         .Select(static el => el.Element("resursId")!.Value)
+         .First();
     }
 
     /// <summary>

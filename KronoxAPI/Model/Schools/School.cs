@@ -101,6 +101,11 @@ public class School
             Console.WriteLine(e.Message);
             throw new ParseException("The requested schedule could not be found or was corrupted.", e);
         }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            throw new ParseException("An unknown error occurred while parsing schedule: " + scheduleIds.ToString(), e);
+        }
     }
 
     /// <summary>

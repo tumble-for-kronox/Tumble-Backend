@@ -31,7 +31,7 @@ public static class KronoxFetchController
             ["startDatum"] = parsedDate,
             ["intervallTyp"] = "m",
             ["intervallAntal"] = "6",
-            ["sprak"] = parsedLang.ToString() ?? "SV",
+            ["sprak"] = parsedLang.Value ?? "SV",
             ["sokMedAND"] = "false",
             ["forklaringar"] = "true",
             ["resurser"] = string.Join(',', scheduleId)
@@ -51,7 +51,7 @@ public static class KronoxFetchController
     /// <returns></returns>
     public static async Task<string> GetProgrammesAsync(IKronoxRequestClient client, string searchQuery)
     {
-         const string endpoint = "ajax/ajax_sokResurser.jsp";
+        const string endpoint = "ajax/ajax_sokResurser.jsp";
 
         var parameters = new Dictionary<string, string>
         {
@@ -76,7 +76,7 @@ public static class KronoxFetchController
     {
         await KronoxSessionController.SetSessionEnglishAsync(client);
         const string endpoint = "aktivitetsanmalan.jsp";
-        
+
         var parameters = new Dictionary<string, string>();
 
         var response = await HttpUtilities.SendRequestAsync(client, HttpMethod.Get, endpoint, parameters);
