@@ -17,7 +17,6 @@ using System.Diagnostics;
 using Prometheus;
 using Serilog;
 using Serilog.Formatting.Compact;
-using Serilog.Sinks.Grafana.Loki;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -128,8 +127,6 @@ void RegisterServices(IServiceCollection services, IConfiguration configuration,
         options.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
     });
 
-    services.AddSpaStaticFiles(config => { config.RootPath = "wwwroot"; });
-
     var dbglistener = new TextWriterTraceListener(Console.Out);
     Trace.Listeners.Add(dbglistener);
 }
@@ -148,7 +145,6 @@ void ConfigureMiddleware(WebApplication app)
 
     app.UseAuthorization();
     app.UseDefaultFiles();
-    app.UseSpaStaticFiles();
 
     app.UseMiddleware<GeneralExceptionMiddleware>();
     app.UseMiddleware<TimeoutExceptionMiddleware>();
